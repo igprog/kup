@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>KUP JANAF</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>-->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
+    <link rel="stylesheet" href="assets/css/style.css">
+
+</head>
+<body ng-app="app" ng-controller="appCtrl">
+    <!-- Bootstrap NavBar -->
+    <nav class="navbar navbar-expand-md navbar-dark bg-primary">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="#">
+            <!--<img src="https://v4-alpha.getbootstrap.com/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="">-->
+            <span class="menu-collapsed">KUP JANAF</span>
+        </a>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav ml-auto">
+                <!--<li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>-->
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Info</a>
+                </li>
+                <li ng-if="d.isLogin" class="nav-item">
+                    <a class="nav-link" href="" ng-click="logout()">Odjava</a>
+                </li>
+
+                <!-- This menu is hidden in bigger devices with d-sm-none.
+                     The sidebar isn't proper for smaller screens imo, so this dropdown menu can keep all the useful sidebar itens exclusively for smaller screens  -->
+                <li ng-if="d.isLogin" class="nav-item dropdown d-sm-block d-md-none">
+                    <a class="nav-link dropdown-toggle" href="#" id="smallerscreenmenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Menu
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="smallerscreenmenu">
+                        <a class="dropdown-item" href="#">Dashboard</a>
+                        <a class="dropdown-item" href="#">Korisnici</a>
+                        <a class="dropdown-item" href="#">Pozajmice</a>
+                        <a class="dropdown-item" href="#">Rekapitulacija</a>
+                    </div>
+                </li><!-- Smaller devices menu END -->
+
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- NavBar END -->
+    <!-- Bootstrap row -->
+    <div ng-if="!d.isLogin">
+        <ng-include src="'assets/partials/login.html'"></ng-include>
+    </div>
+
+    <div ng-if="d.isLogin" class="row" id="body-row">
+            <ng-include src="'assets/partials/sidebar.html'"></ng-include>
+            <div class="col">
+                <div style="min-height:50px">
+                    <h1 ng-if="d.currTplTitle=='Dashboard'">
+                        Kasa uzajamne pomoći
+                        <small class="text-muted">Verzija {{config.version}}</small>
+                    </h1>
+                </div>
+                <div class="card">
+                    <h4 class="card-header">{{d.currTplTitle}}</h4>
+                    <div class="card-body">
+                        <ng-include src="d.currTpl"></ng-include>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+    <script src="../assets/js/app.js"></script>
+
+</body>
+</html>

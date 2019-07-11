@@ -1,0 +1,28 @@
+﻿<div style="padding-top:200px">
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="card">
+                <h3>Prijava</h3>
+                <div class="card-body">
+                    <form id="loginform">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                            <input ng-model="d.admin.userName" type="text" class="form-control" name="email" placeholder="email">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-unlock-alt"></i></span>
+                            <input ng-model="d.admin.password" type="password" class="form-control" name="password" placeholder="lozinka">
+                        </div>
+                    </form>
+                    <div class="text-right">
+                        <button type="submit" form="loginform" ng-click="login(d.admin)" class="btn btn-light"><span class="fa fa-unlock-altfa fa-key" aria-hidden="true"></span> <span class="text-capitalize">Prijava</span></button>
+                    </div>
+                    <!--<div ng-if="errorLogin" class="alert alert-danger">
+                        <strong class="text-uppercase"></strong> {{errorMesage}}.
+                    </div>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

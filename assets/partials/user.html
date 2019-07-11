@@ -1,0 +1,21 @@
+﻿<div ng-controller="userCtrl">
+    <form>
+        <div class="form-group">
+            <label for="firstName">Matični broj.:</label>
+            <input ng-model="d.user.id" type="text" class="form-control" placeholder="Upiši Ime" name="firstName">
+        </div>
+        <div class="form-group">
+            <label for="firstName">Ime:</label>
+            <input ng-model="d.user.firstName" type="text" class="form-control" placeholder="Upiši Ime" name="firstName">
+        </div>
+        <div class="form-group">
+            <label for="lastName">Prezime:</label>
+            <input ng-model="d.user.lastName" type="text" class="form-control" placeholder="Upiši Prezime" name="lastName">
+        </div>
+        <div class="form-group">
+            <label for="pin">OIB:</label>
+            <input ng-model="d.user.pin" type="text" class="form-control" placeholder="Upiši OIB" name="pin">
+        </div>
+        <button type="submit" class="btn btn-primary" ng-click="save(d.user)">Spremi</button>
+    </form>
+</div>
