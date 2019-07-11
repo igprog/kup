@@ -10,51 +10,36 @@ using Newtonsoft.Json;
 using Igprog;
 
 /// <summary>
-/// Users
+/// BuisinessUnit
 /// </summary>
 [WebService(Namespace = "http://janaf.hr/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
-public class Users : System.Web.Services.WebService {
+public class BuisinessUnit : System.Web.Services.WebService {
     string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
-    public Users() {
+    public BuisinessUnit() { 
     }
 
-    public class NewUser {
+    public class NewUnit {
         public string id;
-        public string buissinesUnitId;
-        public string firstName;
-        public string lastName;
-        public string pin;
-        public string birthDate;
-        public string accessDate;
-        public string terminationDate;
-        public int isActive;
+        public string title;
     }
 
     [WebMethod]
     public string Init() {
-        NewUser x = new NewUser();
+        NewUnit x = new NewUnit();
         x.id = null;
-        x.buissinesUnitId = null;
-        x.firstName = null;
-        x.lastName = null;
-        x.pin = null;
-        x.birthDate = null;
-        x.accessDate = DateTime.Now.ToShortDateString();
-        x.terminationDate = null;
-        x.isActive = 1;
+        x.title = null;
         return JsonConvert.SerializeObject(x, Formatting.Indented);
     }
 
     [WebMethod]
-    public string Save(NewUser x) {
+    public string Save(NewUnit x) {
         try {
-            db.Users();
-            string sql = string.Format(@"INSERT INTO Users VALUES  
-                       ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')"
-                        , x.id, x.buissinesUnitId, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive);
+            db.BuisinessUnit();
+            //TODO insert or update
+            string sql = string.Format(@"INSERT INTO BuisinessUnit VALUES ('{0}', '{1}')", x.id, x.title);
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -71,14 +56,14 @@ public class Users : System.Web.Services.WebService {
     [WebMethod]
     public string Load() {
         try {
-            string sql = "SELECT * FROM Users";
-            List<NewUser> xx = new List<NewUser>();
+            string sql = "SELECT * FROM BuisinessUnit";
+            List<NewUnit> xx = new List<NewUnit>();
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     using (SqlDataReader reader = command.ExecuteReader()) {
                         while (reader.Read()) {
-                            NewUser x = ReadData(reader);
+                            NewUnit x = ReadData(reader);
                             xx.Add(x);
                         }
                     }
@@ -91,20 +76,11 @@ public class Users : System.Web.Services.WebService {
         }
     }
 
-    NewUser ReadData(SqlDataReader reader) {
-        NewUser x = new NewUser();
+    NewUnit ReadData(SqlDataReader reader) {
+        NewUnit x = new NewUnit();
         x.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
-        x.buissinesUnitId = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
-        x.firstName = reader.GetValue(2) == DBNull.Value ? null : reader.GetString(2);
-        x.lastName = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
-        x.pin = reader.GetValue(4) == DBNull.Value ? null : reader.GetString(4);
-        x.birthDate = reader.GetValue(5) == DBNull.Value ? null : reader.GetString(5);
-        x.accessDate = reader.GetValue(6) == DBNull.Value ? null : reader.GetString(6);
-        x.terminationDate = reader.GetValue(7) == DBNull.Value ? null : reader.GetString(7);
-        x.isActive = reader.GetValue(8) == DBNull.Value ? 1 : reader.GetInt32(8);
+        x.title = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
         return x;
     }
-
-
 
 }

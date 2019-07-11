@@ -19,7 +19,7 @@ namespace Igprog {
         #region CreateTable
         public void Users() {
             string sql = string.Format(@"{0})
-                        CREATE TABLE users
+                        CREATE TABLE Users
                         (id NVARCHAR (50) PRIMARY KEY,
                         buissinesUnitId NVARCHAR (50),
                         firstName NVARCHAR (50),
@@ -28,7 +28,15 @@ namespace Igprog {
                         birthDate NVARCHAR (50),
                         accessDate NVARCHAR (50),
                         terminationDate NVARCHAR (50),
-                        isActive INTEGER)", CheckTbl("users"));
+                        isActive INTEGER)", CheckTbl("Users"));
+            CreateTable(sql);
+        }
+
+        public void BuisinessUnit() {
+            string sql = string.Format(@"{0})
+                        CREATE TABLE BuisinessUnit
+                        (id NVARCHAR (50) PRIMARY KEY,
+                        title NVARCHAR (50))", CheckTbl("BuisinessUnit"));
             CreateTable(sql);
         }
 

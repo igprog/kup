@@ -33,15 +33,6 @@
             </a>
         </li>
         <!-- Submenu content -->
-        <!--<li id='submenu1' class="collapse sidebar-submenu">
-            <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
-                <span class="menu-collapsed">Novi Korisnik</span>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
-                <span class="menu-collapsed">Lista Korisnika</span>
-            </a>
-        </li>-->
-        <!-- Submenu content -->
         <!--<li id='submenu2' class="collapse sidebar-submenu">
             <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
                 <span class="menu-collapsed">Settings</span>
@@ -89,6 +80,24 @@
                 <span class="menu-collapsed">Godišni Izvještaji</span>
             </a>
         </li>
+
+        <li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
+        </li>
+        <!-- Menu with submenu -->
+        <li href="#submenu1" data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
+            <a class="d-flex w-100 justify-content-start align-items-center">
+                <span class="fa fa-dashboard fa-fw mr-3"></span>
+                <span class="menu-collapsed">Postavke</span>
+            </a>
+        </li>
+        <!-- Submenu content -->
+        <li id='submenu1' class="collapse sidebar-submenu">
+            <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('buisinessunit', 'Poslovne jedinice')">
+                <span class="menu-collapsed">Poslovne jedinice</span>
+            </a>
+        </li>
+
+
         <!--<li href="#" class="bg-dark list-group-item list-group-item-action">
             <a class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-envelope-o fa-fw mr-3"></span>

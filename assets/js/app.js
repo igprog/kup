@@ -138,6 +138,39 @@
 
 }])
 
+.controller('buisinessUnitCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
+
+    var data = {
+        unit: {},
+        units: []
+    }
+    $scope.d = data;
+
+
+    var init = () => {
+        f.post('BuisinessUnit', 'Init', {}).then((d) => {
+            $scope.d.unit = d;
+        });
+    }
+    init();
+
+    $scope.save = (x) => {
+        f.post('BuisinessUnit', 'Save', { x: x }).then((d) => {
+            alert(d);
+        });
+    }
+
+    var load = () => {
+        f.post('BuisinessUnit', 'Load', {}).then((d) => {
+            $scope.d.units = d;
+        });
+    }
+    load();
+
+
+
+}])
+
 
 
 //.directive('sortDirective', function () {
