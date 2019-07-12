@@ -76,6 +76,23 @@ public class BuisinessUnit : System.Web.Services.WebService {
         }
     }
 
+    [WebMethod]
+    public string Delete(string id) {
+        try {
+            string sql = string.Format("DELETE FROM BuisinessUnit WHERE id = '{0}'", id);
+            using (SqlConnection connection = new SqlConnection(connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    command.ExecuteReader();
+                }
+                connection.Close();
+            }
+            return JsonConvert.SerializeObject("Obrisano", Formatting.Indented);
+        }catch (Exception e) {
+            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+        }
+    }
+
     NewUnit ReadData(SqlDataReader reader) {
         NewUnit x = new NewUnit();
         x.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);

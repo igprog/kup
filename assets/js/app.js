@@ -149,6 +149,7 @@
 
     var init = () => {
         f.post('BuisinessUnit', 'Init', {}).then((d) => {
+            data.unit = d;
             $scope.d.unit = d;
         });
     }
@@ -167,7 +168,22 @@
     }
     load();
 
+    var remove = (id) => {
+        debugger;
+        f.post('BuisinessUnit', 'Delete', {id: id}).then((d) => {
+            alert(d);
+        });
+    }
 
+    $scope.add = () => {
+        $scope.d.units.push(angular.copy(data.unit));
+    }
+
+    $scope.remove = (id, idx) => {
+        debugger;
+        $scope.d.units.splice(idx, 1);
+        remove(id);
+    }
 
 }])
 
