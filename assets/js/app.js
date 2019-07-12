@@ -103,7 +103,8 @@
 .controller('userCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
 
     var data = {
-        user: {}
+        user: {},
+        buisinessUnits: []
     }
     $scope.d = data;
 
@@ -113,6 +114,13 @@
         });
     }
     init();
+
+    var loadBuisinessUnit = () => {
+        f.post('BuisinessUnit', 'Load', {}).then((d) => {
+            $scope.d.buisinessUnits = d;
+        });
+    }
+    loadBuisinessUnit();
 
     $scope.save = (x) => {
         f.post('Users', 'Save', { x: x }).then((d) => {
@@ -140,21 +148,6 @@
 
 .controller('buisinessUnitCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
 
-    var data = {
-        unit: {},
-        units: []
-    }
-    $scope.d = data;
-
-
-    var init = () => {
-        f.post('BuisinessUnit', 'Init', {}).then((d) => {
-            data.unit = d;
-            $scope.d.unit = d;
-        });
-    }
-    init();
-
     $scope.save = (x) => {
         f.post('BuisinessUnit', 'Save', { x: x }).then((d) => {
             alert(d);
@@ -163,27 +156,46 @@
 
     var load = () => {
         f.post('BuisinessUnit', 'Load', {}).then((d) => {
-            $scope.d.units = d;
+            $scope.d = d;
         });
     }
     load();
 
     var remove = (id) => {
-        debugger;
-        f.post('BuisinessUnit', 'Delete', {id: id}).then((d) => {
-            alert(d);
+        f.post('BuisinessUnit', 'Delete', { id: id }).then((d) => {
         });
     }
 
     $scope.add = () => {
-        $scope.d.units.push(angular.copy(data.unit));
+        f.post('BuisinessUnit', 'Init', {}).then((d) => {
+            $scope.d.push(d);
+        });
     }
 
     $scope.remove = (id, idx) => {
-        debugger;
-        $scope.d.units.splice(idx, 1);
-        remove(id);
+        if (confirm('Briši?')) {
+            $scope.d.splice(idx, 1);
+            remove(id);
+        }
     }
+
+}])
+
+
+
+.controller('loanCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
+
+    var data = {
+
+    }
+    $scope.d = data;
+
+    var init = () => {
+        f.post('Loan', 'Init', {}).then((d) => {
+            $scope.d = d;
+        });
+    }
+    init();
 
 }])
 

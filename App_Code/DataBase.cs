@@ -21,21 +21,23 @@ namespace Igprog {
             string sql = string.Format(@"{0})
                         CREATE TABLE Users
                         (id NVARCHAR (50) PRIMARY KEY,
-                        buissinesUnitId NVARCHAR (50),
+                        buissinesUnitCode NVARCHAR (50),
                         firstName NVARCHAR (50),
                         lastName NVARCHAR (50),
                         pin NVARCHAR (50),
                         birthDate NVARCHAR (50),
                         accessDate NVARCHAR (50),
                         terminationDate NVARCHAR (50),
-                        isActive INTEGER)", CheckTbl("Users"));
+                        isActive INTEGER,
+                        monthlyPayment NVARCHAR (50))", CheckTbl("Users"));
             CreateTable(sql);
         }
 
         public void BuisinessUnit() {
             string sql = string.Format(@"{0})
                         CREATE TABLE BuisinessUnit
-                        (id NVARCHAR (50) PRIMARY KEY,
+                        (id NVARCHAR (50),
+                        code NVARCHAR (50) PRIMARY KEY,
                         title NVARCHAR (50))", CheckTbl("BuisinessUnit"));
             CreateTable(sql);
         }

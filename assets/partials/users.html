@@ -6,6 +6,8 @@
                 <th>Ime</th>
                 <th>Prezime</th>
                 <th>OIB</th>
+                <th>Br. posl. jedinice</th>
+                <th>Ulog (kn)</th>
             </tr>
         </thead>
         <tbody>
@@ -14,8 +16,10 @@
                 <td>{{x.firstName}}</td>
                 <td>{{x.lastName}}</td>
                 <td>{{x.pin}}</td>
+                <td>{{x.buissinesUnitCode}}</td>
+                <td>{{x.monthlyPayment | number:2}}</td>
             </tr>
         </tbody>
     </table>
-    <!--<prev>{{d.users | json}}</prev>-->
+    <prev>{{d.users | json}}</prev>
 </div>
