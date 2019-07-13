@@ -74,22 +74,7 @@ public class Users : System.Web.Services.WebService {
     [WebMethod]
     public string Load() {
         try {
-            db.Users();
-            string sql = "SELECT * FROM Users";
-            List<NewUser> xx = new List<NewUser>();
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(sql, connection)) {
-                    using (SqlDataReader reader = command.ExecuteReader()) {
-                        while (reader.Read()) {
-                            NewUser x = ReadData(reader);
-                            xx.Add(x);
-                        }
-                    }
-                }
-                connection.Close();
-            }
-            return JsonConvert.SerializeObject(xx, Formatting.Indented);
+            return JsonConvert.SerializeObject(GetUsers(), Formatting.Indented);
         }catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
         }
@@ -110,6 +95,23 @@ public class Users : System.Web.Services.WebService {
         return x;
     }
 
-
+    public List<NewUser> GetUsers() {
+        db.Users();
+        string sql = "SELECT * FROM Users";
+        List<NewUser> xx = new List<NewUser>();
+        using (SqlConnection connection = new SqlConnection(connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        NewUser x = ReadData(reader);
+                        xx.Add(x);
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return xx;
+    }
 
 }

@@ -147,27 +147,28 @@
 }])
 
 .controller('buisinessUnitCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
+    var service = 'BuisinessUnit';
 
     $scope.save = (x) => {
-        f.post('BuisinessUnit', 'Save', { x: x }).then((d) => {
+        f.post(service, 'Save', { x: x }).then((d) => {
             alert(d);
         });
     }
 
     var load = () => {
-        f.post('BuisinessUnit', 'Load', {}).then((d) => {
+        f.post(service, 'Load', {}).then((d) => {
             $scope.d = d;
         });
     }
     load();
 
     var remove = (id) => {
-        f.post('BuisinessUnit', 'Delete', { id: id }).then((d) => {
+        f.post(service, 'Delete', { id: id }).then((d) => {
         });
     }
 
     $scope.add = () => {
-        f.post('BuisinessUnit', 'Init', {}).then((d) => {
+        f.post(service, 'Init', {}).then((d) => {
             $scope.d.push(d);
         });
     }
@@ -181,17 +182,47 @@
 
 }])
 
+.controller('accountCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
+    var service = 'Account';
+    var data = {
+        users: [],
+        account: {},
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear()
+    }
+    $scope.d = data;
 
+    var GetMonthlyRecords = (month, year) => {
+        f.post(service, 'GetMonthlyRecords', { month: month, year: year }).then((d) => {
+            $scope.d.users = d;
+        });
+    }
+    GetMonthlyRecords(data.month, data.year);
+
+    $scope.GetMonthlyRecords = (month, year) => {
+        return GetMonthlyRecords(month, year);
+    }
+
+    //var init = () => {
+    //    f.post(service, 'Init', {}).then((d) => {
+    //        $scope.d.account = d;
+    //    });
+    //}
+    //init();
+
+
+
+}])
 
 .controller('loanCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
-
+    var service = 'Loan';
     var data = {
 
     }
     $scope.d = data;
 
     var init = () => {
-        f.post('Loan', 'Init', {}).then((d) => {
+        f.post(service, 'Init', {}).then((d) => {
             $scope.d = d;
         });
     }

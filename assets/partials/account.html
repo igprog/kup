@@ -1,0 +1,36 @@
+﻿<div ng-controller="accountCtrl">
+    <div class="form-inline">
+        <label for="month" class="mb-2 mr-sm-2">Mjesec:</label>
+        <input ng-model="d.month" type="text" class="form-control mb-2 mr-sm-2" id="month">
+        <label for="year" class="mb-2 mr-sm-2"> / </label>
+        <input ng-model="d.year" type="text" class="form-control mb-2 mr-sm-2" id="year">
+        <label for="year" class="mb-2 mr-sm-2"> g </label>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Mat. br.</th>
+                <th>Ime</th>
+                <th>Prezime</th>
+                <th>Br. posl. jedinice</th>
+                <th>Ulog (kn)</th>
+                <th>Pozajica (kn)</th>
+                <th>Rata (kn)</th>
+                <th colspan="2"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="x in d.users">
+                <td>{{x.user.id}}</td>
+                <td>{{x.user.firstName}}</td>
+                <td>{{x.user.lastName}}</td>
+                <td>{{x.user.buissinesUnitCode}}</td>
+                <td><input ng-model="x.input" class="form-control" /></td>
+                <td><input ng-model="x.loan" class="form-control" /></td>
+                <td><input ng-model="x.repayment" class="form-control" /></td>
+                <td><button class="btn btn-outline-primary">Spremi</button></td>
+            </tr>
+        </tbody>
+    </table>
+    <prev>{{d | json}}</prev>
+</div>

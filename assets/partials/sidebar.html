@@ -49,13 +49,20 @@
         </li>-->
         <!-- Separator with title -->
         <li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
-            <small>POZAJMICE</small>
+            <small>RAČUN</small>
         </li>
         <!-- /END Separator -->
         <li href="#" class="bg-dark list-group-item list-group-item-action">
             <a class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-calendar fa-fw mr-3"></span>
                 <span class="menu-collapsed">Nova Pozajmica</span>
+            </a>
+        </li>
+        <li data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
+            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('account', 'Račun')">
+                <span class="fa fa-dashboard fa-fw mr-3"></span>
+                <span class="menu-collapsed">Promet</span>
+                <!--<span class="submenu-icon ml-auto"></span>-->
             </a>
         </li>
         <!--<li href="#" class="bg-dark list-group-item list-group-item-action">
