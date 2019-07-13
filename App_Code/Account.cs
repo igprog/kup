@@ -65,7 +65,7 @@ public class Account : System.Web.Services.WebService {
                                                 END
                                             ELSE
                                                 BEGIN
-                                                   INSERT INTO Account (id, code, title)
+                                                   INSERT INTO Account (id, userId, mo, yr, input, loan, loanDate, repayment, repaymentDate, restToRepayment, accountBalance, note)
                                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}')
                                                 END
                                         COMMIT TRAN", x.id, x.user.id, x.month, x.year, x.input, x.loan, x.loanDate, x.repayment, x.repaymentDate, x.restToRepayment, x.accountBalance, x.note);
@@ -161,6 +161,7 @@ public class Account : System.Web.Services.WebService {
     NewAccount ReadData(SqlDataReader reader) {
         NewAccount x = new NewAccount();
         x.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
+        x.user = new Users.NewUser();
         x.user.id = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
         x.month = reader.GetValue(2) == DBNull.Value ? 1 : reader.GetInt32(2);
         x.year = reader.GetValue(3) == DBNull.Value ? DateTime.Now.Year :reader.GetInt32(3);
@@ -170,8 +171,8 @@ public class Account : System.Web.Services.WebService {
         x.repayment = reader.GetValue(7) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(7));
         x.repaymentDate = reader.GetValue(8) == DBNull.Value ? null : reader.GetString(8);
         x.restToRepayment = reader.GetValue(9) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(9));
-        x.accountBalance = reader.GetValue(10) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(11));
-        x.note = reader.GetValue(12) == DBNull.Value ? null : reader.GetString(12);
+        x.accountBalance = reader.GetValue(10) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(10));
+        x.note = reader.GetValue(11) == DBNull.Value ? null : reader.GetString(11);
         return x;
     }
 

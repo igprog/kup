@@ -5,6 +5,7 @@
         <label for="year" class="mb-2 mr-sm-2"> / </label>
         <input ng-model="d.year" type="text" class="form-control mb-2 mr-sm-2" id="year">
         <label for="year" class="mb-2 mr-sm-2"> g </label>
+        <button ng-click="GetMonthlyRecords(d.month, d.year)" class="btn btn-outline-primary">Filter</button>
     </div>
     <table class="table table-striped">
         <thead>
@@ -28,7 +29,7 @@
                 <td><input ng-model="x.input" class="form-control" /></td>
                 <td><input ng-model="x.loan" class="form-control" /></td>
                 <td><input ng-model="x.repayment" class="form-control" /></td>
-                <td><button class="btn btn-outline-primary">Spremi</button></td>
+                <td><button class="btn btn-outline-primary" ng-click="save(x)">Spremi</button></td>
             </tr>
         </tbody>
     </table>

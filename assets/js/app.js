@@ -203,6 +203,12 @@
         return GetMonthlyRecords(month, year);
     }
 
+    $scope.save = (x) => {
+        f.post(service, 'Save', { x: x }).then((d) => {
+            alert(d);
+        });
+    }
+
     //var init = () => {
     //    f.post(service, 'Init', {}).then((d) => {
     //        $scope.d.account = d;
