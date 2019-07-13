@@ -209,30 +209,36 @@
         });
     }
 
-    //var init = () => {
-    //    f.post(service, 'Init', {}).then((d) => {
-    //        $scope.d.account = d;
-    //    });
-    //}
-    //init();
-
-
-
 }])
 
 .controller('loanCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
     var service = 'Loan';
     var data = {
-
-    }
+        users: [],
+        loan: {}
+    };
     $scope.d = data;
+
+    var loadUsers = () => {
+        f.post('Users', 'Load', {}).then((d) => {
+            $scope.d.users = d;
+        });
+    }
 
     var init = () => {
         f.post(service, 'Init', {}).then((d) => {
-            $scope.d = d;
+            $scope.d.loan = d;
+            loadUsers();
         });
     }
     init();
+
+    $scope.save = (x) => {
+        f.post(service, 'Save', { x: x }).then((d) => {
+            alert(d);
+        });
+    }
+
 
 }])
 

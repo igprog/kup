@@ -1,4 +1,38 @@
 ﻿<div ng-controller="loanCtrl">
-   Pozajmica
-    <prev>{{d | json}}</prev>
+    <div class="col-sm-6">
+        <form>
+            <div class="form-group">
+                <label for="accessDate">Datum:</label>
+                <input ng-model="d.loan.loanDate" type="text" class="form-control" name="accessDate">
+            </div>
+            <hr />
+            <div class="form-group">
+                <label for="buissinesUnitCode">Korisnik:</label>
+                <select ng-model="d.loan.user.id" class="form-control" name="buissinesUnitCode">
+                    <option ng-repeat="x in d.users" value="{{x.id}}">{{x.id}} - {{x.firstName}} {{x.lastName}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="id">Iznos pozajmice:</label>
+                <input ng-model="d.loan.loan" type="text" class="form-control" name="id">
+            </div>
+            <div class="form-group">
+                <label for="firstName">Rata:</label>
+                <input ng-model="d.loan.repayment" type="text" class="form-control" name="firstName">
+            </div>
+            <div class="form-group">
+                <label for="lastName">Manipulativni troškovi:</label>
+                <input ng-model="d.loan.manipulativeCosts" type="text" class="form-control" name="lastName">
+            </div>
+            <div class="form-group">
+                <label for="pin">Rok vraćanja:</label>
+                <input ng-model="d.loan.dedline" type="text" class="form-control" name="pin">
+            </div>
+            <hr />
+            <div class="text-right">
+                <button type="submit" class="btn btn-outline-primary" ng-click="save(d.loan)">Spremi</button>
+            </div>
+        </form>
+    </div>
+    <pre ng-if="config.debug">{{d | json}}</pre>
 </div>

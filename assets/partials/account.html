@@ -1,12 +1,12 @@
 ﻿<div ng-controller="accountCtrl">
-    <div class="form-inline">
+    <form class="form-inline">
         <label for="month" class="mb-2 mr-sm-2">Mjesec:</label>
         <input ng-model="d.month" type="text" class="form-control mb-2 mr-sm-2" id="month">
         <label for="year" class="mb-2 mr-sm-2"> / </label>
         <input ng-model="d.year" type="text" class="form-control mb-2 mr-sm-2" id="year">
         <label for="year" class="mb-2 mr-sm-2"> g </label>
-        <button ng-click="GetMonthlyRecords(d.month, d.year)" class="btn btn-outline-primary">Filter</button>
-    </div>
+        <button ng-click="GetMonthlyRecords(d.month, d.year)" type="submit" class="btn btn-outline-primary">Filter</button>
+    </form>
     <table class="table table-striped">
         <thead>
             <tr>

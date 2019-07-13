@@ -58,6 +58,21 @@ namespace Igprog {
                         note NVARCHAR (50))", CheckTbl(tbl), tbl);
             CreateTable(sql);
         }
+
+        public void Loan() {
+            string tbl = "Loan";
+            string sql = string.Format(@"{0}
+                        CREATE TABLE {1}
+                        (id NVARCHAR (50) PRIMARY KEY,
+                        userId NVARCHAR (50),
+                        loan NVARCHAR (50),
+                        loanDate NVARCHAR (50),
+                        repayment NVARCHAR (50),
+                        manipulativeCosts NVARCHAR (50),
+                        dedline NVARCHAR (50),
+                        note NVARCHAR (50))", CheckTbl(tbl), tbl);
+            CreateTable(sql);
+        }
         #endregion
 
         #region Methods

@@ -109,16 +109,15 @@ public class Account : System.Web.Services.WebService {
     [WebMethod]
     public string GetMonthlyRecords(int month, int year) {
         try {
-            //db.Account();
             Users u = new Users();
             List<Users.NewUser> users = u.GetUsers();
             db.Account();
             List<NewAccount> xx = new List<NewAccount>();
             foreach(Users.NewUser user in users) {
                 NewAccount x = new NewAccount();
-                //TODO: provjeriti dali postoje rekordi za odabrani mjesec i godinu, ako postoje onda učitati iz baze, a ako ne postoje onda init =>
                 x = GetRecord(user.id, month, year);
                 if (string.IsNullOrEmpty(x.id)) {
+                    //Provjeri dali postoji rekord u Loan tbl, ako nema onda init
                     x.id = Guid.NewGuid().ToString();
                     x.user = user;
                     x.month = month;
@@ -191,7 +190,6 @@ public class Account : System.Web.Services.WebService {
             connection.Close();
         }
         return x;
-
     }
 
 }
