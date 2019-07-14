@@ -17,6 +17,8 @@
                 <th>Ulog (kn)</th>
                 <th>Pozajica (kn)</th>
                 <th>Rata (kn)</th>
+                <th>Otplaćeno (kn)</th>
+                <th>Ostatak za uplatu (kn)</th>
                 <th colspan="2"></th>
             </tr>
         </thead>
@@ -26,9 +28,11 @@
                 <td>{{x.user.firstName}}</td>
                 <td>{{x.user.lastName}}</td>
                 <td>{{x.user.buissinesUnitCode}}</td>
-                <td><input ng-model="x.input" class="form-control" /></td>
+                <td><input ng-model="x.monthlyFee" class="form-control" /></td>
                 <td><input ng-model="x.loan" class="form-control" /></td>
                 <td><input ng-model="x.repayment" class="form-control" /></td>
+                <td>{{x.repaid}}</td>
+                <td>{{x.restToRepayment}}</td>
                 <td><button class="btn btn-outline-primary" ng-click="save(x)">Spremi</button></td>
             </tr>
         </tbody>

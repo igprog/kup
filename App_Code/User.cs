@@ -10,19 +10,19 @@ using Newtonsoft.Json;
 using Igprog;
 
 /// <summary>
-/// Users
+/// User
 /// </summary>
 [WebService(Namespace = "http://janaf.hr/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
-public class Users : System.Web.Services.WebService {
+public class User : System.Web.Services.WebService {
     string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
-    double monthlyPayment = Convert.ToDouble(ConfigurationManager.AppSettings["monthlyPayment"]);
-    public Users() {
+    double monthlyFee = Convert.ToDouble(ConfigurationManager.AppSettings["monthlyFee"]);
+    public User() {
     }
 
-    public class NewUser {
+      public class NewUser {
         public string id;
         public string buissinesUnitCode;
         public string firstName;
@@ -32,7 +32,7 @@ public class Users : System.Web.Services.WebService {
         public string accessDate;
         public string terminationDate;
         public int isActive;
-        public double monthlyPayment;
+        public double monthlyFee;
     }
 
     [WebMethod]
@@ -47,7 +47,7 @@ public class Users : System.Web.Services.WebService {
         x.accessDate = DateTime.Now.ToShortDateString();
         x.terminationDate = null;
         x.isActive = 1;
-        x.monthlyPayment = monthlyPayment;
+        x.monthlyFee = monthlyFee;
         return JsonConvert.SerializeObject(x, Formatting.Indented);
     }
 
@@ -57,7 +57,7 @@ public class Users : System.Web.Services.WebService {
             db.Users();
             string sql = string.Format(@"INSERT INTO Users VALUES  
                        ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')"
-                        , x.id, x.buissinesUnitCode, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyPayment);
+                        , x.id, x.buissinesUnitCode, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -91,7 +91,7 @@ public class Users : System.Web.Services.WebService {
         x.accessDate = reader.GetValue(6) == DBNull.Value ? null : reader.GetString(6);
         x.terminationDate = reader.GetValue(7) == DBNull.Value ? null : reader.GetString(7);
         x.isActive = reader.GetValue(8) == DBNull.Value ? 1 : reader.GetInt32(8);
-        x.monthlyPayment = reader.GetValue(9) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(9));
+        x.monthlyFee = reader.GetValue(9) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(9));
         return x;
     }
 

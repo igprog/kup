@@ -74,7 +74,7 @@
 
     $scope.login = (x) => {
         f.post('Admin', 'Login', { username: x.userName, password: x.password }).then((d) => {
-            if (d == true) {
+            if (d === true) {
                 $scope.d.currTpl = f.currTpl('dashboard');
                 $scope.d.currTplTitle = 'Dashboard';
             } else {
@@ -109,7 +109,7 @@
     $scope.d = data;
 
     var init = () => {
-        f.post('Users', 'Init', {}).then((d) => {
+        f.post('User', 'Init', {}).then((d) => {
             $scope.d.user = d;
         });
     }
@@ -123,7 +123,7 @@
     loadBuisinessUnit();
 
     $scope.save = (x) => {
-        f.post('Users', 'Save', { x: x }).then((d) => {
+        f.post('User', 'Save', { x: x }).then((d) => {
             alert(d);
         });
     }
@@ -138,7 +138,7 @@
     $scope.d = data;
 
     var load = () => {
-        f.post('Users', 'Load', {}).then((d) => {
+        f.post('User', 'Load', {}).then((d) => {
             $scope.d.users = d;
         });
     }
@@ -220,7 +220,7 @@
     $scope.d = data;
 
     var loadUsers = () => {
-        f.post('Users', 'Load', {}).then((d) => {
+        f.post('User', 'Load', {}).then((d) => {
             $scope.d.users = d;
         });
     }

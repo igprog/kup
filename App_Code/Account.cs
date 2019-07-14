@@ -23,15 +23,17 @@ public class Account : System.Web.Services.WebService {
 
     public class NewAccount {
         public string id;
-        public Users.NewUser user;
+        public User.NewUser user;
         public int month;
         public int year;
-        public double input;
+        public double monthlyFee;
+        public string loanId;
         public double loan;
         public string loanDate;
         public double repayment;
         public string repaymentDate;
         public double restToRepayment;
+        public double repaid;
         public double accountBalance;
         public string note;
     }
@@ -40,14 +42,16 @@ public class Account : System.Web.Services.WebService {
     public string Init() {
         NewAccount x = new NewAccount();
         x.id = Guid.NewGuid().ToString();
-        x.user = new Users.NewUser();
+        x.user = new User.NewUser();
         x.month = 1;
         x.year = DateTime.Now.Year;
-        x.input = 0;
+        x.monthlyFee = 0;
+        x.loanId = null;
         x.loan = 0;
         x.loanDate = null;
         x.repayment = 0;
         x.repaymentDate = null;
+        x.repaid = 0;
         x.restToRepayment = 0;
         x.accountBalance = 0;
         x.note = null;
@@ -61,14 +65,14 @@ public class Account : System.Web.Services.WebService {
             string sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Account WITH (updlock,serializable) WHERE id = '{0}')
                                                 BEGIN
-                                                   UPDATE Account SET userId = '{1}', mo = '{2}', yr = '{3}', input = '{4}', loan = '{5}', loanDate = '{6}', repayment = '{7}', repaymentDate = '{8}', restToRepayment = '{9}', accountBalance = '{10}', note = '{11}' WHERE id = '{0}'
+                                                   UPDATE Account SET userId = '{1}', mo = '{2}', yr = '{3}', monthlyFee = '{4}', loanId = '{5}', loan = '{6}', loanDate = '{7}', repayment = '{8}', repaymentDate = '{9}', repaid = '{10}', restToRepayment = '{11}', accountBalance = '{12}', note = '{13}' WHERE id = '{0}'
                                                 END
                                             ELSE
                                                 BEGIN
-                                                   INSERT INTO Account (id, userId, mo, yr, input, loan, loanDate, repayment, repaymentDate, restToRepayment, accountBalance, note)
-                                                   VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}')
+                                                   INSERT INTO Account (id, userId, mo, yr, monthlyFee, loanId, loan, loanDate, repayment, repaymentDate, repaid, restToRepayment, accountBalance, note)
+                                                   VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}')
                                                 END
-                                        COMMIT TRAN", x.id, x.user.id, x.month, x.year, x.input, x.loan, x.loanDate, x.repayment, x.repaymentDate, x.restToRepayment, x.accountBalance, x.note);
+                                        COMMIT TRAN", x.id, x.user.id, x.month, x.year, x.monthlyFee, x.loanId, x.loan, x.loanDate, x.repayment, x.repaymentDate, x.repaid, x.restToRepayment, x.accountBalance, x.note);
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -109,27 +113,29 @@ public class Account : System.Web.Services.WebService {
     [WebMethod]
     public string GetMonthlyRecords(int month, int year) {
         try {
-            Users u = new Users();
-            List<Users.NewUser> users = u.GetUsers();
+            User u = new User();
+            List<User.NewUser> users = u.GetUsers();
             db.Account();
             List<NewAccount> xx = new List<NewAccount>();
-            foreach(Users.NewUser user in users) {
+            foreach(User.NewUser user in users) {
                 NewAccount x = new NewAccount();
                 x = GetRecord(user.id, month, year);
                 if (string.IsNullOrEmpty(x.id)) {
-                    //Provjeri dali postoji rekord u Loan tbl, ako nema onda init
                     x.id = Guid.NewGuid().ToString();
                     x.user = user;
                     x.month = month;
                     x.year = year;
-                    x.input = user.monthlyPayment;
+                    x.monthlyFee = user.monthlyFee;
+                    x.loanId = null;
                     x.loan = 0;
                     x.loanDate = null;
                     x.repayment = 0;
                     x.repaymentDate = null;
+                    x.repaid = 0;
                     x.restToRepayment = 0;
                     x.accountBalance = 0;
                     x.note = null;
+                    x = CheckLoan(x, user.id);
                 }
                 x.user = user;
                 xx.Add(x);
@@ -160,18 +166,20 @@ public class Account : System.Web.Services.WebService {
     NewAccount ReadData(SqlDataReader reader) {
         NewAccount x = new NewAccount();
         x.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
-        x.user = new Users.NewUser();
+        x.user = new User.NewUser();
         x.user.id = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
         x.month = reader.GetValue(2) == DBNull.Value ? 1 : reader.GetInt32(2);
         x.year = reader.GetValue(3) == DBNull.Value ? DateTime.Now.Year :reader.GetInt32(3);
-        x.input = reader.GetValue(4) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(4));
-        x.loan = reader.GetValue(5) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(5));
-        x.loanDate = reader.GetValue(6) == DBNull.Value ? null : reader.GetString(6);
-        x.repayment = reader.GetValue(7) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(7));
-        x.repaymentDate = reader.GetValue(8) == DBNull.Value ? null : reader.GetString(8);
-        x.restToRepayment = reader.GetValue(9) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(9));
-        x.accountBalance = reader.GetValue(10) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(10));
-        x.note = reader.GetValue(11) == DBNull.Value ? null : reader.GetString(11);
+        x.monthlyFee = reader.GetValue(4) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(4));
+        x.loanId = reader.GetValue(5) == DBNull.Value ? null : reader.GetString(5);
+        x.loan = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
+        x.loanDate = reader.GetValue(7) == DBNull.Value ? null : reader.GetString(7);
+        x.repayment = reader.GetValue(8) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(8));
+        x.repaymentDate = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);
+        x.repaid = reader.GetValue(10) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(10));
+        x.restToRepayment = reader.GetValue(11) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(11));
+        x.accountBalance = reader.GetValue(12) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(12));
+        x.note = reader.GetValue(13) == DBNull.Value ? null : reader.GetString(13);
         return x;
     }
 
@@ -184,6 +192,31 @@ public class Account : System.Web.Services.WebService {
                 using (SqlDataReader reader = command.ExecuteReader()) {
                     while (reader.Read()) {
                         x = ReadData(reader);
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
+    }
+
+    public NewAccount CheckLoan(NewAccount x, string userId) {
+        string sql = string.Format(@"
+                    SELECT l.id, l.loan, l.repayment, SUM(CAST(a.repayment AS decimal)) FROM Loan l
+                    LEFT OUTER JOIN Account a
+                    ON l.id = a.loanId
+                    WHERE l.userId = '{0}' AND l.isRepaid = 0
+                    GROUP BY l.id, l.loan, l.repayment", userId);
+        using (SqlConnection connection = new SqlConnection(connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x.loanId = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
+                        x.loan = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
+                        x.repayment = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
+                        x.repaid = reader.GetValue(3) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(3));
+                        x.restToRepayment = x.loan - x.repaid;
                     }
                 }
             }

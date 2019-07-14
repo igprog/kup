@@ -23,12 +23,13 @@ public class Loan : System.Web.Services.WebService {
 
     public class NewLoan {
         public string id;
-        public Users.NewUser user;
+        public User.NewUser user;
         public double loan;
         public string loanDate;
         public double repayment;
         public double manipulativeCosts;
         public string dedline;
+        public int isRepaid;
         public string note;
     }
 
@@ -36,12 +37,13 @@ public class Loan : System.Web.Services.WebService {
     public string Init() {
         NewLoan x = new NewLoan();
         x.id = Guid.NewGuid().ToString();
-        x.user = new Users.NewUser();
+        x.user = new User.NewUser();
         x.loan = 0;
         x.loanDate = DateTime.Now.ToShortDateString();
         x.repayment = 0;
         x.manipulativeCosts = 0;
         x.dedline = null;
+        x.isRepaid = 0;
         x.note = null;
         return JsonConvert.SerializeObject(x, Formatting.Indented);
     }
@@ -53,14 +55,14 @@ public class Loan : System.Web.Services.WebService {
             string sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Loan WITH (updlock,serializable) WHERE id = '{0}')
                                                 BEGIN
-                                                   UPDATE Loan SET userId = '{1}', loan = '{2}', loanDate = '{3}', repayment = '{4}', manipulativeCosts = '{5}', dedline = '{6}', note = '{7}' WHERE id = '{0}'
+                                                   UPDATE Loan SET userId = '{1}', loan = '{2}', loanDate = '{3}', repayment = '{4}', manipulativeCosts = '{5}', dedline = '{6}', isRepaid = '{7}', note = '{8}' WHERE id = '{0}'
                                                 END
                                             ELSE
                                                 BEGIN
-                                                   INSERT INTO Loan (id, userId, loan, loanDate, repayment, manipulativeCosts, dedline, note)
-                                                   VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')
+                                                   INSERT INTO Loan (id, userId, loan, loanDate, repayment, manipulativeCosts, dedline, isRepaid, note)
+                                                   VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
                                                 END
-                                        COMMIT TRAN", x.id, x.user.id, x.loan, x.loanDate, x.repayment, x.manipulativeCosts, x.dedline, x.note);
+                                        COMMIT TRAN", x.id, x.user.id, x.loan, x.loanDate, x.repayment, x.manipulativeCosts, x.dedline, x.isRepaid, x.note);
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -118,14 +120,15 @@ public class Loan : System.Web.Services.WebService {
     NewLoan ReadData(SqlDataReader reader) {
         NewLoan x = new NewLoan();
         x.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
-        x.user = new Users.NewUser();
+        x.user = new User.NewUser();
         x.user.id = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
         x.loan = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
         x.loanDate = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
         x.repayment = reader.GetValue(4) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(4));
         x.manipulativeCosts = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
         x.dedline = reader.GetValue(7) == DBNull.Value ? null : reader.GetString(7);
-        x.note = reader.GetValue(8) == DBNull.Value ? null : reader.GetString(8);
+        x.isRepaid = reader.GetValue(8) == DBNull.Value ? 0 : reader.GetInt32(8);
+        x.note = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);
         return x;
     }
 
