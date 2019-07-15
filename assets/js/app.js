@@ -51,6 +51,13 @@
                 years.push(i);
             }
             return years;
+        },
+        setDate: (x) => {
+            debugger;
+            var day = x.getDate();
+            var mo = x.getMonth() < 10 ? '0' + (x.getMonth() + 1) : x.getMonth() + 1;
+            var yr = x.getFullYear();
+            return yr + '-' + mo + '-' + day;
         }
     }
 }])
@@ -122,7 +129,6 @@
     }
 
 }])
-
 
 .controller('userCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
 
@@ -241,7 +247,8 @@
     var service = 'Loan';
     var data = {
         users: [],
-        loan: {}
+        loan: {},
+        date: new Date()
     };
     $scope.d = data;
 
@@ -259,7 +266,9 @@
     }
     init();
 
-    $scope.save = (x) => {
+    $scope.save = (x, date) => {
+        debugger;
+        x.loanDate = f.setDate(date);
         f.post(service, 'Save', { x: x }).then((d) => {
             alert(d);
         });

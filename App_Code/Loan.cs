@@ -39,7 +39,7 @@ public class Loan : System.Web.Services.WebService {
         x.id = Guid.NewGuid().ToString();
         x.user = new User.NewUser();
         x.loan = 0;
-        x.loanDate = DateTime.Now.ToShortDateString();
+        x.loanDate = null;
         x.repayment = 0;
         x.manipulativeCosts = 0;
         x.dedline = null;

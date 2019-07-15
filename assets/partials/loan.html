@@ -3,7 +3,7 @@
         <form>
             <div class="form-group">
                 <label for="accessDate">Datum:</label>
-                <input ng-model="d.loan.loanDate" type="text" class="form-control" name="accessDate">
+                <input ng-model="d.date" type="date" class="form-control" name="accessDate">
             </div>
             <hr />
             <div class="form-group">
@@ -30,7 +30,7 @@
             </div>
             <hr />
             <div class="text-right">
-                <button type="submit" class="btn btn-outline-primary" ng-click="save(d.loan)">Spremi</button>
+                <button type="submit" class="btn btn-outline-primary" ng-click="save(d.loan, d.date)">Spremi</button>
             </div>
         </form>
     </div>
