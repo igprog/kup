@@ -135,7 +135,7 @@ public class Account : System.Web.Services.WebService {
                     x.restToRepayment = 0;
                     x.accountBalance = 0;
                     x.note = null;
-                    x = CheckLoan(x, user.id);
+                    x = CheckLoan(x, user.id, month, year);
                 }
                 x.user = user;
                 xx.Add(x);
@@ -200,13 +200,13 @@ public class Account : System.Web.Services.WebService {
         return x;
     }
 
-    public NewAccount CheckLoan(NewAccount x, string userId) {
+    public NewAccount CheckLoan(NewAccount x, string userId, int month, int year) {
         string sql = string.Format(@"
                     SELECT l.id, l.loan, l.repayment, SUM(CAST(a.repayment AS decimal)) FROM Loan l
                     LEFT OUTER JOIN Account a
                     ON l.id = a.loanId
-                    WHERE l.userId = '{0}' AND l.isRepaid = 0
-                    GROUP BY l.id, l.loan, l.repayment", userId);
+                    WHERE l.userId = '{0}' AND l.isRepaid = 0 AND CONVERT(datetime, l.loanDate) <= '{2}-{1}-01'
+                    GROUP BY l.id, l.loan, l.repayment", userId, month, year);
         using (SqlConnection connection = new SqlConnection(connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {

@@ -27,6 +27,30 @@
         },
         currTpl: (tpl) => {
             return 'assets/partials/' + tpl + '.html';
+        },
+        months: () => {
+            return [
+                { id: 1, title: 'siječanj' },
+                { id: 2, title: 'veljača' },
+                { id: 3, title: 'ožujak' },
+                { id: 4, title: 'travanj' },
+                { id: 5, title: 'svibanj' },
+                { id: 6, title: 'lipanj' },
+                { id: 7, title: 'srpanj' },
+                { id: 8, title: 'kolovoz' },
+                { id: 9, title: 'rujan' },
+                { id: 10, title: 'listopad' },
+                { id: 11, title: 'studeni' },
+                { id: 12, title: 'prosinac' }
+            ]
+        },
+        years: () => {
+            var year = new Date().getFullYear();
+            var years = [];
+            for (var i = 2016; i <= year; i++) {
+                years.push(i);
+            }
+            return years;
         }
     }
 }])
@@ -188,7 +212,9 @@
         users: [],
         account: {},
         month: new Date().getMonth() + 1,
-        year: new Date().getFullYear()
+        year: new Date().getFullYear(),
+        months: f.months(),
+        years: f.years()
     }
     $scope.d = data;
 
