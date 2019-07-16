@@ -212,6 +212,50 @@
 
 }])
 
+.controller('loanCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
+    var service = 'Loan';
+    var data = {
+        users: [],
+        loan: {},
+        date: new Date()
+    };
+    $scope.d = data;
+
+    var loadUsers = () => {
+        f.post('User', 'Load', {}).then((d) => {
+            $scope.d.users = d;
+        });
+    }
+
+    var init = () => {
+        f.post(service, 'Init', {}).then((d) => {
+            $scope.d.loan = d;
+            loadUsers();
+        });
+    }
+    init();
+
+    $scope.calculate = (x) => {
+        if (x.loan > 0) {
+            $scope.d.loan.manipulativeCosts = (x.loan * x.manipulativeCostsCoeff).toFixed(2);
+            $scope.d.loan.repayment = (x.loan / x.dedline).toFixed(2);
+        }
+    }
+
+    $scope.myFunc = function () {
+        alert('ok')
+    };
+
+    $scope.save = (x, date) => {
+        x.loanDate = f.setDate(date);
+        f.post(service, 'Save', { x: x }).then((d) => {
+            alert(d);
+        });
+    }
+
+
+}])
+
 .controller('accountCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
     var service = 'Account';
     var data = {
@@ -257,39 +301,7 @@
 
 }])
 
-.controller('loanCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
-    var service = 'Loan';
-    var data = {
-        users: [],
-        loan: {},
-        date: new Date()
-    };
-    $scope.d = data;
 
-    var loadUsers = () => {
-        f.post('User', 'Load', {}).then((d) => {
-            $scope.d.users = d;
-        });
-    }
-
-    var init = () => {
-        f.post(service, 'Init', {}).then((d) => {
-            $scope.d.loan = d;
-            loadUsers();
-        });
-    }
-    init();
-
-    $scope.save = (x, date) => {
-        debugger;
-        x.loanDate = f.setDate(date);
-        f.post(service, 'Save', { x: x }).then((d) => {
-            alert(d);
-        });
-    }
-
-
-}])
 
 
 

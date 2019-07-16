@@ -14,19 +14,19 @@
             </div>
             <div class="form-group">
                 <label for="id">Iznos pozajmice:</label>
-                <input ng-model="d.loan.loan" type="text" class="form-control" name="id">
+                <input ng-model="d.loan.loan" type="text" class="form-control" name="id" ng-change="calculate(d.loan)">
             </div>
             <div class="form-group">
-                <label for="firstName">Rata:</label>
-                <input ng-model="d.loan.repayment" type="text" class="form-control" name="firstName">
+                <label for="firstName">Mjesečna rata:</label>
+                <input ng-model="d.loan.repayment" type="text" class="form-control" name="firstName" ng-change="calculate(d.loan)">
             </div>
             <div class="form-group">
-                <label for="lastName">Manipulativni troškovi:</label>
-                <input ng-model="d.loan.manipulativeCosts" type="text" class="form-control" name="lastName">
+                <label for="lastName">Manipulativni troškovi ({{d.loan.manipulativeCostsCoeff * 100}}%):</label>
+                <input ng-model="d.loan.manipulativeCosts" type="text" class="form-control" name="lastName" ng-change="calculate(d.loan)">
             </div>
             <div class="form-group">
                 <label for="pin">Rok vraćanja:</label>
-                <input ng-model="d.loan.dedline" type="text" class="form-control" name="pin">
+                <input ng-model="d.loan.dedline" type="text" class="form-control" name="pin" ng-change="calculate(d.loan)">
             </div>
             <hr />
             <div class="text-right">

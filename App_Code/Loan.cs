@@ -18,6 +18,8 @@ using Igprog;
 public class Loan : System.Web.Services.WebService {
     string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
+    double manipulativeCostsCoeff = Convert.ToDouble(ConfigurationManager.AppSettings["manipulativeCostsCoeff"]);
+    double defaultDedline = Convert.ToDouble(ConfigurationManager.AppSettings["defaultDedline"]);  // ***** Months to repayment *****
     public Loan() {
     }
 
@@ -28,9 +30,10 @@ public class Loan : System.Web.Services.WebService {
         public string loanDate;
         public double repayment;
         public double manipulativeCosts;
-        public string dedline;
+        public double dedline;
         public int isRepaid;
         public string note;
+        public double manipulativeCostsCoeff;
     }
 
     [WebMethod]
@@ -42,9 +45,10 @@ public class Loan : System.Web.Services.WebService {
         x.loanDate = null;
         x.repayment = 0;
         x.manipulativeCosts = 0;
-        x.dedline = null;
+        x.dedline = defaultDedline;
         x.isRepaid = 0;
         x.note = null;
+        x.manipulativeCostsCoeff = manipulativeCostsCoeff;
         return JsonConvert.SerializeObject(x, Formatting.Indented);
     }
 
@@ -126,7 +130,7 @@ public class Loan : System.Web.Services.WebService {
         x.loanDate = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
         x.repayment = reader.GetValue(4) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(4));
         x.manipulativeCosts = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
-        x.dedline = reader.GetValue(7) == DBNull.Value ? null : reader.GetString(7);
+        x.dedline = reader.GetValue(7) == DBNull.Value ? defaultDedline : Convert.ToDouble(reader.GetString(7));
         x.isRepaid = reader.GetValue(8) == DBNull.Value ? 0 : reader.GetInt32(8);
         x.note = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);
         return x;
