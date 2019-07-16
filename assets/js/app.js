@@ -220,24 +220,38 @@
         month: new Date().getMonth() + 1,
         year: new Date().getFullYear(),
         months: f.months(),
-        years: f.years()
+        years: f.years(),
+        buisinessUnits: [],
+        buisinessUnitCode: null
     }
     $scope.d = data;
 
-    var GetMonthlyRecords = (month, year) => {
-        f.post(service, 'GetMonthlyRecords', { month: month, year: year }).then((d) => {
+    var getMonthlyRecords = (x) => {
+        debugger;
+        f.post(service, 'GetMonthlyRecords', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
             $scope.d.users = d;
         });
     }
-    GetMonthlyRecords(data.month, data.year);
 
-    $scope.GetMonthlyRecords = (month, year) => {
-        return GetMonthlyRecords(month, year);
+    var loadBuisinessUnit = () => {
+        f.post('BuisinessUnit', 'Load', {}).then((d) => {
+            $scope.d.buisinessUnits = d;
+        });
+    }
+    loadBuisinessUnit();
+
+    $scope.getMonthlyRecords = (x) => {
+        return getMonthlyRecords(x);
     }
 
-    $scope.save = (x) => {
+    $scope.save = (x, idx) => {
+        if (x.repayment > x.restToRepayment) {
+            alert('Rata je veća od duga!');
+            return false;
+        }
         f.post(service, 'Save', { x: x }).then((d) => {
-            alert(d);
+            $scope.d.users[idx].repaid = d.repaid;
+            $scope.d.users[idx].restToRepayment = d.restToRepayment;
         });
     }
 

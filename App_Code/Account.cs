@@ -62,6 +62,7 @@ public class Account : System.Web.Services.WebService {
     public string Save(NewAccount x) {
         try {
             db.Account();
+            double lastRepayment = GetRecord(x.user.id, x.month, x.year).repayment;  // ***** in case of update repaiment  *****
             string sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Account WITH (updlock,serializable) WHERE id = '{0}')
                                                 BEGIN
@@ -72,7 +73,7 @@ public class Account : System.Web.Services.WebService {
                                                    INSERT INTO Account (id, userId, mo, yr, monthlyFee, loanId, loan, loanDate, repayment, repaymentDate, repaid, restToRepayment, accountBalance, note)
                                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}')
                                                 END
-                                        COMMIT TRAN", x.id, x.user.id, x.month, x.year, x.monthlyFee, x.loanId, x.loan, x.loanDate, x.repayment, x.repaymentDate, x.repaid, x.restToRepayment, x.accountBalance, x.note);
+                                        COMMIT TRAN", x.id, x.user.id, x.month, x.year, x.monthlyFee, x.loanId, x.loan, x.loanDate, x.repayment, x.repaymentDate, x.repaid - lastRepayment + x.repayment, x.restToRepayment + lastRepayment - x.repayment, x.accountBalance, x.note);
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -80,7 +81,7 @@ public class Account : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
-            return JsonConvert.SerializeObject("Spremljeno", Formatting.Indented);
+            return JsonConvert.SerializeObject(CheckLoan(x, x.user.id, x.month, x.year), Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
         }
@@ -111,10 +112,10 @@ public class Account : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    public string GetMonthlyRecords(int month, int year) {
+    public string GetMonthlyRecords(int month, int year, string buisinessUnitCode) {
         try {
             User u = new User();
-            List<User.NewUser> users = u.GetUsers();
+            List<User.NewUser> users = u.GetUsers(buisinessUnitCode);
             db.Account();
             List<NewAccount> xx = new List<NewAccount>();
             foreach(User.NewUser user in users) {
@@ -209,11 +210,11 @@ public class Account : System.Web.Services.WebService {
 
     public NewAccount CheckLoan(NewAccount x, string userId, int month, int year) {
         string sql = string.Format(@"
-                    SELECT l.id, l.loan, l.repayment, SUM(CAST(a.repayment AS decimal)) FROM Loan l
+                    SELECT l.id, l.loan, l.repayment, a.repaid, a.restToRepayment FROM Loan l
                     LEFT OUTER JOIN Account a
                     ON l.id = a.loanId
                     WHERE l.userId = '{0}' AND l.isRepaid = 0 AND CONVERT(datetime, l.loanDate) <= '{1}'
-                    GROUP BY l.id, l.loan, l.repayment", userId, ReffDate(month, year));
+                    GROUP BY l.id, l.loan, l.repayment, a.repaid, a.restToRepayment", userId, ReffDate(month, year));
         using (SqlConnection connection = new SqlConnection(connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -222,8 +223,8 @@ public class Account : System.Web.Services.WebService {
                         x.loanId = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
                         x.loan = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
                         x.repayment = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
-                        x.repaid = reader.GetValue(3) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(3));
-                        x.restToRepayment = x.loan - x.repaid;
+                        x.repaid = reader.GetValue(3) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(3));
+                        x.restToRepayment = reader.GetValue(4) == DBNull.Value ? x.loan : Convert.ToDouble(reader.GetString(4));
                     }
                 }
             }

@@ -24,7 +24,7 @@ public class User : System.Web.Services.WebService {
 
       public class NewUser {
         public string id;
-        public string buissinesUnitCode;
+        public string buisinessUnitCode;
         public string firstName;
         public string lastName;
         public string pin;
@@ -39,7 +39,7 @@ public class User : System.Web.Services.WebService {
     public string Init() {
         NewUser x = new NewUser();
         x.id = null;
-        x.buissinesUnitCode = null;
+        x.buisinessUnitCode = null;
         x.firstName = null;
         x.lastName = null;
         x.pin = null;
@@ -57,7 +57,7 @@ public class User : System.Web.Services.WebService {
             db.Users();
             string sql = string.Format(@"INSERT INTO Users VALUES  
                        ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')"
-                        , x.id, x.buissinesUnitCode, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
+                        , x.id, x.buisinessUnitCode, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -74,7 +74,7 @@ public class User : System.Web.Services.WebService {
     [WebMethod]
     public string Load() {
         try {
-            return JsonConvert.SerializeObject(GetUsers(), Formatting.Indented);
+            return JsonConvert.SerializeObject(GetUsers(null), Formatting.Indented);
         }catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
         }
@@ -83,7 +83,7 @@ public class User : System.Web.Services.WebService {
     NewUser ReadData(SqlDataReader reader) {
         NewUser x = new NewUser();
         x.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
-        x.buissinesUnitCode = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
+        x.buisinessUnitCode = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
         x.firstName = reader.GetValue(2) == DBNull.Value ? null : reader.GetString(2);
         x.lastName = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
         x.pin = reader.GetValue(4) == DBNull.Value ? null : reader.GetString(4);
@@ -95,9 +95,14 @@ public class User : System.Web.Services.WebService {
         return x;
     }
 
-    public List<NewUser> GetUsers() {
+    public List<NewUser> GetUsers(string buisinessUnitCode) {
         db.Users();
-        string sql = "SELECT * FROM Users";
+        string sql = null;
+        if(string.IsNullOrEmpty(buisinessUnitCode)) {
+            sql = "SELECT * FROM Users";
+        } else {
+            sql = string.Format("SELECT * FROM Users WHERE buisinessUnitCode = '{0}'", buisinessUnitCode);
+        }
         List<NewUser> xx = new List<NewUser>();
         using (SqlConnection connection = new SqlConnection(connectionString)) {
             connection.Open();

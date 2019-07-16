@@ -18,7 +18,7 @@ namespace Igprog {
             string sql = string.Format(@"{0}
                         CREATE TABLE {1}
                         (id NVARCHAR (50) PRIMARY KEY,
-                        buissinesUnitCode NVARCHAR (50),
+                        buisinessUnitCode NVARCHAR (50),
                         firstName NVARCHAR (50),
                         lastName NVARCHAR (50),
                         pin NVARCHAR (50),
