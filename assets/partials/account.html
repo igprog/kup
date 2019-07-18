@@ -37,7 +37,7 @@
                 <td>{{x.user.id}}</td>
                 <td>{{x.user.firstName}}</td>
                 <td>{{x.user.lastName}}</td>
-                <td>{{x.user.buissinesUnitCode}}</td>
+                <td>{{x.user.buisinessUnitCode}}</td>
                 <td><input ng-model="x.monthlyFee" class="form-control" /></td>
                 <td>{{x.loan}}</td>
                 <td><input ng-model="x.repayment" class="form-control" /></td>
@@ -47,5 +47,5 @@
             </tr>
         </tbody>
     </table>
-    <prev>{{d | json}}</prev>
+    <pre ng-if="config.debug">{{d | json}}</pre>
 </div>
