@@ -107,7 +107,7 @@
         f.post('Admin', 'Login', { username: x.userName, password: x.password }).then((d) => {
             if (d === true) {
                 $scope.d.currTpl = f.currTpl('dashboard');
-                $scope.d.currTplTitle = 'Dashboard';
+                $scope.d.currTplTitle = $scope.config.apptitle;
             } else {
                 $scope.d.currTpl = f.currTpl('login');
             }

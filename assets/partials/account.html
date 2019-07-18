@@ -15,7 +15,7 @@
             <option ng-repeat="x in d.years" value="{{x}}">{{x}}</option>
         </select>
         <label for="year" class="mb-2 mr-sm-2"> g </label>
-        <button ng-click="getMonthlyRecords(d)" type="submit" class="btn btn-outline-primary mb-2 mr-sm-2">Filter</button>
+        <button ng-click="getMonthlyRecords(d)" type="submit" class="btn btn-outline-primary mb-2 mr-sm-2"><i class="fas fa-filter"></i> Filter</button>
     </form>
     <table class="table table-striped">
         <thead>
@@ -43,7 +43,7 @@
                 <td><input ng-model="x.repayment" class="form-control" /></td>
                 <td>{{x.repaid}}</td>
                 <td>{{x.restToRepayment}}</td>
-                <td><button class="btn btn-outline-primary" ng-click="save(x, $index)">Spremi</button></td>
+                <td><button class="btn btn-outline-primary" ng-click="save(x, $index)"><i class="fas fa-save"></i> Spremi</button></td>
             </tr>
         </tbody>
     </table>

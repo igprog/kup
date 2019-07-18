@@ -12,14 +12,14 @@
             </thead>
             <tbody>
                 <tr ng-repeat="x in d track by $index">
-                    <td><button class="btn btn-outline-danger" ng-click="remove(x.id, $index)">x</button></td>
+                    <td><button class="btn btn-outline-danger" ng-click="remove(x.id, $index)"><i class="fas fa-minus"></i></button></td>
                     <td><input ng-model="x.code" class="form-control" /></td>
                     <td><input ng-model="x.title" class="form-control" /></td>
-                    <td><button type="submit" class="btn btn-outline-primary" ng-click="save(x)">Spremi</button></td>
+                    <td><button type="submit" class="btn btn-outline-primary" ng-click="save(x)"><i class="fas fa-save"></i> Spremi</button></td>
                 </tr>
                 <tr>
                     <td>
-                        <button class="btn btn-outline-primary" ng-click="add()">+</button>
+                        <button class="btn btn-outline-primary" ng-click="add()"><i class="fas fa-plus"></i></button>
                     </td>
                     <td colspan="3"></td>
                 </tr>

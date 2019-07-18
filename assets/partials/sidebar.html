@@ -1,80 +1,48 @@
-﻿   <!-- Sidebar -->
-<div id="sidebar-container" class="sidebar-expanded d-none d-md-block">
-    <!-- d-* hiddens the Sidebar in smaller devices. Its itens can be kept on the Navbar 'Menu' -->
-    <!-- Bootstrap List Group -->
+﻿<div id="sidebar-container" class="sidebar-expanded d-none d-md-block">
     <ul class="list-group">
         <li data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
-            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('dashboard', 'Dashboard')">
-                <span class="fa fa-dashboard fa-fw mr-3"></span>
-                <span class="menu-collapsed">Dashboard</span>
-                <!--<span class="submenu-icon ml-auto"></span>-->
+            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('dashboard', config.apptitle)">
+                <span class="fas fa-home fa-fw mr-3"></span>
+                <span class="menu-collapsed">Naslovna</span>
             </a>
         </li>
 
-        <!-- Separator with title -->
         <li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
             <small>KORISNICI</small>
         </li>
-        <!-- /END Separator -->
-        <!-- Menu with submenu -->
-
         <li data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
             <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('user', 'Novi Korisnik')">
-                <span class="fa fa-dashboard fa-fw mr-3"></span>
+                <span class="fa fa-user-plus fa-fw mr-3"></span>
                 <span class="menu-collapsed">Novi Korisnik</span>
                 <!--<span class="submenu-icon ml-auto"></span>-->
             </a>
         </li>
         <li data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
             <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('users', 'Korisnici')">
-                <span class="fa fa-dashboard fa-fw mr-3"></span>
+                <span class="fa fa-users fa-fw mr-3"></span>
                 <span class="menu-collapsed">Popis Korisnika</span>
                 <!--<span class="submenu-icon ml-auto"></span>-->
             </a>
         </li>
-        <!-- Submenu content -->
-        <!--<li id='submenu2' class="collapse sidebar-submenu">
-            <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
-                <span class="menu-collapsed">Settings</span>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action bg-dark text-white">
-                <span class="menu-collapsed">Password</span>
-            </a>
-        </li>
-        <li href="#" class="bg-dark list-group-item list-group-item-action">
-            <a class="d-flex w-100 justify-content-start align-items-center">
-                <span class="fa fa-tasks fa-fw mr-3"></span>
-                <span class="menu-collapsed">Tasks</span>
-            </a>
-        </li>-->
-        <!-- Separator with title -->
         <li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
-            <small>RAČUN</small>
+            <small>POZAJMICE</small>
         </li>
-        <!-- /END Separator -->
         <li href="#" class="bg-dark list-group-item list-group-item-action">
             <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('loan', 'Nova Pozajmica')">
-                <span class="fa fa-calendar fa-fw mr-3"></span>
+                <span class="fa fa-hand-holding-usd fa-fw mr-3"></span>
                 <span class="menu-collapsed">Nova Pozajmica</span>
             </a>
         </li>
         <li data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
-            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('account', 'Račun')">
-                <span class="fa fa-dashboard fa-fw mr-3"></span>
+            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('account', 'Promet')">
+                <span class="fa fa-coins fa-fw mr-3"></span>
                 <span class="menu-collapsed">Promet</span>
                 <!--<span class="submenu-icon ml-auto"></span>-->
             </a>
         </li>
-        <!--<li href="#" class="bg-dark list-group-item list-group-item-action">
-            <a class="d-flex w-100 justify-content-start align-items-center">
-                <span class="fa fa-envelope-o fa-fw mr-3"></span>
-                <span class="menu-collapsed">Messages <span class="badge badge-pill badge-primary ml-2">5</span></span>
-            </a>
-        </li>-->
-        <li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
+        <!--<li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
             <small>REKAPITULACIJA</small>
         </li>
-        <!-- /END Separator -->
         <li href="#" class="bg-dark list-group-item list-group-item-action">
             <a class="d-flex w-100 justify-content-start align-items-center">
                 <span class="fa fa-calendar fa-fw mr-3"></span>
@@ -86,34 +54,20 @@
                 <span class="fa fa-calendar fa-fw mr-3"></span>
                 <span class="menu-collapsed">Godišni Izvještaji</span>
             </a>
-        </li>
-
+        </li>-->
         <li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
         </li>
-        <!-- Menu with submenu -->
         <li href="#submenu1" data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
             <a class="d-flex w-100 justify-content-start align-items-center">
-                <span class="fa fa-dashboard fa-fw mr-3"></span>
+                <span class="fa fa-cogs fa-fw mr-3"></span>
                 <span class="menu-collapsed">Postavke</span>
             </a>
         </li>
-        <!-- Submenu content -->
         <li id='submenu1' class="collapse sidebar-submenu">
             <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('buisinessunit', 'Poslovne jedinice')">
+                <span class="fa fa-building fa-fw mr-3"></span>
                 <span class="menu-collapsed">Poslovne jedinice</span>
             </a>
         </li>
-
-
-        <!--<li href="#" class="bg-dark list-group-item list-group-item-action">
-            <a class="d-flex w-100 justify-content-start align-items-center">
-                <span class="fa fa-envelope-o fa-fw mr-3"></span>
-                <span class="menu-collapsed">Messages <span class="badge badge-pill badge-primary ml-2">5</span></span>
-            </a>
-        </li>-->
-        <!-- Logo -->
-        <!--<li class="list-group-item logo-separator d-flex justify-content-center">
-            <img src='https://v4-alpha.getbootstrap.com/assets/brand/bootstrap-solid.svg' width="30" height="30" />
-        </li>-->
-    </ul><!-- List Group END-->
-</div><!-- sidebar-container END -->
+    </ul>
+</div>
