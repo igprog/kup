@@ -242,16 +242,42 @@
         }
     }
 
-    $scope.myFunc = function () {
-        alert('ok')
-    };
-
     $scope.save = (x, date) => {
         x.loanDate = f.setDate(date);
         f.post(service, 'Save', { x: x }).then((d) => {
             alert(d);
         });
     }
+
+}])
+
+.controller('loansCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
+    var service = 'Loan';
+    var data = {
+        loans: [],
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear(),
+        months: f.months(),
+        years: f.years(),
+        buisinessUnits: [],
+        buisinessUnitCode: null
+    };
+    $scope.d = data;
+
+    var loadBuisinessUnit = () => {
+        f.post('BuisinessUnit', 'Load', {}).then((d) => {
+            $scope.d.buisinessUnits = d;
+        });
+    }
+    loadBuisinessUnit();
+
+    var load = () => {
+        f.post('Loan', 'Load', {}).then((d) => {
+            $scope.d.loans = d;
+        });
+    }
+    load();
+
 
 
 }])
@@ -271,7 +297,6 @@
     $scope.d = data;
 
     var getMonthlyRecords = (x) => {
-        debugger;
         f.post(service, 'GetMonthlyRecords', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
             $scope.d.users = d;
         });

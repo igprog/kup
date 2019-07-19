@@ -30,6 +30,7 @@ public class Loan : System.Web.Services.WebService {
         public string loanDate;
         public double repayment;
         public double manipulativeCosts;
+        public double actualLoan;
         public double dedline;
         public int isRepaid;
         public string note;
@@ -45,6 +46,7 @@ public class Loan : System.Web.Services.WebService {
         x.loanDate = null;
         x.repayment = 0;
         x.manipulativeCosts = 0;
+        x.actualLoan = 0;
         x.dedline = defaultDedline;
         x.isRepaid = 0;
         x.note = null;
@@ -129,10 +131,11 @@ public class Loan : System.Web.Services.WebService {
         x.loan = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
         x.loanDate = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
         x.repayment = reader.GetValue(4) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(4));
-        x.manipulativeCosts = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
-        x.dedline = reader.GetValue(7) == DBNull.Value ? defaultDedline : Convert.ToDouble(reader.GetString(7));
-        x.isRepaid = reader.GetValue(8) == DBNull.Value ? 0 : reader.GetInt32(8);
-        x.note = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);
+        x.manipulativeCosts = reader.GetValue(5) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(5));
+        x.actualLoan = x.loan - x.manipulativeCosts;
+        x.dedline = reader.GetValue(6) == DBNull.Value ? defaultDedline : Convert.ToDouble(reader.GetString(6));
+        x.isRepaid = reader.GetValue(7) == DBNull.Value ? 0 : reader.GetInt32(7);
+        x.note = reader.GetValue(8) == DBNull.Value ? null : reader.GetString(8);
         return x;
     }
 

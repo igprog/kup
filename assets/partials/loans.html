@@ -1,4 +1,4 @@
-﻿<div ng-controller="accountCtrl">
+﻿<div ng-controller="loansCtrl">
     <form class="form-inline">
         <div class="form-group">
             <label for="buissinesUnitCode" class="mb-2 mr-sm-2">Poslovna jedinica:</label>
@@ -24,25 +24,25 @@
                 <th>Ime</th>
                 <th>Prezime</th>
                 <th>Br. posl. jedinice</th>
-                <th>Ulog (kn)</th>
-                <th>Pozajica (kn)</th>
-                <th>Rata (kn)</th>
-                <th>Otplaćeno (kn)</th>
-                <th>Ostatak za uplatu (kn)</th>
+                <th>Odobrena pozajmica (kn)</th>
+                <th>Manipulativni troškovi (kn)</th>
+                <th>Pozajmica (kn)</th>
+                <th>Neotplaćena pozajmica (kn)</th>
+                <th>Za isplatu (kn)</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="x in d.users track by $index">
+            <tr ng-repeat="x in d.loans track by $index">
                 <td>{{x.user.id}}</td>
                 <td>{{x.user.firstName}}</td>
                 <td>{{x.user.lastName}}</td>
                 <td>{{x.user.buisinessUnitCode}}</td>
-                <td><input ng-model="x.monthlyFee" class="form-control" /></td>
                 <td>{{x.loan}}</td>
-                <td><input ng-model="x.repayment" class="form-control" /></td>
-                <td>{{x.repaid}}</td>
-                <td>{{x.restToRepayment}}</td>
+                <td>{{x.manipulativeCosts}}</td>
+                <td>{{x.actualLoan}}</td>
+                <td>TODO</td>
+                <td>TODO</td>
                 <td><button class="btn btn-outline-primary" ng-click="save(x, $index)"><i class="fas fa-save"></i> Spremi</button></td>
             </tr>
         </tbody>
