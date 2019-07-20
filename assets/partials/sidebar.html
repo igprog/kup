@@ -34,7 +34,7 @@
             </a>
         </li>
         <li href="#" class="bg-dark list-group-item list-group-item-action">
-            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('loans', 'Nova Pozajmice')">
+            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('loans', 'Pozajmice')">
                 <span class="fa fa-list fa-fw mr-3"></span>
                 <span class="menu-collapsed">Pozajmice</span>
             </a>
@@ -73,6 +73,12 @@
             <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('buisinessunit', 'Poslovne jedinice')">
                 <span class="fa fa-building fa-fw mr-3"></span>
                 <span class="menu-collapsed">Poslovne jedinice</span>
+            </a>
+        </li>
+        <li ng-if="config.showadminpage" id='submenu1' class="collapse sidebar-submenu">
+            <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('admin', 'Admin')">
+                <span class="fa fa-user-lock fa-fw mr-3"></span>
+                <span class="menu-collapsed">Admin</span>
             </a>
         </li>
     </ul>

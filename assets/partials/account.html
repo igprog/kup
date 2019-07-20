@@ -3,49 +3,49 @@
         <div class="form-group">
             <label for="buissinesUnitCode" class="mb-2 mr-sm-2">Poslovna jedinica:</label>
             <select ng-model="d.buisinessUnitCode" class="form-control mb-2 mr-sm-2" name="buissinesUnitCode">
-                <option ng-repeat="x in d.buisinessUnits" value="{{x.code}}">{{x.code}} - {{x.title}}</option>
+                <option ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.code}} - {{x.title}}</option>
             </select>
         </div>
         <label for="month" class="mb-2 mr-sm-2">Mjesec:</label>
         <select ng-model="d.month" class="form-control mb-2 mr-sm-2">
-            <option ng-repeat="x in d.months" value="{{x.id}}">{{x.title}}</option>
+            <option ng-repeat="x in g.months" value="{{x.id}}">{{x.title}}</option>
         </select>
         <label for="year" class="mb-2 mr-sm-2"> / </label>
         <select ng-model="d.year" class="form-control mb-2 mr-sm-2">
-            <option ng-repeat="x in d.years" value="{{x}}">{{x}}</option>
+            <option ng-repeat="x in g.years" value="{{x}}">{{x}}</option>
         </select>
         <label for="year" class="mb-2 mr-sm-2"> g </label>
         <button ng-click="getMonthlyRecords(d)" type="submit" class="btn btn-outline-primary mb-2 mr-sm-2"><i class="fas fa-filter"></i> Filter</button>
     </form>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Mat. br.</th>
-                <th>Ime</th>
-                <th>Prezime</th>
-                <th>Br. posl. jedinice</th>
-                <th>Ulog (kn)</th>
-                <th>Pozajica (kn)</th>
-                <th>Rata (kn)</th>
-                <th>Otplaćeno (kn)</th>
-                <th>Ostatak za uplatu (kn)</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="x in d.users track by $index">
-                <td>{{x.user.id}}</td>
-                <td>{{x.user.firstName}}</td>
-                <td>{{x.user.lastName}}</td>
-                <td>{{x.user.buisinessUnitCode}}</td>
-                <td><input ng-model="x.monthlyFee" class="form-control" /></td>
-                <td>{{x.loan}}</td>
-                <td><input ng-model="x.repayment" class="form-control" /></td>
-                <td>{{x.repaid}}</td>
-                <td>{{x.restToRepayment}}</td>
-                <td><button class="btn btn-outline-primary" ng-click="save(x, $index)"><i class="fas fa-save"></i> Spremi</button></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Mat. br.</th>
+                    <th>Ime</th>
+                    <th>Prezime</th>
+                    <th>Ulog (kn)</th>
+                    <th>Pozajica (kn)</th>
+                    <th>Rata (kn)</th>
+                    <th>Otplaćeno (kn)</th>
+                    <th>Ostatak za uplatu (kn)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="x in d.users track by $index">
+                    <td>{{x.user.id}}</td>
+                    <td>{{x.user.firstName}}</td>
+                    <td>{{x.user.lastName}}</td>
+                    <td><input ng-model="x.monthlyFee" class="form-control" /></td>
+                    <td>{{x.loan}}</td>
+                    <td><input ng-model="x.repayment" class="form-control" /></td>
+                    <td>{{x.repaid}}</td>
+                    <td>{{x.restToRepayment}}</td>
+                    <td><button class="btn btn-outline-primary" ng-click="save(x, $index)"><i class="fas fa-save"></i> Spremi</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     <pre ng-if="config.debug">{{d | json}}</pre>
 </div>

@@ -18,6 +18,7 @@ using Igprog;
 public class Account : System.Web.Services.WebService {
     string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
+    Global g = new Global();
     public Account() {
     }
 
@@ -201,20 +202,13 @@ public class Account : System.Web.Services.WebService {
         return x;
     }
 
-    public string ReffDate(int month, int year) {
-        int nextMonth = month == 12 ? 1 : month + 1;
-        string month_ = nextMonth < 10 ? string.Format("0{0}", nextMonth) : nextMonth.ToString();
-        int year_ = month == 12 ? year + 1 : year;
-        return string.Format("{0}-{1}-01", year_, month_);
-    }
-
     public NewAccount CheckLoan(NewAccount x, string userId, int month, int year) {
         string sql = string.Format(@"
                     SELECT l.id, l.loan, l.repayment, a.repaid, a.restToRepayment FROM Loan l
                     LEFT OUTER JOIN Account a
                     ON l.id = a.loanId
                     WHERE l.userId = '{0}' AND l.isRepaid = 0 AND CONVERT(datetime, l.loanDate) <= '{1}'
-                    GROUP BY l.id, l.loan, l.repayment, a.repaid, a.restToRepayment", userId, ReffDate(month, year));
+                    GROUP BY l.id, l.loan, l.repayment, a.repaid, a.restToRepayment", userId, g.ReffDate(month, year));
         using (SqlConnection connection = new SqlConnection(connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {

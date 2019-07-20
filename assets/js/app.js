@@ -92,6 +92,22 @@
     };
     getConfig();
 
+    var loadGlobalData = () => {
+        var data = {
+            date: new Date(),
+            month: new Date().getMonth() + 1,
+            year: new Date().getFullYear(),
+            months: f.months(),
+            years: f.years(),
+            buisinessUnits: []
+        }
+        f.post('BuisinessUnit', 'Load', {}).then((d) => {
+            data.buisinessUnits = d;
+        });
+        $scope.g = data;
+    }
+    loadGlobalData();
+
     var data = {
         admin: {
             userName: null,
@@ -257,28 +273,21 @@
         loans: [],
         month: new Date().getMonth() + 1,
         year: new Date().getFullYear(),
-        months: f.months(),
-        years: f.years(),
-        buisinessUnits: [],
         buisinessUnitCode: null
     };
     $scope.d = data;
 
-    var loadBuisinessUnit = () => {
-        f.post('BuisinessUnit', 'Load', {}).then((d) => {
-            $scope.d.buisinessUnits = d;
-        });
-    }
-    loadBuisinessUnit();
-
-    var load = () => {
-        f.post('Loan', 'Load', {}).then((d) => {
+    $scope.load = (x) => {
+        f.post('Loan', 'Load', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
             $scope.d.loans = d;
         });
     }
-    load();
+    //load();
 
-
+    //TODO: print
+    $scope.print = (x) => {
+        alert('TODO');
+    }
 
 }])
 
@@ -287,11 +296,8 @@
     var data = {
         users: [],
         account: {},
-        month: new Date().getMonth() + 1,
-        year: new Date().getFullYear(),
-        months: f.months(),
-        years: f.years(),
-        buisinessUnits: [],
+        month: $scope.g.month,
+        year: $scope.g.year,
         buisinessUnitCode: null
     }
     $scope.d = data;
@@ -326,7 +332,33 @@
 
 }])
 
+.controller('adminCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
+    var service = 'Admin';
+    
+    var data = {
+        admin: {
+            userName: null,
+            password: null
+        },
+        isLogin: false,
+        truncateTbl: null,
+        dropTbl: null
+    }
+    $scope.d = data;
 
+    $scope.login = (x) => {
+        f.post('Admin', 'LoginSupervisor', { username: x.userName, password: x.password }).then((d) => {
+            $scope.d.isLogin = d;
+        });
+    }
+
+    $scope.sql = (x, tbl) => {
+        f.post('Admin', 'SQL', { method: x, tbl: tbl }).then((d) => {
+            Alert(d);
+        });
+    }
+
+}])
 
 
 

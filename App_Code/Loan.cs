@@ -18,6 +18,7 @@ using Igprog;
 public class Loan : System.Web.Services.WebService {
     string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
+    Global g = new Global();
     double manipulativeCostsCoeff = Convert.ToDouble(ConfigurationManager.AppSettings["manipulativeCostsCoeff"]);
     double defaultDedline = Convert.ToDouble(ConfigurationManager.AppSettings["defaultDedline"]);  // ***** Months to repayment *****
     public Loan() {
@@ -35,6 +36,7 @@ public class Loan : System.Web.Services.WebService {
         public int isRepaid;
         public string note;
         public double manipulativeCostsCoeff;
+        public BuisinessUnit.NewUnit buisinessUnit;
     }
 
     [WebMethod]
@@ -51,6 +53,7 @@ public class Loan : System.Web.Services.WebService {
         x.isRepaid = 0;
         x.note = null;
         x.manipulativeCostsCoeff = manipulativeCostsCoeff;
+        x.buisinessUnit = new BuisinessUnit.NewUnit();
         return JsonConvert.SerializeObject(x, Formatting.Indented);
     }
 
@@ -83,10 +86,15 @@ public class Loan : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    public string Load() {
+    public string Load(int month, int year, string buisinessUnitCode) {
         try {
             db.Loan();
-            string sql = "SELECT * FROM Loan";
+            string sql = string.Format(@"SELECT l.id, l.userId, l.loan, l.loanDate, l.repayment, l.manipulativeCosts, l.dedline, l.isRepaid, l.note, u.firstName, u.lastName, b.code, b.title FROM Loan l
+                        LEFT OUTER JOIN Users u
+                        ON l.userId = u.id
+                        LEFT OUTER JOIN BuisinessUnit b
+                        ON u.buisinessUnitCode = b.code
+                        WHERE u.buisinessUnitCode = '{0}' AND CONVERT(datetime, l.loanDate) <= '{1}'", buisinessUnitCode, g.ReffDate(month, year));
             List<NewLoan> xx = new List<NewLoan>();
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
@@ -136,6 +144,28 @@ public class Loan : System.Web.Services.WebService {
         x.dedline = reader.GetValue(6) == DBNull.Value ? defaultDedline : Convert.ToDouble(reader.GetString(6));
         x.isRepaid = reader.GetValue(7) == DBNull.Value ? 0 : reader.GetInt32(7);
         x.note = reader.GetValue(8) == DBNull.Value ? null : reader.GetString(8);
+        x.user.firstName = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);
+        x.user.lastName = reader.GetValue(10) == DBNull.Value ? null : reader.GetString(10);
+        x.user.buisinessUnit = new BuisinessUnit.NewUnit();
+        x.user.buisinessUnit.code = reader.GetValue(11) == DBNull.Value ? null : reader.GetString(11);
+        x.user.buisinessUnit.title = reader.GetValue(12) == DBNull.Value ? null : reader.GetString(12);
+        return x;
+    }
+
+    public NewLoan GetRecord(string userId, int month, int year) {
+        string sql = string.Format("SELECT * FROM Loan WHERE userId = '{0}' AND mo = '{1}' AND yr = '{2}'", userId, month, year);
+        NewLoan x = new NewLoan();
+        using (SqlConnection connection = new SqlConnection(connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = ReadData(reader);
+                    }
+                }
+            }
+            connection.Close();
+        }
         return x;
     }
 

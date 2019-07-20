@@ -6,7 +6,7 @@
                 <th>Ime</th>
                 <th>Prezime</th>
                 <th>OIB</th>
-                <th>Br. posl. jedinice</th>
+                <th>Posl. jedinice</th>
                 <th>Ulog (kn)</th>
             </tr>
         </thead>
@@ -16,7 +16,7 @@
                 <td>{{x.firstName}}</td>
                 <td>{{x.lastName}}</td>
                 <td>{{x.pin}}</td>
-                <td>{{x.buisinessUnitCode}}</td>
+                <td>{{x.buisinessUnit.code}} - {{x.buisinessUnit.title}}</td>
                 <td>{{x.monthlyFee | number:2}}</td>
             </tr>
         </tbody>

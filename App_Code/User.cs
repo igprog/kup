@@ -19,12 +19,15 @@ public class User : System.Web.Services.WebService {
     string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
     double monthlyFee = Convert.ToDouble(ConfigurationManager.AppSettings["monthlyFee"]);
+    string sqlString = "u.id, u.buisinessUnitCode, u.firstName, u.lastName, u.pin, u.birthDate, u.accessDate, u.terminationDate, u.isActive, u.monthlyFee";
+
     public User() {
     }
 
       public class NewUser {
         public string id;
-        public string buisinessUnitCode;
+        //public string buisinessUnitCode;
+        public BuisinessUnit.NewUnit buisinessUnit;
         public string firstName;
         public string lastName;
         public string pin;
@@ -39,7 +42,8 @@ public class User : System.Web.Services.WebService {
     public string Init() {
         NewUser x = new NewUser();
         x.id = null;
-        x.buisinessUnitCode = null;
+        //x.buisinessUnitCode = null;
+        x.buisinessUnit = new BuisinessUnit.NewUnit();
         x.firstName = null;
         x.lastName = null;
         x.pin = null;
@@ -57,7 +61,7 @@ public class User : System.Web.Services.WebService {
             db.Users();
             string sql = string.Format(@"INSERT INTO Users VALUES  
                        ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')"
-                        , x.id, x.buisinessUnitCode, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
+                        , x.id, x.buisinessUnit.code, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -83,7 +87,8 @@ public class User : System.Web.Services.WebService {
     NewUser ReadData(SqlDataReader reader) {
         NewUser x = new NewUser();
         x.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
-        x.buisinessUnitCode = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
+        x.buisinessUnit = new BuisinessUnit.NewUnit();
+        x.buisinessUnit.code = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
         x.firstName = reader.GetValue(2) == DBNull.Value ? null : reader.GetString(2);
         x.lastName = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
         x.pin = reader.GetValue(4) == DBNull.Value ? null : reader.GetString(4);
@@ -92,17 +97,17 @@ public class User : System.Web.Services.WebService {
         x.terminationDate = reader.GetValue(7) == DBNull.Value ? null : reader.GetString(7);
         x.isActive = reader.GetValue(8) == DBNull.Value ? 1 : reader.GetInt32(8);
         x.monthlyFee = reader.GetValue(9) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(9));
+        x.buisinessUnit.title = reader.GetValue(10) == DBNull.Value ? null : reader.GetString(10);
         return x;
     }
 
     public List<NewUser> GetUsers(string buisinessUnitCode) {
         db.Users();
-        string sql = null;
-        if(string.IsNullOrEmpty(buisinessUnitCode)) {
-            sql = "SELECT * FROM Users";
-        } else {
-            sql = string.Format("SELECT * FROM Users WHERE buisinessUnitCode = '{0}'", buisinessUnitCode);
-        }
+        string sql = string.Format(@"SELECT {0}, b.title FROM Users u
+                        LEFT OUTER JOIN BuisinessUnit b
+                        ON u.buisinessUnitCode = b.code {1}"
+                        , sqlString 
+                        , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("WHERE buisinessUnitCode = '{0}'", buisinessUnitCode): "");
         List<NewUser> xx = new List<NewUser>();
         using (SqlConnection connection = new SqlConnection(connectionString)) {
             connection.Open();
