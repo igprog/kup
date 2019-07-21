@@ -4,15 +4,15 @@
     <title>KUP JANAF</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/css/vendor/bootstrap.min.css">
-    <script src="/assets/js/vendor/jquery.min.js"></script>
-    <script src="/assets/js/vendor/bootstrap.min.js"></script>
-    <script src="/assets/js/vendor/angular.min.js"></script>
+    <link rel="stylesheet" href="./assets/css/vendor/bootstrap.min.css">
+    <script src="./assets/js/vendor/jquery.min.js"></script>
+    <script src="./assets/js/vendor/bootstrap.min.js"></script>
+    <script src="./assets/js/vendor/angular.min.js"></script>
     <!--*********** FontAwesome ***********-->
-    <script src="/assets/js/vendor/fontawesome.min.js"></script>
-    <script src="/assets/js/vendor/solid.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/vendor/solid.min.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="./assets/js/vendor/fontawesome.min.js"></script>
+    <script src="./assets/js/vendor/solid.min.js"></script>
+    <link rel="stylesheet" href="./assets/css/vendor/solid.min.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
     <!--*********** FontAwesome ***********-->
 </head>
 <body ng-app="app" ng-controller="appCtrl" ng-cloak>
@@ -49,11 +49,11 @@
     </nav>
     
     <div ng-if="!d.isLogin">
-        <ng-include src="'assets/partials/login.html'"></ng-include>
+        <ng-include src="'./assets/partials/login.html'"></ng-include>
     </div>
 
     <div ng-if="d.isLogin" class="row" id="body-row">
-            <ng-include src="'assets/partials/sidebar.html'"></ng-include>
+            <ng-include src="'./assets/partials/sidebar.html'"></ng-include>
             <div class="col">
                 <div style="min-height:50px">
                 </div>
@@ -66,7 +66,7 @@
             </div>
 
     </div>
-    <script src="../assets/js/app.js"></script>
+    <script src="./assets/js/app.js"></script>
 
 </body>
 </html>

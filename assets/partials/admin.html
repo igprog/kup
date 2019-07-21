@@ -19,15 +19,22 @@
     <div ng-if="d.isLogin">
         <form class="form-inline">
             <div class="form-group">
-                <label for="buissinesUnitCode" class="mb-2 mr-sm-2">Truncate Table:</label>
-                <input ng-model="d.truncateTbl" class="form-control mb-2 mr-sm-2" />
+                <label class="mb-2 mr-sm-2">Briši Korisnika:</label>
+                <input ng-model="d.userId" class="form-control mb-2 mr-sm-2" placeholder="Mat. br." />
+            </div>
+            <button ng-click="removeUser(d.userId)" type="submit" class="btn btn-outline-danger mb-2 mr-sm-2"><i class="fas fa-trash"></i> Briši</button>
+        </form>
+        <form class="form-inline">
+            <div class="form-group">
+                <label class="mb-2 mr-sm-2">Truncate Table:</label>
+                <input ng-model="d.truncateTbl" class="form-control mb-2 mr-sm-2" placeholder="Tablica" />
             </div>
             <button ng-click="sql(d.truncateTbl, 'truncate')" type="submit" class="btn btn-outline-warning mb-2 mr-sm-2"><i class="fas fa-exclamation-triangle"></i> Truncate</button>
         </form>
         <form class="form-inline">
             <div class="form-group">
-                <label for="buissinesUnitCode" class="mb-2 mr-sm-2">Drop Table:</label>
-                <input ng-model="d.dropTbl" class="form-control mb-2 mr-sm-2" />
+                <label class="mb-2 mr-sm-2">Drop Table:</label>
+                <input ng-model="d.dropTbl" class="form-control mb-2 mr-sm-2" placeholder="Tablica" />
             </div>
             <button ng-click="sql(d.dropTbl, 'drop')" type="submit" class="btn btn-outline-danger mb-2 mr-sm-2"><i class="fas fa-skull-crossbones"></i> Drop</button>
         </form>

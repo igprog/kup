@@ -14,7 +14,7 @@
     return {
         post: (service, method, data) => {
             return $http({
-                url: '../' + service + '.asmx/' + method,
+                url: './' + service + '.asmx/' + method,
                 method: 'POST',
                 data: data
             })
@@ -26,7 +26,7 @@
             });
         },
         currTpl: (tpl) => {
-            return 'assets/partials/' + tpl + '.html';
+            return './assets/partials/' + tpl + '.html';
         },
         months: () => {
             return [
@@ -59,7 +59,7 @@
             return yr + '-' + mo + '-' + day;
         },
         pdfTempPath: (x) => {
-            return 'upload/pdf/temp/' + x + '.pdf';
+            return './upload/pdf/temp/' + x + '.pdf';
         }
     }
 }])
@@ -87,7 +87,7 @@
     }
 
     var getConfig = () => {
-        $http.get('../config/config.json').then(function (response) {
+        $http.get('./config/config.json').then(function (response) {
               $scope.config = response.data;
               reloadPage();
           });
@@ -175,6 +175,15 @@
         });
     }
 
+    $scope.cancelUser = (x) => {
+        if (confirm('Deaktiviraj korisnika: ' + x.lastName + ' ' + x.firstName)) {
+            f.post('User', 'Cancel', { id: x }).then((d) => {
+                alert(d);
+            });
+        }
+    }
+
+
 }])
 
 .controller('usersCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
@@ -190,6 +199,10 @@
         });
     }
     load();
+
+    $scope.details = (id) => {
+        alert('TODO');
+    }
 
 }])
 
@@ -352,6 +365,7 @@
             password: null
         },
         isLogin: false,
+        userId: null,
         truncateTbl: null,
         dropTbl: null
     }
@@ -363,11 +377,24 @@
         });
     }
 
+    $scope.removeUser = (x) => {
+        if (confirm('Dali ste sigurni da želite izbrisati korisnika: ' + x + '?')) {
+            alert('TODO');
+            //f.post('User', 'Delete', { id: x }).then((d) => {
+            //    alert(d);
+            //});
+        }
+
     $scope.sql = (x, tbl) => {
-        f.post('Admin', 'Sql', { method: x, tbl: tbl }).then((d) => {
-            Alert(d);
-        });
+        if (confirm('Dali ste sigurni da želite izbrisati tablicu: ' + x + '?')) {
+            f.post('Admin', 'Sql', { method: x, tbl: tbl }).then((d) => {
+                alert(d);
+            });
+        }
     }
+
+    }
+
 
 }])
 

@@ -84,6 +84,26 @@ public class User : System.Web.Services.WebService {
         }
     }
 
+    [WebMethod]
+    public string Cancel(string id) {
+        try {
+            db.Users();
+            string sql = string.Format(@"UPDATE Users SET isActive = 0 WHERE id = '{0}'", id);
+            using (SqlConnection connection = new SqlConnection(connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+            return JsonConvert.SerializeObject("Korisnik izbrisan", Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+        }
+    }
+
+    //TODO: Delete User and all users data.
+
     NewUser ReadData(SqlDataReader reader) {
         NewUser x = new NewUser();
         x.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);

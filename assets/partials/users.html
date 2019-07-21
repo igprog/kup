@@ -8,6 +8,7 @@
                 <th>OIB</th>
                 <th>Posl. jedinice</th>
                 <th>Ulog (kn)</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -18,6 +19,7 @@
                 <td>{{x.pin}}</td>
                 <td>{{x.buisinessUnit.code}} - {{x.buisinessUnit.title}}</td>
                 <td>{{x.monthlyFee | number:2}}</td>
+                <td><button class="btn btn-outline-primary" ng-click="details(x.id)"><i class="fas fa-info-circle"></i></button></td>
             </tr>
         </tbody>
     </table>
