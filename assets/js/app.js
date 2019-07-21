@@ -53,11 +53,13 @@
             return years;
         },
         setDate: (x) => {
-            debugger;
             var day = x.getDate();
             var mo = x.getMonth() < 10 ? '0' + (x.getMonth() + 1) : x.getMonth() + 1;
             var yr = x.getFullYear();
             return yr + '-' + mo + '-' + day;
+        },
+        pdfTempPath: (x) => {
+            return 'upload/pdf/temp/' + x + '.pdf';
         }
     }
 }])
@@ -127,7 +129,6 @@
             } else {
                 $scope.d.currTpl = f.currTpl('login');
             }
-           // $scope.d.currTpl = d == true ? f.currTpl('dashboard') : f.currTpl('login');
             $scope.d.isLogin = d;
             //TODO: save user to session storage
         });
@@ -273,7 +274,9 @@
         loans: [],
         month: new Date().getMonth() + 1,
         year: new Date().getFullYear(),
-        buisinessUnitCode: null
+        buisinessUnitCode: null,
+        pdf: null,
+        loadingPdf: false
     };
     $scope.d = data;
 
@@ -282,11 +285,19 @@
             $scope.d.loans = d;
         });
     }
-    //load();
 
-    //TODO: print
     $scope.print = (x) => {
-        alert('TODO');
+        $scope.d.pdf = null;
+        $scope.d.loadingPdf = true;
+        f.post('Pdf', 'Loans', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, loans: x.loans }).then((d) => {
+            debugger;
+            $scope.d.pdf = f.pdfTempPath(d);
+            $scope.d.loadingPdf = false;
+        });
+    }
+
+    $scope.removePdfLink = function () {
+        $scope.d.pdf = null;
     }
 
 }])
@@ -353,34 +364,13 @@
     }
 
     $scope.sql = (x, tbl) => {
-        f.post('Admin', 'SQL', { method: x, tbl: tbl }).then((d) => {
+        f.post('Admin', 'Sql', { method: x, tbl: tbl }).then((d) => {
             Alert(d);
         });
     }
 
 }])
 
-
-
-//.directive('sortDirective', function () {
-//    return {
-//        restrict: 'E',
-//        templateUrl: 'partials/filterCtrl.html'
-//    };
-//})
-
-//.directive('productDirective', function () {
-//    return {
-//        restrict: 'E',
-//        scope: {
-//            filtercategory: '=',
-//            products: '=',
-//            filtervalue: '=',
-//            ordervalue: '='
-//        },
-//        templateUrl: 'partials/products.html'
-//    };
-//})
 
 //.directive('modalDirective', function () {
 //    return {
@@ -391,20 +381,5 @@
 //        templateUrl: 'partials/popup/modal.html'
 //    };
 //})
-
-//.directive('checkImage', function ($http) {
-//    return {
-//        restrict: 'A',
-//        link: function (scope, element, attrs) {
-//            attrs.$observe('ngSrc', function (ngSrc) {
-//                $http.get(ngSrc).success(function () {
-//                }).error(function () {
-//                    element.attr('src', './img/default.png'); // set default image
-//                });
-//            });
-//        }
-//    };
-//});
-
 
 ;

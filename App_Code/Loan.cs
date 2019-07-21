@@ -33,10 +33,24 @@ public class Loan : System.Web.Services.WebService {
         public double manipulativeCosts;
         public double actualLoan;
         public double dedline;
+        public double restToRepayment;  //TODO
         public int isRepaid;
         public string note;
         public double manipulativeCostsCoeff;
         public BuisinessUnit.NewUnit buisinessUnit;
+    }
+
+    public class Total {
+        public double loan;
+        public double repayment;
+        public double manipulativeCosts;
+        public double actualLoan;
+        public double restToRepayment;
+    }
+
+    public class Loans {
+        public List<NewLoan> data;
+        public Total total; 
     }
 
     [WebMethod]
@@ -95,19 +109,27 @@ public class Loan : System.Web.Services.WebService {
                         LEFT OUTER JOIN BuisinessUnit b
                         ON u.buisinessUnitCode = b.code
                         WHERE u.buisinessUnitCode = '{0}' AND CONVERT(datetime, l.loanDate) <= '{1}'", buisinessUnitCode, g.ReffDate(month, year));
-            List<NewLoan> xx = new List<NewLoan>();
+            Loans xx = new Loans();
+            xx.data = new List<NewLoan>();
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     using (SqlDataReader reader = command.ExecuteReader()) {
                         while (reader.Read()) {
                             NewLoan x = ReadData(reader);
-                            xx.Add(x);
+                            xx.data.Add(x);
                         }
                     }
                 }
                 connection.Close();
             }
+            xx.total = new Total();
+            xx.total.loan = xx.data.Sum(a => a.loan);
+            xx.total.repayment = xx.data.Sum(a => a.repayment);
+            xx.total.manipulativeCosts = xx.data.Sum(a => a.manipulativeCosts);
+            xx.total.actualLoan = xx.data.Sum(a => a.actualLoan);
+            xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
+
             return JsonConvert.SerializeObject(xx, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
@@ -141,6 +163,7 @@ public class Loan : System.Web.Services.WebService {
         x.repayment = reader.GetValue(4) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(4));
         x.manipulativeCosts = reader.GetValue(5) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(5));
         x.actualLoan = x.loan - x.manipulativeCosts;
+        //TODO:  x.restToRepayment;
         x.dedline = reader.GetValue(6) == DBNull.Value ? defaultDedline : Convert.ToDouble(reader.GetString(6));
         x.isRepaid = reader.GetValue(7) == DBNull.Value ? 0 : reader.GetInt32(7);
         x.note = reader.GetValue(8) == DBNull.Value ? null : reader.GetString(8);

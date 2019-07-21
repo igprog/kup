@@ -3,5 +3,6 @@
   "appname": "KUP - Janaf",
   "apptitle": "Kasa Uzajamne Pomoći",
   "debug": true,
-  "showadminpage": true
+  "showadminpage": true,
+  "currency": "kn"
 }

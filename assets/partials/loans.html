@@ -20,36 +20,47 @@
                 <button ng-click="load(d)" type="submit" class="btn btn-outline-primary mb-2 mr-sm-2"><i class="fas fa-filter"></i> Filter</button>
             </form>
         </div>
-        <div class="col-sm-2 text-right">
-            <button class="btn btn-outline-success" ng-click="print(d)"><i class="fas fa-print"></i> Ispis</button>
+        <div ng-if="d.loans.data.length>0" class="col-sm-2 text-right">
+            <button ng-if="!d.pdf" class="btn btn-outline-danger" ng-click="print(d)"><i class="fas fa-{{d.loadingPdf?'spinner fa-spin':'file-pdf'}}"></i> PDF</button>
+            <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" check-link download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
         </div>
     </div>
     <div class="table-responsive">
-        <table class="table table-striped">
+        <table class="table table-hover">
             <thead>
                 <tr>
                     <th>Mat. br.</th>
-                    <th>Ime</th>
                     <th>Prezime</th>
-                    <th>Odobrena pozajmica (kn)</th>
-                    <th>Manipulativni troškovi (kn)</th>
-                    <th>Pozajmica (kn)</th>
-                    <th>Neotplaćena pozajmica (kn)</th>
-                    <th>Za isplatu (kn)</th>
+                    <th>Ime</th>
+                    <th class="text-right">Odobrena pozajmica ({{config.currency}})</th>
+                    <th class="text-right">Manipulativni troškovi ({{config.currency}})</th>
+                    <th class="text-right">Pozajmica ({{config.currency}})</th>
+                    <th class="text-right">Neotplaćena pozajmica ({{config.currency}})</th>
+                    <th class="text-right">Za isplatu ({{config.currency}})</th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="x in d.loans track by $index">
+                <tr ng-repeat="x in d.loans.data track by $index">
                     <td>{{x.user.id}}</td>
-                    <td>{{x.user.firstName}}</td>
                     <td>{{x.user.lastName}}</td>
-                    <td>{{x.loan}}</td>
-                    <td>{{x.manipulativeCosts}}</td>
-                    <td>{{x.actualLoan}}</td>
-                    <td>TODO</td>
-                    <td>TODO</td>
+                    <td>{{x.user.firstName}}</td>
+                    <td class="text-right">{{x.loan | number:2}}</td>
+                    <td class="text-right">{{x.manipulativeCosts | number:2}}</td>
+                    <td class="text-right">{{x.actualLoan | number:2}}</td>
+                    <td class="text-right">TODO</td>
+                    <td class="text-right">TODO</td>
                 </tr>
             </tbody>
+            <tfoot ng-if="d.loans.data.length>0" class="thead-light">
+                <tr class="text-right">
+                    <th colspan="3">Ukupno:</th>
+                    <th>{{d.loans.total.loan | number:2}}</th>
+                    <th>{{d.loans.total.manipulativeCosts | number:2}}</th>
+                    <th>{{d.loans.total.actualLoan | number:2}}</th>
+                    <th>TODO</th>
+                    <th>TODO</th>
+                </tr>
+            </tfoot>
         </table>
     </div>
     <pre ng-if="config.debug">{{d | json}}</pre>

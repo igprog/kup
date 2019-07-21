@@ -3,8 +3,8 @@
         <thead>
             <tr>
                 <th>Mat. br.</th>
-                <th>Ime</th>
                 <th>Prezime</th>
+                <th>Ime</th>
                 <th>OIB</th>
                 <th>Posl. jedinice</th>
                 <th>Ulog (kn)</th>
@@ -13,8 +13,8 @@
         <tbody>
             <tr ng-repeat="x in d.users">
                 <td>{{x.id}}</td>
-                <td>{{x.firstName}}</td>
                 <td>{{x.lastName}}</td>
+                <td>{{x.firstName}}</td>
                 <td>{{x.pin}}</td>
                 <td>{{x.buisinessUnit.code}} - {{x.buisinessUnit.title}}</td>
                 <td>{{x.monthlyFee | number:2}}</td>
