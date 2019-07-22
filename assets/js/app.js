@@ -47,7 +47,7 @@
         years: () => {
             var year = new Date().getFullYear();
             var years = [];
-            for (var i = 2016; i <= year; i++) {
+            for (var i = 2018; i <= year; i++) {
                 years.push(i);
             }
             return years;
@@ -379,11 +379,11 @@
 
     $scope.removeUser = (x) => {
         if (confirm('Dali ste sigurni da želite izbrisati korisnika: ' + x + '?')) {
-            alert('TODO');
-            //f.post('User', 'Delete', { id: x }).then((d) => {
-            //    alert(d);
-            //});
+            f.post('User', 'Delete', { id: x }).then((d) => {
+                alert(d);
+            });
         }
+    }
 
     $scope.sql = (x, tbl) => {
         if (confirm('Dali ste sigurni da želite izbrisati tablicu: ' + x + '?')) {
@@ -392,9 +392,6 @@
             });
         }
     }
-
-    }
-
 
 }])
 

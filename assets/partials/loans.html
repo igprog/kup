@@ -21,7 +21,7 @@
             </form>
         </div>
         <div ng-if="d.loans.data.length>0" class="col-sm-2 text-right">
-            <button ng-if="!d.pdf" class="btn btn-outline-danger" ng-click="print(d)"><i class="fas fa-{{d.loadingPdf?'spinner fa-spin':'file-pdf'}}"></i> PDF</button>
+            <button ng-if="!d.pdf" class="btn btn-outline-danger" ng-disabled="loadingPdf==true" ng-click="print(d)"><i class="fas fa-{{d.loadingPdf==true?'spinner fa-spin':'file-pdf'}}"></i> PDF</button>
             <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" check-link download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
         </div>
     </div>

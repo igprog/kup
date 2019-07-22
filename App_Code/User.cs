@@ -102,7 +102,25 @@ public class User : System.Web.Services.WebService {
         }
     }
 
-    //TODO: Delete User and all users data.
+    [WebMethod]
+    public string Delete(string id) {
+        try {
+            db.Users();
+            string sql = string.Format(@"DELETE FROM Users WHERE id = '{0}';
+                        DELETE FROM Account WHERE userId = '{0}';
+                        DELETE FROM Loan WHERE userId = '{0}';", id);
+            using (SqlConnection connection = new SqlConnection(connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+            return JsonConvert.SerializeObject("Korisnik izbrisan", Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+        }
+    }
 
     NewUser ReadData(SqlDataReader reader) {
         NewUser x = new NewUser();

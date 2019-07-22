@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.IO;
+using System.Configuration;
 
 
 /// <summary>
@@ -30,6 +31,11 @@ namespace Igprog {
             if (Directory.Exists(path)) {
                 Directory.Delete(path, true);
             }
+        }
+
+        public string Currency(double value) {
+            string currency = ConfigurationManager.AppSettings["currency"];
+            return string.Format("{0:N} {1}", value.ToString(), currency);
         }
     }
 }
