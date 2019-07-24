@@ -19,7 +19,7 @@
                     <th>OIB</th>
                     <th>Posl. jedinice</th>
                     <th>Ulog (kn)</th>
-                    <th></th>
+                    <th colspan="2"></th>
                 </tr>
             </thead>
             <tbody>
@@ -30,7 +30,10 @@
                     <td>{{x.pin}}</td>
                     <td>{{x.buisinessUnit.code}} - {{x.buisinessUnit.title}}</td>
                     <td>{{x.monthlyFee | number:2}}</td>
-                    <td><button class="btn btn-outline-primary" title="Korisnički profil" ng-click="get('user', 'Korisnički Profil', x.id)"><i class="fas fa-info-circle"></i></button></td>
+                    <td>
+                        <button class="btn btn-outline-primary" title="Korisnički Profil" ng-click="get('user', 'Korisnički Profil', x.id)"><i class="fas fa-user"></i></button>
+                        <button class="btn btn-outline-danger" title="Kartica Korisnika" ng-click="get('card', 'Kartica Korisnika', x.id)"><i class="fas fa-id-card"></i></button>
+                    </td>
                 </tr>
             </tbody>
         </table>

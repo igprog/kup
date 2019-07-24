@@ -27,7 +27,7 @@
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Info</a>
+                    <a class="nav-link" href="#" data-toggle="modal" data-target="#infoModal">Info</a>
                 </li>
                 <li ng-if="d.isLogin" class="nav-item">
                     <a class="nav-link" href="" ng-click="logout()">Odjava</a>
@@ -64,8 +64,10 @@
                     </div>
                 </div>
             </div>
-
     </div>
+
+    <modal-directive id="'infoModal'" title="'Info'" partial="'./assets/partials/popup/info.html'"></modal-directive>
+
     <script src="./assets/js/app.js"></script>
 
 </body>

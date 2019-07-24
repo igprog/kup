@@ -139,7 +139,7 @@
 
     $scope.logout = () => {
         $scope.g.currTpl = f.currTpl('login');
-        $scope.g.isLogin = false;
+        $scope.d.isLogin = false;
         //TODO: clear session storage
     }
 
@@ -397,15 +397,17 @@
 
 }])
 
-
-//.directive('modalDirective', function () {
-//    return {
-//        restrict: 'E',
-//        scope: {
-//            img: '='
-//        },
-//        templateUrl: 'partials/popup/modal.html'
-//    };
-//})
+.directive('modalDirective', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            id: '=',
+            title: '=',
+            data: '=',
+            partial: '='
+        },
+        templateUrl: './assets/partials/popup/modal.html'
+    };
+})
 
 ;
