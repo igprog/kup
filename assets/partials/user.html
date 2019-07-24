@@ -8,8 +8,8 @@
             <hr />
             <div class="form-group">
                 <label for="buissinesUnitCode">Poslovna jedinica:</label>
-                <select ng-model="d.buisinessUnitCode" class="form-control" name="buissinesUnitCode">
-                    <option ng-repeat="x in d.buisinessUnits" value="{{x.code}}">{{x.code}} - {{x.title}}</option>
+                <select ng-model="d.user.buisinessUnit.code" class="form-control" name="buissinesUnitCode">
+                    <option ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.code}} - {{x.title}}</option>
                 </select>
             </div>
             <div class="form-group">

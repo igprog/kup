@@ -1,27 +1,40 @@
-﻿<div ng-controller="usersCtrl">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Mat. br.</th>
-                <th>Prezime</th>
-                <th>Ime</th>
-                <th>OIB</th>
-                <th>Posl. jedinice</th>
-                <th>Ulog (kn)</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="x in d.users">
-                <td>{{x.id}}</td>
-                <td>{{x.lastName}}</td>
-                <td>{{x.firstName}}</td>
-                <td>{{x.pin}}</td>
-                <td>{{x.buisinessUnit.code}} - {{x.buisinessUnit.title}}</td>
-                <td>{{x.monthlyFee | number:2}}</td>
-                <td><button class="btn btn-outline-primary" ng-click="details(x.id)"><i class="fas fa-info-circle"></i></button></td>
-            </tr>
-        </tbody>
-    </table>
-    <pre ng-if="config.debug">{{d.users | json}}</pre>
+﻿<div ng-controller="userCtrl">
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label for="buissinesUnitCode">Poslovna jedinica:</label>
+                <select ng-model="d.buisinessUnitCode" class="form-control" name="buissinesUnitCode" ng-click="load(d.buisinessUnitCode)">
+                    <option ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.code}} - {{x.title}}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div ng-if="d.users" class="table-rsponsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Mat. br.</th>
+                    <th>Prezime</th>
+                    <th>Ime</th>
+                    <th>OIB</th>
+                    <th>Posl. jedinice</th>
+                    <th>Ulog (kn)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="x in d.users">
+                    <td>{{x.id}}</td>
+                    <td>{{x.lastName}}</td>
+                    <td>{{x.firstName}}</td>
+                    <td>{{x.pin}}</td>
+                    <td>{{x.buisinessUnit.code}} - {{x.buisinessUnit.title}}</td>
+                    <td>{{x.monthlyFee | number:2}}</td>
+                    <td><button class="btn btn-outline-primary" title="Korisnički profil" ng-click="get('user', 'Korisnički Profil', x.id)"><i class="fas fa-info-circle"></i></button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+   
+    <pre ng-if="config.debug">{{d | json}}</pre>
 </div>

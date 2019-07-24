@@ -19,7 +19,9 @@ public class User : System.Web.Services.WebService {
     string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
     double monthlyFee = Convert.ToDouble(ConfigurationManager.AppSettings["monthlyFee"]);
-    string sqlString = "u.id, u.buisinessUnitCode, u.firstName, u.lastName, u.pin, u.birthDate, u.accessDate, u.terminationDate, u.isActive, u.monthlyFee";
+    string sqlString = @"SELECT u.id, u.buisinessUnitCode, u.firstName, u.lastName, u.pin, u.birthDate, u.accessDate, u.terminationDate, u.isActive, u.monthlyFee, b.id, b.title FROM Users u
+                        LEFT OUTER JOIN BuisinessUnit b
+                        ON u.buisinessUnitCode = b.code";
 
     public User() {
     }
@@ -59,9 +61,25 @@ public class User : System.Web.Services.WebService {
     public string Save(NewUser x) {
         try {
             db.Users();
-            string sql = string.Format(@"INSERT INTO Users VALUES  
-                       ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')"
-                        , x.id, x.buisinessUnit.code, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
+
+
+            string sql = string.Format(@"BEGIN TRAN
+                                            IF EXISTS (SELECT * from Users WITH (updlock,serializable) WHERE id = '{0}')
+                                                BEGIN
+                                                   UPDATE Users SET buisinessUnitCode = '{1}', firstName = '{2}', lastName = '{3}', pin = '{4}', birthDate = '{5}', accessDate = '{6}', terminationDate = '{7}', isActive = '{8}', monthlyFee = '{9}' WHERE id = '{0}'
+                                                END
+                                            ELSE
+                                                BEGIN
+                                                   INSERT INTO Users (id, buisinessUnitCode, firstName, lastName, pin, birthDate, accessDate, terminationDate, isActive, monthlyFee)
+                                                   VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
+                                                END
+                                        COMMIT TRAN", x.id, x.buisinessUnit.code, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
+
+
+
+            //string sql = string.Format(@"INSERT INTO Users VALUES  
+            //           ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')"
+            //            , x.id, x.buisinessUnit.code, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -76,11 +94,34 @@ public class User : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    public string Load() {
+    public string Load(string buisinessUnitCode) {
         try {
-            return JsonConvert.SerializeObject(GetUsers(null), Formatting.Indented);
+            return JsonConvert.SerializeObject(GetUsers(buisinessUnitCode), Formatting.Indented);
         }catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+        }
+    }
+
+    [WebMethod]
+    public string Get(string id) {
+        try {
+            db.Users();
+            string sql = string.Format("{0} WHERE u.id = '{1}'", sqlString, id);
+            NewUser x = new NewUser();
+            using (SqlConnection connection = new SqlConnection(connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            x = ReadData(reader);
+                        }
+                    }
+                }
+                connection.Close();
+            }
+            return JsonConvert.SerializeObject(x, Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
         }
     }
 
@@ -135,17 +176,16 @@ public class User : System.Web.Services.WebService {
         x.terminationDate = reader.GetValue(7) == DBNull.Value ? null : reader.GetString(7);
         x.isActive = reader.GetValue(8) == DBNull.Value ? 1 : reader.GetInt32(8);
         x.monthlyFee = reader.GetValue(9) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(9));
-        x.buisinessUnit.title = reader.GetValue(10) == DBNull.Value ? null : reader.GetString(10);
+        x.buisinessUnit.id = reader.GetValue(10) == DBNull.Value ? null : reader.GetString(10);
+        x.buisinessUnit.title = reader.GetValue(11) == DBNull.Value ? null : reader.GetString(11);
         return x;
     }
 
     public List<NewUser> GetUsers(string buisinessUnitCode) {
         db.Users();
-        string sql = string.Format(@"SELECT {0}, b.title FROM Users u
-                        LEFT OUTER JOIN BuisinessUnit b
-                        ON u.buisinessUnitCode = b.code {1}"
+        string sql = string.Format(@"{0} {1}"
                         , sqlString 
-                        , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("WHERE buisinessUnitCode = '{0}'", buisinessUnitCode): "");
+                        , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("WHERE u.buisinessUnitCode = '{0}'", buisinessUnitCode): "");
         List<NewUser> xx = new List<NewUser>();
         using (SqlConnection connection = new SqlConnection(connectionString)) {
             connection.Open();

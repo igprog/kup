@@ -38,7 +38,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="smallerscreenmenu">
                         <a class="dropdown-item" href="#" ng-click="toggleTpl('dashboard', config.apptitle)">Naslovna</a>
-                        <a class="dropdown-item" href="#" ng-click="toggleTpl('user', 'Novi Korisnik')">Novi Korisnik</a>
+                        <a class="dropdown-item" href="#" ng-click="toggleTpl('newuser', 'Novi Korisnik')">Novi Korisnik</a>
                         <a class="dropdown-item" href="#"ng-click="toggleTpl('users', 'Korisnici')">Korisnici</a>
                         <a class="dropdown-item" href="#" ng-click="toggleTpl('loan', 'Nova Pozajmica')">Nova Pozajmica</a>
                         <a class="dropdown-item" href="#" ng-click="toggleTpl('account', 'Promet')">Promet</a>
@@ -58,9 +58,9 @@
                 <div style="min-height:50px">
                 </div>
                 <div class="card">
-                    <h4 class="card-header">{{d.currTplTitle}}</h4>
+                    <h4 class="card-header">{{g.currTplTitle}}</h4>
                     <div class="card-body">
-                        <ng-include src="d.currTpl"></ng-include>
+                        <ng-include src="g.currTpl"></ng-include>
                     </div>
                 </div>
             </div>

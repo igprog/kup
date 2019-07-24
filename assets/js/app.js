@@ -60,6 +60,9 @@
         },
         pdfTempPath: (x) => {
             return './upload/pdf/temp/' + x + '.pdf';
+        },
+        defined: (x) => {
+            return x === undefined ? false : true;
         }
     }
 }])
@@ -96,6 +99,8 @@
 
     var loadGlobalData = () => {
         var data = {
+            currTpl: f.currTpl('login'),
+            currTplTitle: null,
             date: new Date(),
             month: new Date().getMonth() + 1,
             year: new Date().getFullYear(),
@@ -115,19 +120,17 @@
             userName: null,
             password: null
         },
-        isLogin: false,
-        currTpl: f.currTpl('login'),
-        currTplTitle: null
+        isLogin: false
     }
     $scope.d = data;
 
     $scope.login = (x) => {
         f.post('Admin', 'Login', { username: x.userName, password: x.password }).then((d) => {
             if (d === true) {
-                $scope.d.currTpl = f.currTpl('dashboard');
-                $scope.d.currTplTitle = $scope.config.apptitle;
+                $scope.g.currTpl = f.currTpl('dashboard');
+                $scope.g.currTplTitle = $scope.config.apptitle;
             } else {
-                $scope.d.currTpl = f.currTpl('login');
+                $scope.g.currTpl = f.currTpl('login');
             }
             $scope.d.isLogin = d;
             //TODO: save user to session storage
@@ -135,43 +138,63 @@
     }
 
     $scope.logout = () => {
-        $scope.d.currTpl = f.currTpl('login');
-        $scope.d.isLogin = false;
+        $scope.g.currTpl = f.currTpl('login');
+        $scope.g.isLogin = false;
         //TODO: clear session storage
     }
 
     $scope.toggleTpl = (tpl, title) => {
-        $scope.d.currTpl = f.currTpl(tpl);
-        $scope.d.currTplTitle = title;
+        $scope.g.currTpl = f.currTpl(tpl);
+        $scope.g.currTplTitle = title;
     }
 
 }])
 
 .controller('userCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
 
-    var data = {
-        user: {},
-        buisinessUnits: []
-    }
-    $scope.d = data;
-
     var init = () => {
         f.post('User', 'Init', {}).then((d) => {
             $scope.d.user = d;
         });
     }
-    init();
 
-    var loadBuisinessUnit = () => {
-        f.post('BuisinessUnit', 'Load', {}).then((d) => {
-            $scope.d.buisinessUnits = d;
-        });
+    var load = (bu) => {
+        if (f.defined(bu)) {
+            f.post('User', 'Load', { buisinessUnitCode: bu }).then((d) => {
+                $scope.d.users = d;
+            });
+        }
     }
-    loadBuisinessUnit();
+
+    $scope.load = (bu) => {
+        load(bu);
+    }
+   
+    if ($scope.g.currTpl == './assets/partials/newuser.html') {
+        var data = {
+            user: {},
+            users: [],
+            buisinessUnitCode: null
+        }
+        $scope.d = data;
+        init();
+    } else {
+        //$scope.d.users = [],
+        $scope.d.buisinessUnitCode = null;
+        load(null);
+    }
 
     $scope.save = (x) => {
         f.post('User', 'Save', { x: x }).then((d) => {
             alert(d);
+        });
+    }
+
+    $scope.get = (tpl, title, id) => {
+        f.post('User', 'Get', { id: id }).then((d) => {
+            $scope.d.user = d;
+            $scope.g.currTpl = f.currTpl(tpl);
+            $scope.g.currTplTitle = title;
         });
     }
 
@@ -183,26 +206,6 @@
         }
     }
 
-
-}])
-
-.controller('usersCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
-
-    var data = {
-        users: {}
-    }
-    $scope.d = data;
-
-    var load = () => {
-        f.post('User', 'Load', {}).then((d) => {
-            $scope.d.users = d;
-        });
-    }
-    load();
-
-    $scope.details = (id) => {
-        alert('TODO');
-    }
 
 }])
 
@@ -251,8 +254,8 @@
     };
     $scope.d = data;
 
-    var loadUsers = () => {
-        f.post('User', 'Load', {}).then((d) => {
+    var loadUsers = (bu) => {
+        f.post('User', 'Load', { buisinessUnitCode: bu}).then((d) => {
             $scope.d.users = d;
         });
     }
@@ -260,7 +263,7 @@
     var init = () => {
         f.post(service, 'Init', {}).then((d) => {
             $scope.d.loan = d;
-            loadUsers();
+            loadUsers(null);
         });
     }
     init();
@@ -303,7 +306,6 @@
         $scope.d.pdf = null;
         $scope.d.loadingPdf = true;
         f.post('Pdf', 'Loans', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, loans: x.loans }).then((d) => {
-            debugger;
             $scope.d.pdf = f.pdfTempPath(d);
             $scope.d.loadingPdf = false;
         });
