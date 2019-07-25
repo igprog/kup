@@ -53,20 +53,20 @@
     </div>
 
     <div ng-if="d.isLogin" class="row" id="body-row">
-            <ng-include src="'./assets/partials/sidebar.html'"></ng-include>
-            <div class="col">
-                <div style="min-height:50px">
-                </div>
-                <div class="card">
-                    <h4 class="card-header">{{g.currTplTitle}}</h4>
-                    <div class="card-body">
-                        <ng-include src="g.currTpl"></ng-include>
-                    </div>
+        <ng-include src="'./assets/partials/sidebar.html'"></ng-include>
+        <div class="col">
+            <div style="min-height:50px">
+            </div>
+            <div class="card">
+                <h4 class="card-header">{{g.currTplTitle}}</h4>
+                <div class="card-body">
+                    <ng-include src="g.currTpl"></ng-include>
                 </div>
             </div>
+        </div>
     </div>
 
-    <modal-directive id="'infoModal'" title="'Info'" partial="'./assets/partials/popup/info.html'"></modal-directive>
+    <modal-directive id="'infoModal'" title="'Info'" src="'./assets/partials/popup/info.html'"></modal-directive>
 
     <script src="./assets/js/app.js"></script>
 

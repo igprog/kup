@@ -183,13 +183,16 @@
             users: [],
             buisinessUnitCode: null,
             year: f.year(),
-            records: []
+            records: [],
+            pdf: null,
+            loadingPdf: false
         }
         $scope.d = data;
         init();
     } else {
-        //$scope.d.users = [],
         $scope.d.buisinessUnitCode = null;
+        $scope.d.pdf = null;
+        $scope.d.loadingPdf = false;
         load(null);
     }
 
@@ -443,9 +446,36 @@
             id: '=',
             title: '=',
             data: '=',
-            partial: '='
+            src: '='
         },
-        templateUrl: './assets/partials/popup/modal.html'
+        templateUrl: './assets/partials/directive/modal.html'
+    };
+})
+
+.directive('loadingDirective', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            title: '=',
+            loadingtitle: '=',
+            value: '='
+        },
+        templateUrl: './assets/partials/directive/loading.html'
+    };
+})
+
+.directive('checkLink', function ($http) {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attrs) {
+            attrs.$observe('href', function (href) {
+                $http.get(href).success(function () {
+                }).error(function () {
+                    element.attr('class', 'btn btn-warning');
+                    element.attr('disabled', 'disabled');
+                });
+            });
+        }
     };
 })
 
