@@ -10,7 +10,7 @@
         </div>
     </div>
     <div ng-if="d.users" class="table-rsponsive">
-        <table class="table table-striped">
+        <table class="table table-hover">
             <thead>
                 <tr>
                     <th>Mat. br.</th>
@@ -31,8 +31,8 @@
                     <td>{{x.buisinessUnit.code}} - {{x.buisinessUnit.title}}</td>
                     <td>{{x.monthlyFee | number:2}}</td>
                     <td>
-                        <button class="btn btn-outline-primary" title="Korisnički Profil" ng-click="get('user', 'Korisnički Profil', x.id)"><i class="fas fa-user"></i></button>
-                        <button class="btn btn-outline-danger" title="Kartica Korisnika" ng-click="get('card', 'Kartica Korisnika', x.id)"><i class="fas fa-id-card"></i></button>
+                        <button class="btn btn-outline-primary" title="Korisnički Profil" ng-click="get('user', 'Korisnički Profil', x.id, null)"><i class="fas fa-user"></i></button>
+                        <button class="btn btn-outline-danger" title="Kartica Korisnika" ng-click="get('card', 'Kartica Korisnika', x.id, d.year)"><i class="fas fa-id-card"></i></button>
                     </td>
                 </tr>
             </tbody>

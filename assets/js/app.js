@@ -52,6 +52,12 @@
             }
             return years;
         },
+        month: () => {
+            return  new Date().getMonth() + 1;
+        },
+        year: () => {
+            return new Date().getFullYear();
+        },
         setDate: (x) => {
             var day = x.getDate();
             var mo = x.getMonth() < 10 ? '0' + (x.getMonth() + 1) : x.getMonth() + 1;
@@ -151,7 +157,7 @@
 }])
 
 .controller('userCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
-
+    var service = 'User'
     var init = () => {
         f.post('User', 'Init', {}).then((d) => {
             $scope.d.user = d;
@@ -160,8 +166,9 @@
 
     var load = (bu) => {
         if (f.defined(bu)) {
-            f.post('User', 'Load', { buisinessUnitCode: bu }).then((d) => {
+            f.post(service, 'Load', { buisinessUnitCode: bu }).then((d) => {
                 $scope.d.users = d;
+                $scope.d.year = f.year();
             });
         }
     }
@@ -174,7 +181,9 @@
         var data = {
             user: {},
             users: [],
-            buisinessUnitCode: null
+            buisinessUnitCode: null,
+            year: f.year(),
+            records: []
         }
         $scope.d = data;
         init();
@@ -185,13 +194,13 @@
     }
 
     $scope.save = (x) => {
-        f.post('User', 'Save', { x: x }).then((d) => {
+        f.post(service, 'Save', { x: x }).then((d) => {
             alert(d);
         });
     }
 
-    $scope.get = (tpl, title, id) => {
-        f.post('User', 'Get', { id: id }).then((d) => {
+    $scope.get = (tpl, title, id, year) => {
+        f.post(service, 'Get', { id: id, year: year }).then((d) => {
             $scope.d.user = d;
             $scope.g.currTpl = f.currTpl(tpl);
             $scope.g.currTplTitle = title;
@@ -204,6 +213,33 @@
                 alert(d);
             });
         }
+    }
+
+    $scope.saveRecord = (x, idx) => {
+        if (x.repayment > x.restToRepayment) {
+            alert('Rata je veća od duga!');
+            return false;
+        }
+        f.post('Account', 'Save', { x: x }).then((d) => {
+            $scope.d.user.records[idx].repaid = d.repaid;
+            $scope.d.user.records[idx].restToRepayment = d.restToRepayment;
+        });
+    }
+
+    $scope.printCard = (x) => {
+        if (f.defined(x.user.records.length)) {
+            if (x.user.records.length == 0) { return false; }
+        }
+        $scope.d.pdf = null;
+        $scope.d.loadingPdf = true;
+        f.post('Pdf', 'Card', { year: x.year, user: x.user }).then((d) => {
+            $scope.d.pdf = f.pdfTempPath(d);
+            $scope.d.loadingPdf = false;
+        });
+    }
+
+    $scope.removePdfLink = () => {
+        $scope.d.pdf = null;
     }
 
 
@@ -288,8 +324,8 @@
     var service = 'Loan';
     var data = {
         loans: [],
-        month: new Date().getMonth() + 1,
-        year: new Date().getFullYear(),
+        month: f.month(),
+        year: f.year(),
         buisinessUnitCode: null,
         pdf: null,
         loadingPdf: false
@@ -303,6 +339,9 @@
     }
 
     $scope.print = (x) => {
+        if (f.defined(x.loans.length)) {
+            if(x.loans.length == 0) { return false; }
+        }
         $scope.d.pdf = null;
         $scope.d.loadingPdf = true;
         f.post('Pdf', 'Loans', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, loans: x.loans }).then((d) => {
@@ -311,7 +350,7 @@
         });
     }
 
-    $scope.removePdfLink = function () {
+    $scope.removePdfLink = () => {
         $scope.d.pdf = null;
     }
 

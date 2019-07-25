@@ -148,6 +148,28 @@ public class Account : System.Web.Services.WebService {
         }
     }
 
+
+    //TODO:
+    
+    //[WebMethod]
+    //public string GetYearlyRecordsByUserId(string userId, int year) {
+    //    try {
+    //        User u = new User();
+    //        //List<User.NewUser> users = u.GetUsers(buisinessUnitCode);
+    //        db.Account();
+    //        List<NewAccount> xx = new List<NewAccount>();
+    //       // foreach(User.NewUser user in users) {
+    //            NewAccount x = new NewAccount();
+    //            x = GetRecord(userId, null, year);
+    //            xx.Add(x);
+    //       // }
+    //        return JsonConvert.SerializeObject(xx, Formatting.Indented);
+    //    } catch (Exception e) {
+    //        return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+    //    }
+    //}
+   
+
     [WebMethod]
     public string Delete(string id) {
         try {
@@ -200,6 +222,27 @@ public class Account : System.Web.Services.WebService {
             connection.Close();
         }
         return x;
+    }
+
+    public List<NewAccount> GetRecords(string userId, int? year) {
+        string sql = string.Format("SELECT * FROM Account WHERE userId = '{0}' {1}"
+            , userId
+            , year > 0 ? string.Format("AND yr = '{0}' ORDER BY mo ASC", year) : "");
+        List<NewAccount> xx = new List<NewAccount>();
+        using (SqlConnection connection = new SqlConnection(connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        NewAccount x = new NewAccount();
+                        x = ReadData(reader);
+                        xx.Add(x);
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return xx;
     }
 
     public NewAccount CheckLoan(NewAccount x, string userId, int month, int year) {

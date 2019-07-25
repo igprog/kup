@@ -18,6 +18,7 @@ using Igprog;
 public class User : System.Web.Services.WebService {
     string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
+    Account a = new Account();
     double monthlyFee = Convert.ToDouble(ConfigurationManager.AppSettings["monthlyFee"]);
     string sqlString = @"SELECT u.id, u.buisinessUnitCode, u.firstName, u.lastName, u.pin, u.birthDate, u.accessDate, u.terminationDate, u.isActive, u.monthlyFee, b.id, b.title FROM Users u
                         LEFT OUTER JOIN BuisinessUnit b
@@ -38,6 +39,9 @@ public class User : System.Web.Services.WebService {
         public string terminationDate;
         public int isActive;
         public double monthlyFee;
+
+        //TODO: list<Card>
+        public List<Account.NewAccount> records;
     }
 
     [WebMethod]
@@ -54,6 +58,7 @@ public class User : System.Web.Services.WebService {
         x.terminationDate = null;
         x.isActive = 1;
         x.monthlyFee = monthlyFee;
+        x.records = new List<Account.NewAccount>();
         return JsonConvert.SerializeObject(x, Formatting.Indented);
     }
 
@@ -103,7 +108,7 @@ public class User : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    public string Get(string id) {
+    public string Get(string id, int? year) {
         try {
             db.Users();
             string sql = string.Format("{0} WHERE u.id = '{1}'", sqlString, id);
@@ -118,6 +123,9 @@ public class User : System.Web.Services.WebService {
                     }
                 }
                 connection.Close();
+            }
+            if(year != null) {
+                x.records = a.GetRecords(x.id, year);
             }
             return JsonConvert.SerializeObject(x, Formatting.Indented);
         } catch (Exception e) {
