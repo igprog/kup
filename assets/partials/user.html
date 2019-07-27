@@ -3,7 +3,11 @@
         <form>
             <div class="form-group">
                 <label for="accessDate">Datum pristupa:</label>
-                <input ng-model="d.user.accessDate" type="text" class="form-control" name="accessDate">
+                <input ng-model="d.user.accessDate" type="date" class="form-control" name="accessDate">
+
+                <!--TODO-->
+                <!--<date-directive></date-directive>-->
+
             </div>
             <hr />
             <div class="form-group">
@@ -30,7 +34,7 @@
             </div>
             <div class="form-group">
                 <label for="birthDate">Datum rođenja:</label>
-                <input ng-model="d.user.birthDate" type="text" class="form-control" name="birthDate">
+                <input ng-model="d.user.birthDate" type="date" class="form-control" name="birthDate">
             </div>
             <hr />
             <div class="form-group">

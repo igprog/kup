@@ -54,7 +54,7 @@ public class User : System.Web.Services.WebService {
         x.lastName = null;
         x.pin = null;
         x.birthDate = null;
-        x.accessDate = DateTime.Now.ToShortDateString();
+        x.accessDate = DateTime.Today.ToString();
         x.terminationDate = null;
         x.isActive = 1;
         x.monthlyFee = monthlyFee;

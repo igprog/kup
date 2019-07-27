@@ -1,5 +1,5 @@
 ﻿angular.module('app', [])
-.config(['$httpProvider', function ($httpProvider) {
+.config(['$httpProvider', ($httpProvider) => {
     //*******************disable catche**********************
         if (!$httpProvider.defaults.headers.get) {
             $httpProvider.defaults.headers.get = {};
@@ -10,7 +10,7 @@
     //*******************************************************
 }])
 
-.factory('f', ['$http', function ($http) {
+.factory('f', ['$http', ($http) => {
     return {
         post: (service, method, data) => {
             return $http({
@@ -27,6 +27,13 @@
         },
         currTpl: (tpl) => {
             return './assets/partials/' + tpl + '.html';
+        },
+        days: () => {
+            var days = [];
+            for (var i = 1; i <= 31; i++) {
+                days.push(i);
+            }
+            return days;
         },
         months: () => {
             return [
@@ -52,6 +59,9 @@
             }
             return years;
         },
+        day: () => {
+            return new Date().getDay();
+        },
         month: () => {
             return  new Date().getMonth() + 1;
         },
@@ -74,7 +84,7 @@
 }])
 
 
-.controller('appCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
+.controller('appCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
 
     window.onbeforeunload = () => {
         return "Your work will be lost.";
@@ -96,7 +106,7 @@
     }
 
     var getConfig = () => {
-        $http.get('./config/config.json').then(function (response) {
+        $http.get('./config/config.json').then((response) => {
               $scope.config = response.data;
               reloadPage();
           });
@@ -156,7 +166,7 @@
 
 }])
 
-.controller('userCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
+.controller('userCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'User'
     var init = () => {
         f.post('User', 'Init', {}).then((d) => {
@@ -197,6 +207,8 @@
     }
 
     $scope.save = (x) => {
+        x.accessDate = f.setDate(x.accessDate);
+        x.birthDate = f.setDate(x.birthDate);
         f.post(service, 'Save', { x: x }).then((d) => {
             alert(d);
         });
@@ -248,7 +260,7 @@
 
 }])
 
-.controller('buisinessUnitCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
+.controller('buisinessUnitCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'BuisinessUnit';
 
     $scope.save = (x) => {
@@ -284,7 +296,7 @@
 
 }])
 
-.controller('loanCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
+.controller('loanCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Loan';
     var data = {
         users: [],
@@ -323,7 +335,7 @@
 
 }])
 
-.controller('loansCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
+.controller('loansCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Loan';
     var data = {
         loans: [],
@@ -359,7 +371,7 @@
 
 }])
 
-.controller('accountCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
+.controller('accountCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Account';
     var data = {
         users: [],
@@ -400,7 +412,7 @@
 
 }])
 
-.controller('adminCtrl', ['$scope', '$http', 'f', function ($scope, $http, f) {
+.controller('adminCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Admin';
     
     var data = {
@@ -439,7 +451,7 @@
 
 }])
 
-.directive('modalDirective', function () {
+.directive('modalDirective', () => {
     return {
         restrict: 'E',
         scope: {
@@ -452,7 +464,7 @@
     };
 })
 
-.directive('loadingDirective', function () {
+.directive('loadingDirective', () => {
     return {
         restrict: 'E',
         scope: {
@@ -464,13 +476,40 @@
     };
 })
 
-.directive('checkLink', function ($http) {
+
+.directive('dateDirective', () => {
+    return {
+        restrict: 'E',
+        scope: {
+            fromYear: '=',
+        },
+        templateUrl: './assets/partials/directive/date.html',
+        controller: 'dateCtrl'
+    };
+})
+.controller('dateCtrl', ['$scope', 'f', ($scope, f) => {
+    var d = {
+        days: f.days(),
+        months: f.months()
+    }
+    $scope.d = d;
+
+    var format = (x) => {
+        return (x < 10 ? '0' + x : x);
+    }
+
+    $scope.getDate = () => {
+        $scope.$parent.date = $scope.yr + '-' + format($scope.mo) + '-' + format($scope.day);
+    }
+}])
+
+.directive('checkLink', ($http) => {
     return {
         restrict: 'A',
-        link: function (scope, element, attrs) {
-            attrs.$observe('href', function (href) {
-                $http.get(href).success(function () {
-                }).error(function () {
+        link: (scope, element, attrs) => {
+            attrs.$observe('href', (href) => {
+                $http.get(href).success(() => {
+                }).error(() => {
                     element.attr('class', 'btn btn-warning');
                     element.attr('disabled', 'disabled');
                 });
