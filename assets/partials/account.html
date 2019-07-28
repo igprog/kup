@@ -38,10 +38,10 @@
                     <td>{{x.user.lastName}}</td>
                     <td>{{x.user.firstName}}</td>
                     <td><input ng-model="x.monthlyFee" class="form-control" /></td>
-                    <td>{{x.loan}}</td>
+                    <td>{{x.loan | number:2}}</td>
                     <td><input ng-model="x.repayment" class="form-control" /></td>
-                    <td>{{x.repaid}}</td>
-                    <td>{{x.restToRepayment}}</td>
+                    <td>{{x.repaid | number:2}}</td>
+                    <td>{{x.restToRepayment | number:2}}</td>
                     <td><button class="btn btn-outline-primary" ng-click="save(x, $index)"><i class="fas fa-save"></i> Spremi</button></td>
                 </tr>
             </tbody>

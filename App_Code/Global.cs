@@ -35,7 +35,7 @@ namespace Igprog {
 
         public string Currency(double value) {
             string currency = ConfigurationManager.AppSettings["currency"];
-            return string.Format("{0:N} {1}", value.ToString(), currency);
+            return string.Format("{0:N} {1}", value, currency);
         }
 
         public string Month(int x) {

@@ -388,13 +388,6 @@
         });
     }
 
-    var loadBuisinessUnit = () => {
-        f.post('BuisinessUnit', 'Load', {}).then((d) => {
-            $scope.d.buisinessUnits = d;
-        });
-    }
-    loadBuisinessUnit();
-
     $scope.getMonthlyRecords = (x) => {
         return getMonthlyRecords(x);
     }
@@ -411,6 +404,46 @@
     }
 
 }])
+
+.controller('suspensionCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+        var service = 'Account';
+        var data = {
+            records: [],
+            month: $scope.g.month,
+            year: $scope.g.year,
+            buisinessUnitCode: null,
+            pdf: null,
+            loadingPdf: false
+        }
+        $scope.d = data;
+
+        var getMonthlyRecords = (x) => {
+            f.post(service, 'GetMonthlyRecords', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
+                $scope.d.records = d;
+            });
+        }
+
+        $scope.getMonthlyRecords = (x) => {
+            return getMonthlyRecords(x);
+        }
+
+        $scope.print = (x) => {
+            //if (f.defined(x.user.records.length)) {
+            //    if (x.user.records.length == 0) { return false; }
+            //}
+            $scope.d.pdf = null;
+            $scope.d.loadingPdf = true;
+            f.post('Pdf', 'Suspension', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, records: x.records }).then((d) => {
+                $scope.d.pdf = f.pdfTempPath(d);
+                $scope.d.loadingPdf = false;
+            });
+        }
+
+        $scope.removePdfLink = () => {
+            $scope.d.pdf = null;
+        }
+
+    }])
 
 .controller('adminCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Admin';

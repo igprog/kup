@@ -113,4 +113,26 @@ public class BuisinessUnit : System.Web.Services.WebService {
         return x;
     }
 
+    public NewUnit Get(string code) {
+        NewUnit x = new NewUnit();
+        try {
+            db.BuisinessUnit();
+            string sql = string.Format("SELECT * FROM BuisinessUnit WHERE code = '{0}'", code);
+            using (SqlConnection connection = new SqlConnection(connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            x = ReadData(reader);
+                        }
+                    }
+                }
+                connection.Close();
+            }
+            return x;
+        } catch (Exception e) {
+            return x;
+        }
+    }
+
 }

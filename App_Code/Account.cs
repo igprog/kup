@@ -23,6 +23,10 @@ public class Account : System.Web.Services.WebService {
     }
 
     public class NewAccount {
+
+
+        //TODO: list data, total
+
         public string id;
         public User.NewUser user;
         public int month;
@@ -34,6 +38,7 @@ public class Account : System.Web.Services.WebService {
         public double repayment;
         public string repaymentDate;
         public double restToRepayment;
+        public double totalObligation;
         public double repaid;
         public double accountBalance;
         public string note;
@@ -54,6 +59,7 @@ public class Account : System.Web.Services.WebService {
         x.repaymentDate = null;
         x.repaid = 0;
         x.restToRepayment = 0;
+        x.totalObligation = 0;
         x.accountBalance = 0;
         x.note = null;
         return JsonConvert.SerializeObject(x, Formatting.Indented);
@@ -135,6 +141,7 @@ public class Account : System.Web.Services.WebService {
                     x.repaymentDate = null;
                     x.repaid = 0;
                     x.restToRepayment = 0;
+                    x.totalObligation = 0;
                     x.accountBalance = 0;
                     x.note = null;
                     x = CheckLoan(x, user.id, month, year);
@@ -202,6 +209,7 @@ public class Account : System.Web.Services.WebService {
         x.repaymentDate = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);
         x.repaid = reader.GetValue(10) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(10));
         x.restToRepayment = reader.GetValue(11) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(11));
+        x.totalObligation = x.monthlyFee + x.repaid;
         x.accountBalance = reader.GetValue(12) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(12));
         x.note = reader.GetValue(13) == DBNull.Value ? null : reader.GetString(13);
         return x;
@@ -262,6 +270,7 @@ public class Account : System.Web.Services.WebService {
                         x.repayment = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
                         x.repaid = reader.GetValue(3) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(3));
                         x.restToRepayment = reader.GetValue(4) == DBNull.Value ? x.loan : Convert.ToDouble(reader.GetString(4));
+                        x.totalObligation = x.monthlyFee + x.repayment;
                     }
                 }
             }
