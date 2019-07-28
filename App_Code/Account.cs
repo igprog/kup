@@ -44,6 +44,17 @@ public class Account : System.Web.Services.WebService {
         public string note;
     }
 
+    public class Total {
+        public double monthlyFee;
+        public double repayment;
+        public double totalObligation;
+    }
+
+    public class Accounts {
+        public List<NewAccount> data;
+        public Total total;
+    }
+
     [WebMethod]
     public string Init() {
         NewAccount x = new NewAccount();
@@ -124,7 +135,8 @@ public class Account : System.Web.Services.WebService {
             User u = new User();
             List<User.NewUser> users = u.GetUsers(buisinessUnitCode);
             db.Account();
-            List<NewAccount> xx = new List<NewAccount>();
+            Accounts xx = new Accounts();
+            xx.data = new List<NewAccount>();
             foreach(User.NewUser user in users) {
                 NewAccount x = new NewAccount();
                 x = GetRecord(user.id, month, year);
@@ -147,8 +159,12 @@ public class Account : System.Web.Services.WebService {
                     x = CheckLoan(x, user.id, month, year);
                 }
                 x.user = user;
-                xx.Add(x);
+                xx.data.Add(x);
             }
+            xx.total = new Total();
+            xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
+            xx.total.repayment = xx.data.Sum(a => a.repayment);
+            xx.total.totalObligation = xx.data.Sum(a => a.totalObligation);
             return JsonConvert.SerializeObject(xx, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);

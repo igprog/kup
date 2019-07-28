@@ -374,7 +374,7 @@
 .controller('accountCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Account';
     var data = {
-        users: [],
+        records: {},
         account: {},
         month: $scope.g.month,
         year: $scope.g.year,
@@ -384,7 +384,7 @@
 
     var getMonthlyRecords = (x) => {
         f.post(service, 'GetMonthlyRecords', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
-            $scope.d.users = d;
+            $scope.d.records = d;
         });
     }
 
@@ -398,8 +398,8 @@
             return false;
         }
         f.post(service, 'Save', { x: x }).then((d) => {
-            $scope.d.users[idx].repaid = d.repaid;
-            $scope.d.users[idx].restToRepayment = d.restToRepayment;
+            $scope.d.records.data[idx].repaid = d.repaid;
+            $scope.d.records.data[idx].restToRepayment = d.restToRepayment;
         });
     }
 
@@ -408,7 +408,7 @@
 .controller('suspensionCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
         var service = 'Account';
         var data = {
-            records: [],
+            records: {},
             month: $scope.g.month,
             year: $scope.g.year,
             buisinessUnitCode: null,
@@ -428,9 +428,9 @@
         }
 
         $scope.print = (x) => {
-            //if (f.defined(x.user.records.length)) {
-            //    if (x.user.records.length == 0) { return false; }
-            //}
+            if (f.defined(x.records.data.length)) {
+                if (x.records.data.length == 0) { return false; }
+            }
             $scope.d.pdf = null;
             $scope.d.loadingPdf = true;
             f.post('Pdf', 'Suspension', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, records: x.records }).then((d) => {
@@ -443,7 +443,46 @@
             $scope.d.pdf = null;
         }
 
-    }])
+}])
+
+.controller('entryCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+    var service = 'Entry';
+    var data = {
+        records: {},
+        month: $scope.g.month,
+        year: $scope.g.year,
+        pdf: null,
+        loadingPdf: false
+    }
+    $scope.d = data;
+
+    var load = (x) => {
+        f.post(service, 'Load', { month: x.month, year: x.year }).then((d) => {
+            $scope.d.records = d;
+        });
+    }
+
+    $scope.load = (x) => {
+        return load(x);
+    }
+
+    $scope.print = (x) => {
+        if (f.defined(x.records.data.length)) {
+            if (x.records.data.length == 0) { return false; }
+        }
+        $scope.d.pdf = null;
+        $scope.d.loadingPdf = true;
+        f.post('Pdf', 'Entry', { month: x.month, year: x.year, records: x.records }).then((d) => {
+            $scope.d.pdf = f.pdfTempPath(d);
+            $scope.d.loadingPdf = false;
+        });
+    }
+
+    $scope.removePdfLink = () => {
+        $scope.d.pdf = null;
+    }
+
+}])
 
 .controller('adminCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Admin';
