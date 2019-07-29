@@ -551,6 +551,20 @@
     };
 })
 
+.directive('linkDirective', () => {
+    return {
+        restrict: 'E',
+        scope: {
+            id: '=',
+            href: '=',
+            src: '=',
+            title: '=',
+            ico: '='
+        },
+        templateUrl: './assets/partials/directive/link.html'
+    };
+})
+
 
 .directive('dateDirective', () => {
     return {

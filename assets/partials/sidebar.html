@@ -1,92 +1,19 @@
 ﻿<div id="sidebar-container" class="sidebar-expanded d-none d-md-block">
     <ul class="list-group">
-        <li data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
-            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('dashboard', config.apptitle)">
-                <span class="fas fa-home fa-fw mr-3"></span>
-                <span class="menu-collapsed">Naslovna</span>
-            </a>
-        </li>
-
-        <li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
-            <small>KORISNICI</small>
-        </li>
-        <li data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
-            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('newuser', 'Novi Korisnik')">
-                <span class="fa fa-user-plus fa-fw mr-3"></span>
-                <span class="menu-collapsed">Novi Korisnik</span>
-            </a>
-        </li>
-        <li data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
-            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('users', 'Korisnici')">
-                <span class="fa fa-users fa-fw mr-3"></span>
-                <span class="menu-collapsed">Korisnici</span>
-            </a>
-        </li>
-        <li data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
-            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('card', 'Kartica Korisnika')">
-                <span class="fa fa-id-card fa-fw mr-3"></span>
-                <span class="menu-collapsed">Kartica Korisnika</span>
-            </a>
-        </li>
-        <li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
-            <small>POZAJMICE</small>
-        </li>
-        <li href="#" class="bg-dark list-group-item list-group-item-action">
-            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('loan', 'Nova Pozajmica')">
-                <span class="fa fa-hand-holding-usd fa-fw mr-3"></span>
-                <span class="menu-collapsed">Nova Pozajmica</span>
-            </a>
-        </li>
-        <li href="#" class="bg-dark list-group-item list-group-item-action">
-            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('loans', 'Pozajmice')">
-                <span class="fa fa-list fa-fw mr-3"></span>
-                <span class="menu-collapsed">Pozajmice</span>
-            </a>
-        </li>
-        <li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
-            <small>MJESEČNI PROMET</small>
-        </li>
-        <li data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
-            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('account', 'Promet')">
-                <span class="fa fa-coins fa-fw mr-3"></span>
-                <span class="menu-collapsed">Promet</span>
-            </a>
-        </li>
-        <li data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
-            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('suspension', 'Obustave Na Plaći')">
-                <span class="fa fa-hand-paper fa-fw mr-3"></span>
-                <span class="menu-collapsed">Obustave</span>
-            </a>
-        </li>
-        <li data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
-            <a class="d-flex w-100 justify-content-start align-items-center" ng-click="toggleTpl('entry', 'Temeljnica')">
-                <span class="fa fa-file-alt fa-fw mr-3"></span>
-                <span class="menu-collapsed">Temeljnica</span>
-            </a>
-        </li>
-        <!--<li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
-            <small>REKAPITULACIJA</small>
-        </li>
-        <li href="#" class="bg-dark list-group-item list-group-item-action">
-            <a class="d-flex w-100 justify-content-start align-items-center">
-                <span class="fa fa-calendar fa-fw mr-3"></span>
-                <span class="menu-collapsed">Mjesečni Izvještaji</span>
-            </a>
-        </li>
-        <li href="#" class="bg-dark list-group-item list-group-item-action">
-            <a class="d-flex w-100 justify-content-start align-items-center">
-                <span class="fa fa-calendar fa-fw mr-3"></span>
-                <span class="menu-collapsed">Godišni Izvještaji</span>
-            </a>
-        </li>-->
-        <li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
-        </li>
-        <li href="#submenu1" data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
-            <a class="d-flex w-100 justify-content-start align-items-center">
-                <span class="fa fa-cogs fa-fw mr-3"></span>
-                <span class="menu-collapsed">Postavke</span>
-            </a>
-        </li>
+        <link-directive src="'newuser'" title="'Naslovna'" ico="'home'" ng-click="toggleTpl('dashboard', config.apptitle)"></link-directive>
+        <link-directive src="null" title="'KORISNICI'" ico="null"></link-directive>
+        <link-directive src="'newuser'" title="'Novi Korisnik'" ico="'user-plus'" ng-click="toggleTpl('newuser', 'Novi Korisnik')"></link-directive>
+        <link-directive src="'users'" title="'Korisnici'" ico="'users'" ng-click="toggleTpl('users', 'Korisnici')"></link-directive>
+        <link-directive src="'card'" title="'Kartica Korisnika'" ico="'id-card'" ng-click="toggleTpl('card', 'Kartica Korisnika')"></link-directive>
+        <link-directive src="null" title="'POZAJMICE'" ico="null"></link-directive>
+        <link-directive src="'loan'" title="'Nova Pozajmica'" ico="'hand-holding-usd'" ng-click="toggleTpl('loan', 'Nova Pozajmica')"></link-directive>
+        <link-directive src="'loans'" title="'Pozajmice'" ico="'list'" ng-click="toggleTpl('loans', 'Pozajmice')"></link-directive>
+        <link-directive src="null" title="'MJESEČNI PROMET'" ico="null"></link-directive>
+        <link-directive src="'loan'" title="'Promet'" ico="'coins'" ng-click="toggleTpl('account', 'Promet')"></link-directive>
+        <link-directive src="'loans'" title="'Obustave Na Plaći'" ico="'hand-paper'" ng-click="toggleTpl('suspension', 'Obustave Na Plaći')"></link-directive>
+        <link-directive src="'entry'" title="'Temeljnica'" ico="'file-alt'" ng-click="toggleTpl('entry', 'Temeljnica')"></link-directive>
+        <link-directive src="null" title="null" ico="null"></link-directive>
+        <link-directive href="'#submenu1'" src="'entry'" title="'Postavke'" ico="'cogs'"></link-directive>
         <li id='submenu1' class="collapse sidebar-submenu">
             <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('buisinessunit', 'Poslovne jedinice')">
                 <span class="fa fa-building fa-fw mr-3"></span>
