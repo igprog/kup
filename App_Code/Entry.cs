@@ -28,8 +28,12 @@ public class Entry : System.Web.Services.WebService {
         public double repayment;
         public double repaid;
         public double restToRepayment;
-        public double totalObligation;
+        public double obligation;
         public double manipulativeCosts;
+        public double totalObligation;
+        public double totalClaim;
+
+        //TODO: Ukupno duguje / potražuje
     }
 
     public class Entries {
@@ -66,7 +70,7 @@ public class Entry : System.Web.Services.WebService {
             xx.total.repayment = xx.data.Sum(a => a.repayment);
             xx.total.repaid = xx.data.Sum(a => a.repaid);
             xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
-            xx.total.totalObligation = xx.data.Sum(a => a.totalObligation);
+            xx.total.obligation = xx.data.Sum(a => a.obligation);
             xx.total.manipulativeCosts = xx.data.Sum(a => a.manipulativeCosts);
             return JsonConvert.SerializeObject(xx, Formatting.Indented);
         } catch (Exception e) {
@@ -82,7 +86,7 @@ public class Entry : System.Web.Services.WebService {
         x.repayment = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
         x.repaid = reader.GetValue(3) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(3));
         x.restToRepayment = reader.GetValue(4) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(4));
-        x.totalObligation = x.monthlyFee + x.repaid;
+        x.obligation = x.monthlyFee + x.repaid;
         x.manipulativeCosts = reader.GetValue(5) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(5));
         return x;
     }
