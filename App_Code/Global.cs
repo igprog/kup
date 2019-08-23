@@ -14,11 +14,13 @@ namespace Igprog {
         public Global() {
         }
 
-        public string ReffDate(int month, int year) {
-            int nextMonth = month == 12 ? 1 : month + 1;
-            string month_ = nextMonth < 10 ? string.Format("0{0}", nextMonth) : nextMonth.ToString();
-            int year_ = month == 12 ? year + 1 : year;
-            return string.Format("{0}-{1}-01", year_, month_);
+        public string ReffDate(int? month, int year) {
+            if(month == 13) {
+                month = 1;
+                year = year + 1;
+            }
+            string month_ = month < 10 ? string.Format("0{0}", month) : month.ToString();
+            return string.Format("{0}-{1}-01", year, month_);
         }
 
         public void CreateFolder(string path) {

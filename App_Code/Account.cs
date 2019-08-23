@@ -274,8 +274,10 @@ public class Account : System.Web.Services.WebService {
                     SELECT l.id, l.loan, l.repayment, a.repaid, a.restToRepayment FROM Loan l
                     LEFT OUTER JOIN Account a
                     ON l.id = a.loanId
-                    WHERE l.userId = '{0}' AND l.isRepaid = 0 AND CONVERT(datetime, l.loanDate) <= '{1}'
-                    GROUP BY l.id, l.loan, l.repayment, a.repaid, a.restToRepayment", userId, g.ReffDate(month, year));
+                    WHERE l.userId = '{0}' AND l.isRepaid = 0 AND {1}
+                    GROUP BY l.id, l.loan, l.repayment, a.repaid, a.restToRepayment"
+                        , userId
+                        , string.Format("CONVERT(datetime, l.loanDate) >= '{0}' AND CONVERT(datetime, l.loanDate) < '{1}'", g.ReffDate(month, year), g.ReffDate(month + 1, year)));
         using (SqlConnection connection = new SqlConnection(connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {

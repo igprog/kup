@@ -48,9 +48,27 @@ public class Loan : System.Web.Services.WebService {
         public double restToRepayment;
     }
 
+    public class MonthlyTotal {
+        public string month;
+        public Total total;
+
+        //public Total mo2;
+        //public Total mo3;
+        //public Total mo4;
+        //public Total mo5;
+        //public Total mo6;
+        //public Total mo7;
+        //public Total mo8;
+        //public Total mo9;
+        //public Total mo10;
+        //public Total mo11;
+        //public Total mo12;
+    }
+
     public class Loans {
         public List<NewLoan> data;
-        public Total total; 
+        public Total total;
+        public List<MonthlyTotal> monthlyTotal; 
     }
 
     [WebMethod]
@@ -100,7 +118,7 @@ public class Loan : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    public string Load(int month, int year, string buisinessUnitCode) {
+    public string Load(int? month, int year, string buisinessUnitCode) {
         try {
             db.Loan();
             string sql = string.Format(@"SELECT l.id, l.userId, l.loan, l.loanDate, l.repayment, l.manipulativeCosts, l.dedline, l.isRepaid, l.note, u.firstName, u.lastName, b.code, b.title FROM Loan l
@@ -108,7 +126,9 @@ public class Loan : System.Web.Services.WebService {
                         ON l.userId = u.id
                         LEFT OUTER JOIN BuisinessUnit b
                         ON u.buisinessUnitCode = b.code
-                        WHERE u.buisinessUnitCode = '{0}' AND CONVERT(datetime, l.loanDate) <= '{1}'", buisinessUnitCode, g.ReffDate(month, year));
+                        WHERE {0} {1}"
+                            , string.Format("CONVERT(datetime, l.loanDate) >= '{0}' AND CONVERT(datetime, l.loanDate) < '{1}'", g.ReffDate(month == null ? 1 : month, year), g.ReffDate(month == null ? 12 : month + 1, year))
+                            , string.IsNullOrEmpty(buisinessUnitCode) ? "" : string.Format("AND u.buisinessUnitCode = '{0}'", buisinessUnitCode));
             Loans xx = new Loans();
             xx.data = new List<NewLoan>();
             using (SqlConnection connection = new SqlConnection(connectionString)) {
@@ -123,12 +143,16 @@ public class Loan : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
+
             xx.total = new Total();
             xx.total.loan = xx.data.Sum(a => a.loan);
             xx.total.repayment = xx.data.Sum(a => a.repayment);
             xx.total.manipulativeCosts = xx.data.Sum(a => a.manipulativeCosts);
             xx.total.actualLoan = xx.data.Sum(a => a.actualLoan);
             xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
+
+            xx.monthlyTotal = new List<MonthlyTotal>();
+            xx.monthlyTotal = GetMonthlyTotal(xx.data);
 
             return JsonConvert.SerializeObject(xx, Formatting.Indented);
         } catch (Exception e) {
@@ -190,6 +214,23 @@ public class Loan : System.Web.Services.WebService {
             connection.Close();
         }
         return x;
+    }
+
+    private List<MonthlyTotal> GetMonthlyTotal(List<NewLoan> data) {
+        List<MonthlyTotal> xx = new List<MonthlyTotal>();
+        for(int i=1; i<=12; i++) {
+            MonthlyTotal x = new MonthlyTotal();
+            x.month = g.Month(i);
+            var aa = data.Where(a => a.loanDate.Substring(5, 2) == x.month);
+            x.total = new Total();
+            x.total.loan = aa.Sum(a => a.loan);
+            x.total.repayment = aa.Sum(a => a.repayment);
+            x.total.manipulativeCosts = aa.Sum(a => a.manipulativeCosts);
+            x.total.actualLoan = aa.Sum(a => a.actualLoan);
+            x.total.restToRepayment = aa.Sum(a => a.restToRepayment);
+            xx.Add(x);
+        }
+        return xx;
     }
 
 }

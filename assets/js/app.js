@@ -347,10 +347,20 @@
     };
     $scope.d = data;
 
-    $scope.load = (x) => {
+
+    var load = (x) => {
         f.post('Loan', 'Load', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
             $scope.d.loans = d;
         });
+    }
+
+    $scope.load = (x) => {
+        load(x);
+    }
+
+    $scope.load_recap = (x) => {
+        x.month = null;
+        load(x);
     }
 
     $scope.print = (x) => {
