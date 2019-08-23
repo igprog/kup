@@ -51,18 +51,6 @@ public class Loan : System.Web.Services.WebService {
     public class MonthlyTotal {
         public string month;
         public Total total;
-
-        //public Total mo2;
-        //public Total mo3;
-        //public Total mo4;
-        //public Total mo5;
-        //public Total mo6;
-        //public Total mo7;
-        //public Total mo8;
-        //public Total mo9;
-        //public Total mo10;
-        //public Total mo11;
-        //public Total mo12;
     }
 
     public class Loans {
