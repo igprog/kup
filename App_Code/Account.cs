@@ -76,7 +76,7 @@ public class Account : System.Web.Services.WebService {
     }
 
     public enum RecordType {
-        loan, monthlyFee, otherFee, bankFee, interest
+        loan, monthlyFee, bankFee, interest, otherFee
     };
 
     //public class RecordType {

@@ -627,6 +627,48 @@
 
 }])
 
+.controller('otherFeeCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+        var service = 'Account';
+        var data = {
+            records: {},
+            month: $scope.g.month,
+            year: $scope.g.year,
+            pdf: null,
+            loadingPdf: false
+        }
+        $scope.d = data;
+
+        var load = (x) => {
+            f.post(service, 'OtherFee', { month: x.month, year: x.year }).then((d) => {
+                $scope.d.records = d;
+            });
+        }
+
+        $scope.load = (x) => {
+            return load(x);
+        }
+
+        $scope.print = (x) => {
+            alert('TODO');
+            /*
+            if (f.defined(x.records.data.length)) {
+                if (x.records.data.length == 0) { return false; }
+            }
+            $scope.d.pdf = null;
+            $scope.d.loadingPdf = true;
+            f.post('Pdf', 'Entry', { month: x.month, year: x.year, records: x.records }).then((d) => {
+                $scope.d.pdf = f.pdfTempPath(d);
+                $scope.d.loadingPdf = false;
+            });
+            */
+        }
+
+        $scope.removePdfLink = () => {
+            $scope.d.pdf = null;
+        }
+
+    }])
+
 .controller('adminCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Admin';
     
