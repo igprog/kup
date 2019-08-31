@@ -70,7 +70,9 @@
         },
         setDate: (x) => {
             var day = x.getDate();
-            var mo = x.getMonth() < 10 ? '0' + (x.getMonth() + 1) : x.getMonth() + 1;
+            day = day < 10 ? '0' + day : day;
+            var mo = x.getMonth();
+            mo = mo < 10 ? '0' + (mo + 1) : mo + 1;
             var yr = x.getFullYear();
             return yr + '-' + mo + '-' + day;
         },
@@ -323,14 +325,34 @@
         if (x.loan > 0) {
             $scope.d.loan.manipulativeCosts = (x.loan * x.manipulativeCostsCoeff).toFixed(2);
             $scope.d.loan.repayment = (x.loan / x.dedline).toFixed(2);
+            $scope.d.loan.actualLoan = x.loan - $scope.d.loan.manipulativeCosts;
+            $scope.d.loan.withdraw = $scope.d.loan.actualLoan - $scope.d.user.restToRepayment;
+            //$scope.d.loan.user.activeLoanId = $scope.d.user.activeLoanId;
         }
     }
 
+    $scope.calculateDedline = (x) => {
+        if (x.loan > 0) {
+            $scope.d.loan.dedline = (x.loan / x.repayment).toFixed(0);
+        }
+    }
+
+
+
     $scope.save = (x, date) => {
-        x.loanDate = f.setDate(date);
-        f.post(service, 'Save', { x: x }).then((d) => {
+        x.loan.loanDate = f.setDate(date);
+        x.loan.user.restToRepayment = x.user.restToRepayment;
+        f.post(service, 'Save', { x: x.loan }).then((d) => {
             alert(d);
         });
+    }
+
+    $scope.getUser = (id) => {
+        if (id !== null) {
+            f.post('User', 'Get', { id: id, year: null }).then((d) => {
+                $scope.d.user = d;
+            });
+        }
     }
 
 }])
@@ -381,39 +403,39 @@
 
 }])
 
-.controller('accountCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
-    var service = 'Account';
-    var data = {
-        records: {},
-        account: {},
-        month: $scope.g.month,
-        year: $scope.g.year,
-        buisinessUnitCode: null
-    }
-    $scope.d = data;
+//.controller('accountCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+//    var service = 'Account';
+//    var data = {
+//        records: {},
+//        account: {},
+//        month: $scope.g.month,
+//        year: $scope.g.year,
+//        buisinessUnitCode: null
+//    }
+//    $scope.d = data;
 
-    var getMonthlyRecords = (x) => {
-        f.post(service, 'GetMonthlyRecords', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
-            $scope.d.records = d;
-        });
-    }
+//    var getMonthlyRecords = (x) => {
+//        f.post(service, 'GetMonthlyRecords', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
+//            $scope.d.records = d;
+//        });
+//    }
 
-    $scope.getMonthlyRecords = (x) => {
-        return getMonthlyRecords(x);
-    }
+//    $scope.getMonthlyRecords = (x) => {
+//        return getMonthlyRecords(x);
+//    }
 
-    $scope.save = (x, idx) => {
-        if (x.repayment > x.restToRepayment) {
-            alert('Rata je veća od duga!');
-            return false;
-        }
-        f.post(service, 'Save', { x: x }).then((d) => {
-            $scope.d.records.data[idx].repaid = d.repaid;
-            $scope.d.records.data[idx].restToRepayment = d.restToRepayment;
-        });
-    }
+//    $scope.save = (x, idx) => {
+//        if (x.repayment > x.restToRepayment) {
+//            alert('Rata je veća od duga!');
+//            return false;
+//        }
+//        f.post(service, 'Save', { x: x }).then((d) => {
+//            $scope.d.records.data[idx].repaid = d.repaid;
+//            $scope.d.records.data[idx].restToRepayment = d.restToRepayment;
+//        });
+//    }
 
-}])
+//}])
 
 .controller('suspensionCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
         var service = 'Account';
@@ -454,6 +476,114 @@
         }
 
 }])
+
+.controller('monthlyFeeCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+    var service = 'Account';
+    var data = {
+        records: {},
+        month: $scope.g.month,
+        year: $scope.g.year,
+        buisinessUnitCode: null,
+        pdf: null,
+        loadingPdf: false
+    }
+    $scope.d = data;
+
+    var getMonthlyRecords = (x) => {
+        f.post(service, 'GetMonthlyFee', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
+            $scope.d.records = d;
+        });
+    }
+
+    $scope.getMonthlyRecords = (x) => {
+        return getMonthlyRecords(x);
+    }
+
+    $scope.save = (x, d, idx) => {
+        x.month = d.month;
+        x.year = d.year;
+        f.post('Account', 'SaveMonthlyFee', { x: x }).then((d) => {
+            //TODO:
+            //$scope.d.user.records[idx].repaid = d.repaid;
+            //$scope.d.user.records[idx].restToRepayment = d.restToRepayment;
+        });
+    }
+
+    $scope.print = (x) => {
+        alert('TODO');
+        if (f.defined(x.records.data.length)) {
+            if (x.records.data.length == 0) { return false; }
+        }
+        $scope.d.pdf = null;
+        $scope.d.loadingPdf = true;
+        f.post('Pdf', 'MonthlyFee', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, records: x.records }).then((d) => {
+            $scope.d.pdf = f.pdfTempPath(d);
+            $scope.d.loadingPdf = false;
+        });
+    }
+
+    $scope.removePdfLink = () => {
+        $scope.d.pdf = null;
+    }
+
+}])
+
+.controller('repaymentCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+        var service = 'Account';
+        var data = {
+            records: {},
+            month: $scope.g.month,
+            year: $scope.g.year,
+            buisinessUnitCode: null,
+            pdf: null,
+            loadingPdf: false
+        }
+        $scope.d = data;
+
+        var getMonthlyRecords = (x) => {
+            f.post(service, 'GetLoanUsers', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
+                $scope.d.records = d;
+            });
+        }
+
+        $scope.getMonthlyRecords = (x) => {
+            return getMonthlyRecords(x);
+        }
+
+        $scope.save = (x, d, idx) => {
+            x.month = d.month;
+            x.year = d.year;
+            //x.amount = x.repayment;
+            //TODO
+            if (x.repayment > x.restToRepayment) {
+                alert('Rata je veća od duga!');
+                return false;
+            }
+            f.post('Account', 'SaveRepayment', { x: x }).then((d) => {
+                //TODO:
+                $scope.d.user.records[idx].repaid = d.repaid;
+                $scope.d.user.records[idx].restToRepayment = d.restToRepayment;
+            });
+        }
+
+        $scope.print = (x) => {
+            alert('TODO');
+            if (f.defined(x.records.data.length)) {
+                if (x.records.data.length == 0) { return false; }
+            }
+            $scope.d.pdf = null;
+            $scope.d.loadingPdf = true;
+            f.post('Pdf', 'Repayment', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, records: x.records }).then((d) => {
+                $scope.d.pdf = f.pdfTempPath(d);
+                $scope.d.loadingPdf = false;
+            });
+        }
+
+        $scope.removePdfLink = () => {
+            $scope.d.pdf = null;
+        }
+
+    }])
 
 .controller('entryCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Entry';
@@ -526,9 +656,9 @@
         }
     }
 
-    $scope.sql = (x, tbl) => {
-        if (confirm('Dali ste sigurni da želite izbrisati tablicu: ' + x + '?')) {
-            f.post('Admin', 'Sql', { method: x, tbl: tbl }).then((d) => {
+    $scope.sql = (method, tbl) => {
+        if (confirm('Dali ste sigurni da želite izbrisati tablicu: ' + tbl + '?')) {
+            f.post('Admin', 'Sql', { method: method, tbl: tbl }).then((d) => {
                 alert(d);
             });
         }

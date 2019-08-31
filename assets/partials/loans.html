@@ -49,8 +49,8 @@
                     <td class="text-right">{{x.loan | number:2}}</td>
                     <td class="text-right">{{x.manipulativeCosts | number:2}}</td>
                     <td class="text-right">{{x.actualLoan | number:2}}</td>
-                    <td class="text-right">TODO</td>
-                    <td class="text-right">TODO</td>
+                    <td class="text-right">{{x.restToRepayment | number:2}}</td>
+                    <td class="text-right">{{x.withdraw | number:2}}</td>
                 </tr>
             </tbody>
             <tfoot ng-if="d.loans.data.length>0" class="thead-light">
@@ -59,8 +59,8 @@
                     <th>{{d.loans.total.loan | number:2}}</th>
                     <th>{{d.loans.total.manipulativeCosts | number:2}}</th>
                     <th>{{d.loans.total.actualLoan | number:2}}</th>
-                    <th>TODO</th>
-                    <th>TODO</th>
+                    <th>{{d.loans.total.restToRepayment | number:2}}</th>
+                    <th>{{d.loans.total.withdraw | number:2}}</th>
                 </tr>
             </tfoot>
         </table>

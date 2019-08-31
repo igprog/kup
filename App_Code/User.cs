@@ -39,6 +39,8 @@ public class User : System.Web.Services.WebService {
         public string terminationDate;
         public int isActive;
         public double monthlyFee;
+        public double restToRepayment;
+        //public string activeLoanId;
 
         //TODO: list<Card>
         public List<Account.NewAccount> records;
@@ -58,6 +60,8 @@ public class User : System.Web.Services.WebService {
         x.terminationDate = null;
         x.isActive = 1;
         x.monthlyFee = monthlyFee;
+        x.restToRepayment = 0;
+        //x.activeLoanId = null;
         x.records = new List<Account.NewAccount>();
         return JsonConvert.SerializeObject(x, Formatting.Indented);
     }
@@ -66,8 +70,6 @@ public class User : System.Web.Services.WebService {
     public string Save(NewUser x) {
         try {
             db.Users();
-
-
             string sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Users WITH (updlock,serializable) WHERE id = '{0}')
                                                 BEGIN
@@ -124,7 +126,9 @@ public class User : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
-            if(year != null) {
+            x.restToRepayment = GetLoanAmount(id) - GetRepayedAmount(id);
+            //x.activeLoanId = GetActiveLoanId(id);
+            if (year != null) {
                 x.records = a.GetRecords(x.id, year);
             }
             return JsonConvert.SerializeObject(x, Formatting.Indented);
@@ -209,5 +213,79 @@ public class User : System.Web.Services.WebService {
         }
         return xx;
     }
+
+    public List<NewUser> GetLoanUsers(string buisinessUnitCode) {
+        db.Users();
+        string sql = string.Format(@"{0}
+                        LEFT OUTER JOIN Loan l on u.id = l.userId
+                        {1}"
+                        , sqlString 
+                        , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("WHERE u.buisinessUnitCode = '{0}' AND l.isRepaid = 0", buisinessUnitCode): "");
+        List<NewUser> xx = new List<NewUser>();
+        using (SqlConnection connection = new SqlConnection(connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        NewUser x = ReadData(reader);
+                        xx.Add(x);
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return xx;
+    }
+
+    public double GetRepayedAmount(string id) {
+        double x = 0;
+        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, amount)) FROM Account WHERE userId = '{0}' and recordType = 'loan'", id);
+        using (SqlConnection connection = new SqlConnection(connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
+    }
+
+    public double GetLoanAmount(string id) {
+        double x = 0;
+        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, loan)) FROM Loan WHERE userId = '{0}'", id);
+        using (SqlConnection connection = new SqlConnection(connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
+    }
+
+    //public string GetActiveLoanId(string id) {
+    //    string x = null;
+    //    string sql = string.Format(@"SELECT id FROM Loan WHERE userId = '{0}' AND isRepaid = 0", id);
+    //    using (SqlConnection connection = new SqlConnection(connectionString)) {
+    //        connection.Open();
+    //        using (SqlCommand command = new SqlCommand(sql, connection)) {
+    //            using (SqlDataReader reader = command.ExecuteReader()) {
+    //                while (reader.Read()) {
+    //                    x = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
+    //                }
+    //            }
+    //        }
+    //        connection.Close();
+    //    }
+    //    return x;
+    //}
 
 }

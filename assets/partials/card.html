@@ -38,18 +38,19 @@
                     <th>Ulog ({{config.currency}})</th>
                     <th>Duguje ({{config.currency}})</th>
                     <th>Potražuje ({{config.currency}})</th>
-                    <th></th>
+                    <!--<th></th>-->
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="x in d.user.records track by $index">
-                    <td><input ng-model="x.repaymentDate" class="form-control" /></td>
+
+                    <td>{{x.recordDate}}</td>
                     <td>{{x.month}}</td>
-                    <td><input ng-model="x.note" class="form-control" /></td>
-                    <td><input ng-model="x.monthlyFee" class="form-control" /></td>
-                    <td>{{x.restToRepayment | number:2}}</td>
-                    <td><input ng-model="x.repayment" class="form-control" /></td>
-                    <td><button class="btn btn-outline-primary" ng-click="saveRecord(x, $index)"><i class="fas fa-save"></i> Spremi</button></td>
+                    <td>{{x.note}}</td>
+                    <td><span ng-if="x.recordType=='monthlyFee'">{{x.amount | number:2}}</span></td>
+                    <td><span ng-if="x.recordType=='loan'">{{x.restToRepayment | number:2}}</span></td>
+                    <td><span ng-if="x.recordType=='loan'">{{x.amount | number:2}}</span></td>
+                    <!--<td><button class="btn btn-outline-primary" ng-click="saveRecord(x, $index)"><i class="fas fa-save"></i> Spremi</button></td>-->
                 </tr>
             </tbody>
         </table>

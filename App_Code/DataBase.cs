@@ -46,20 +46,36 @@ namespace Igprog {
                         CREATE TABLE {1}
                         (id NVARCHAR (50) PRIMARY KEY,
                         userId NVARCHAR (50),
+                        amount NVARCHAR (50),
+                        recordDate NVARCHAR (50),
                         mo INTEGER,
                         yr INTEGER,
-                        monthlyFee NVARCHAR (50),
+                        recordType NVARCHAR (50),
                         loanId NVARCHAR (50),
-                        loan NVARCHAR (50),
-                        loanDate NVARCHAR (50),
-                        repayment NVARCHAR (50),
-                        repaymentDate NVARCHAR (50),
-                        repaid NVARCHAR (50),
-                        restToRepayment NVARCHAR (50),
-                        accountBalance NVARCHAR (50),
                         note NVARCHAR (50))", CheckTbl(tbl), tbl);
             CreateTable(sql);
         }
+
+        //public void Account() {
+        //    string tbl = "Account";
+        //    string sql = string.Format(@"{0}
+        //                CREATE TABLE {1}
+        //                (id NVARCHAR (50) PRIMARY KEY,
+        //                userId NVARCHAR (50),
+        //                mo INTEGER,
+        //                yr INTEGER,
+        //                monthlyFee NVARCHAR (50),
+        //                loanId NVARCHAR (50),
+        //                loan NVARCHAR (50),
+        //                loanDate NVARCHAR (50),
+        //                repayment NVARCHAR (50),
+        //                repaymentDate NVARCHAR (50),
+        //                repaid NVARCHAR (50),
+        //                restToRepayment NVARCHAR (50),
+        //                accountBalance NVARCHAR (50),
+        //                note NVARCHAR (50))", CheckTbl(tbl), tbl);
+        //    CreateTable(sql);
+        //}
 
         public void Loan() {
             string tbl = "Loan";
@@ -71,6 +87,7 @@ namespace Igprog {
                         loanDate NVARCHAR (50),
                         repayment NVARCHAR (50),
                         manipulativeCosts NVARCHAR (50),
+                        withdraw NVARCHAR (50),
                         dedline NVARCHAR (50),
                         isRepaid INTEGER,
                         note NVARCHAR (50))", CheckTbl(tbl), tbl);

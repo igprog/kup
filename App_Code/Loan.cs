@@ -31,7 +31,8 @@ public class Loan : System.Web.Services.WebService {
         public string loanDate;
         public double repayment;
         public double manipulativeCosts;
-        public double actualLoan;
+        public double actualLoan;  // pozajmica - manipulativni troskovi
+        public double withdraw;  // za isplatu (pozajmica - neotplacena pozajmica)
         public double dedline;
         public double restToRepayment;  //TODO
         public int isRepaid;
@@ -45,6 +46,7 @@ public class Loan : System.Web.Services.WebService {
         public double repayment;
         public double manipulativeCosts;
         public double actualLoan;
+        public double withdraw;
         public double restToRepayment;
     }
 
@@ -62,14 +64,16 @@ public class Loan : System.Web.Services.WebService {
     [WebMethod]
     public string Init() {
         NewLoan x = new NewLoan();
-        x.id = Guid.NewGuid().ToString();
+        x.id = null; // Guid.NewGuid().ToString();
         x.user = new User.NewUser();
         x.loan = 0;
-        x.loanDate = null;
+        x.loanDate = g.Date(DateTime.Now);
         x.repayment = 0;
         x.manipulativeCosts = 0;
         x.actualLoan = 0;
+        x.withdraw = 0;
         x.dedline = defaultDedline;
+        x.restToRepayment = 0;
         x.isRepaid = 0;
         x.note = null;
         x.manipulativeCostsCoeff = manipulativeCostsCoeff;
@@ -81,17 +85,27 @@ public class Loan : System.Web.Services.WebService {
     public string Save(NewLoan x) {
         try {
             db.Loan();
+            bool isNewLoan = false;
+            if(string.IsNullOrEmpty(x.id)) {
+                x.id = Guid.NewGuid().ToString();
+                isNewLoan = true;
+            }
+
+            if (isNewLoan && x.user.restToRepayment > 0) {
+                UpdateActiveLoan(x);  //********** Ako postoji pozajmica koja nije otplacena onda se ona otplacuje sa dijelom nove pozajmice.
+            }
+
             string sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Loan WITH (updlock,serializable) WHERE id = '{0}')
                                                 BEGIN
-                                                   UPDATE Loan SET userId = '{1}', loan = '{2}', loanDate = '{3}', repayment = '{4}', manipulativeCosts = '{5}', dedline = '{6}', isRepaid = '{7}', note = '{8}' WHERE id = '{0}'
+                                                   UPDATE Loan SET userId = '{1}', loan = '{2}', loanDate = '{3}', repayment = '{4}', manipulativeCosts = '{5}', withdraw = '{6}', dedline = '{7}', isRepaid = '{8}', note = '{9}' WHERE id = '{0}'
                                                 END
                                             ELSE
                                                 BEGIN
-                                                   INSERT INTO Loan (id, userId, loan, loanDate, repayment, manipulativeCosts, dedline, isRepaid, note)
-                                                   VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
+                                                   INSERT INTO Loan (id, userId, loan, loanDate, repayment, manipulativeCosts, withdraw, dedline, isRepaid, note)
+                                                   VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
                                                 END
-                                        COMMIT TRAN", x.id, x.user.id, x.loan, x.loanDate, x.repayment, x.manipulativeCosts, x.dedline, x.isRepaid, x.note);
+                                        COMMIT TRAN", x.id, x.user.id, x.loan, x.loanDate, x.repayment, x.manipulativeCosts, x.withdraw, x.dedline, x.isRepaid, x.note);
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -99,6 +113,7 @@ public class Loan : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
+
             return JsonConvert.SerializeObject("Spremljeno", Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
@@ -109,7 +124,7 @@ public class Loan : System.Web.Services.WebService {
     public string Load(int? month, int year, string buisinessUnitCode) {
         try {
             db.Loan();
-            string sql = string.Format(@"SELECT l.id, l.userId, l.loan, l.loanDate, l.repayment, l.manipulativeCosts, l.dedline, l.isRepaid, l.note, u.firstName, u.lastName, b.code, b.title FROM Loan l
+            string sql = string.Format(@"SELECT l.id, l.userId, l.loan, l.loanDate, l.repayment, l.manipulativeCosts, l.withdraw, l.dedline, l.isRepaid, l.note, u.firstName, u.lastName, b.code, b.title FROM Loan l
                         LEFT OUTER JOIN Users u
                         ON l.userId = u.id
                         LEFT OUTER JOIN BuisinessUnit b
@@ -137,6 +152,7 @@ public class Loan : System.Web.Services.WebService {
             xx.total.repayment = xx.data.Sum(a => a.repayment);
             xx.total.manipulativeCosts = xx.data.Sum(a => a.manipulativeCosts);
             xx.total.actualLoan = xx.data.Sum(a => a.actualLoan);
+            xx.total.withdraw = xx.data.Sum(a => a.withdraw);
             xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
 
             xx.monthlyTotal = new List<MonthlyTotal>();
@@ -175,15 +191,16 @@ public class Loan : System.Web.Services.WebService {
         x.repayment = reader.GetValue(4) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(4));
         x.manipulativeCosts = reader.GetValue(5) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(5));
         x.actualLoan = x.loan - x.manipulativeCosts;
+        x.withdraw = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
         //TODO:  x.restToRepayment;
-        x.dedline = reader.GetValue(6) == DBNull.Value ? defaultDedline : Convert.ToDouble(reader.GetString(6));
-        x.isRepaid = reader.GetValue(7) == DBNull.Value ? 0 : reader.GetInt32(7);
-        x.note = reader.GetValue(8) == DBNull.Value ? null : reader.GetString(8);
-        x.user.firstName = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);
-        x.user.lastName = reader.GetValue(10) == DBNull.Value ? null : reader.GetString(10);
+        x.dedline = reader.GetValue(7) == DBNull.Value ? defaultDedline : Convert.ToDouble(reader.GetString(7));
+        x.isRepaid = reader.GetValue(8) == DBNull.Value ? 0 : reader.GetInt32(8);
+        x.note = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);
+        x.user.firstName = reader.GetValue(10) == DBNull.Value ? null : reader.GetString(10);
+        x.user.lastName = reader.GetValue(11) == DBNull.Value ? null : reader.GetString(11);
         x.user.buisinessUnit = new BuisinessUnit.NewUnit();
-        x.user.buisinessUnit.code = reader.GetValue(11) == DBNull.Value ? null : reader.GetString(11);
-        x.user.buisinessUnit.title = reader.GetValue(12) == DBNull.Value ? null : reader.GetString(12);
+        x.user.buisinessUnit.code = reader.GetValue(12) == DBNull.Value ? null : reader.GetString(12);
+        x.user.buisinessUnit.title = reader.GetValue(13) == DBNull.Value ? null : reader.GetString(13);
         return x;
     }
 
@@ -215,10 +232,62 @@ public class Loan : System.Web.Services.WebService {
             x.total.repayment = aa.Sum(a => a.repayment);
             x.total.manipulativeCosts = aa.Sum(a => a.manipulativeCosts);
             x.total.actualLoan = aa.Sum(a => a.actualLoan);
+            x.total.withdraw = aa.Sum(a => a.withdraw);
             x.total.restToRepayment = aa.Sum(a => a.restToRepayment);
             xx.Add(x);
         }
         return xx;
+    }
+
+    private void UpdateActiveLoan(NewLoan x) {
+
+        //Provjeri dali postoji aktivna pozajmica
+        string sql = null;
+        string loanId = null;
+        sql = string.Format(@"SELECT id FROM Loan WHERE userId = '{0}' AND isRepaid = 0", x.user.id);
+        using (SqlConnection connection = new SqlConnection(connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        loanId = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
+                    }
+                }
+            }
+            connection.Close();
+        }
+
+        //U Account tbl uplati razliku za otplatu
+        sql = string.Format(@"BEGIN TRAN
+                                BEGIN
+                                    INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
+                                    UPDATE Loan SET isRepaid = 1 WHERE id = '{7}'
+                                END
+                            COMMIT TRAN", Guid.NewGuid().ToString(), x.user.id, x.user.restToRepayment, x.loanDate, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), "loan", loanId, "Otplata novom pozajmicom");
+        using (SqlConnection connection = new SqlConnection(connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
+        }
+
+        //U Loan tbl stavi isRepaid = 1
+        //sql = string.Format(@"BEGIN TRAN
+        //                        BEGIN
+        //                            UPDATE Loan SET isRepaid = 1 WHERE id = '{0}'
+        //                        END
+        //                    COMMIT TRAN", x.id);
+        //using (SqlConnection connection = new SqlConnection(connectionString)) {
+        //    connection.Open();
+        //    using (SqlCommand command = new SqlCommand(sql, connection)) {
+        //        command.ExecuteNonQuery();
+        //    }
+        //    connection.Close();
+        //}
+
+
     }
 
 }
