@@ -85,8 +85,11 @@ public class Loan : System.Web.Services.WebService {
     public string Save(NewLoan x) {
         try {
             db.Loan();
+            db.Account();
             bool isNewLoan = false;
-            if(string.IsNullOrEmpty(x.id)) {
+            string manipulativeCostsId = Guid.NewGuid().ToString();
+            string withdrawId = Guid.NewGuid().ToString();
+            if (string.IsNullOrEmpty(x.id)) {
                 x.id = Guid.NewGuid().ToString();
                 isNewLoan = true;
             }
@@ -95,6 +98,7 @@ public class Loan : System.Web.Services.WebService {
                 UpdateActiveLoan(x);  //********** Ako postoji pozajmica koja nije otplacena onda se ona otplacuje sa dijelom nove pozajmice.
             }
 
+            //TODO: Update Account manipulativeCosts & withdraw
             string sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Loan WITH (updlock,serializable) WHERE id = '{0}')
                                                 BEGIN
@@ -104,8 +108,15 @@ public class Loan : System.Web.Services.WebService {
                                                 BEGIN
                                                    INSERT INTO Loan (id, userId, loan, loanDate, repayment, manipulativeCosts, withdraw, dedline, isRepaid, note)
                                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
+
+                                                   INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+                                                   VALUES ('{12}', '{1}', '{5}', '{3}', '{10}', '{11}', 'manipulativeCosts', '{0}', 'Manipulativni troškovi')
+
+                                                   INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+                                                   VALUES ('{13}', '{1}', '{6}', '{3}', '{10}', '{11}',  'withdraw', '{0}', 'Isplata pozajmice')
+
                                                 END
-                                        COMMIT TRAN", x.id, x.user.id, x.loan, x.loanDate, x.repayment, x.manipulativeCosts, x.withdraw, x.dedline, x.isRepaid, x.note);
+                                        COMMIT TRAN", x.id, x.user.id, x.loan, x.loanDate, x.repayment, x.manipulativeCosts, x.withdraw, x.dedline, x.isRepaid, x.note, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), manipulativeCostsId, withdrawId);
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {

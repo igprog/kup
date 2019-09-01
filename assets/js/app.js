@@ -63,7 +63,7 @@
             return new Date().getDay();
         },
         month: () => {
-            return  new Date().getMonth() + 1;
+            return new Date().getMonth() + 1;
         },
         year: () => {
             return new Date().getFullYear();
@@ -81,7 +81,15 @@
         },
         defined: (x) => {
             return x === undefined ? false : true;
+        },
+        recordTypes: () => {
+            return [
+                { id: 'bankFee', title: 'Troškovi održavanja računa' },
+                { id: 'interest', title: 'Kamata po štednji' },
+                { id: 'otherFee', title: 'Ostalo' }
+            ]
         }
+
     }
 }])
 
@@ -119,12 +127,14 @@
         var data = {
             currTpl: f.currTpl('login'),
             currTplTitle: null,
+            currTplType: null,
             date: new Date(),
             month: new Date().getMonth() + 1,
             year: new Date().getFullYear(),
             months: f.months(),
             years: f.years(),
-            buisinessUnits: []
+            buisinessUnits: [],
+            recordTypes: f.recordTypes()
         }
         f.post('BuisinessUnit', 'Load', {}).then((d) => {
             data.buisinessUnits = d;
@@ -161,9 +171,12 @@
         //TODO: clear session storage
     }
 
-    $scope.toggleTpl = (tpl, title) => {
+    $scope.toggleTpl = (tpl, title, currTplType) => {
         $scope.g.currTpl = f.currTpl(tpl);
         $scope.g.currTplTitle = title;
+        if (f.defined(currTplType)) {
+            $scope.g.currTplType = currTplType;
+        }
     }
 
 }])
@@ -630,13 +643,30 @@
 .controller('otherFeeCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
         var service = 'Account';
         var data = {
+            fee: {},
             records: {},
+            date: new Date(),
             month: $scope.g.month,
             year: $scope.g.year,
+            recordTypes: $scope.g.recordTypes,
             pdf: null,
             loadingPdf: false
         }
         $scope.d = data;
+
+        var init = () => {
+            f.post(service, 'Init', {}).then((d) => {
+                $scope.d.fee = d;
+            });
+        }
+        init();
+
+        $scope.save = (x) => {
+            x.fee.recordDate = f.setDate(x.date);
+            f.post(service, 'SaveOtherFee', { x: x.fee }).then((d) => {
+                $scope.d.records = d;
+            });
+        }
 
         var load = (x) => {
             f.post(service, 'OtherFee', { month: x.month, year: x.year }).then((d) => {
@@ -647,6 +677,8 @@
         $scope.load = (x) => {
             return load(x);
         }
+
+
 
         $scope.print = (x) => {
             alert('TODO');
@@ -667,7 +699,51 @@
             $scope.d.pdf = null;
         }
 
-    }])
+}])
+
+.controller('recapitulationCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+    var service = 'Account';
+    var data = {
+        records: {},
+        date: new Date(),
+        month: $scope.g.month,
+        year: $scope.g.year,
+        type: $scope.g.currTplType,
+        pdf: null,
+        loadingPdf: false
+    }
+    $scope.d = data;
+
+    load = (x) => {
+        f.post(service, 'LoadRecapitulation', { year: x.year, type: x.type }).then((d) => {
+            $scope.d.records = d;
+        });
+    }
+
+    $scope.load = (x) => {
+        return load(x);
+    }
+
+    $scope.print = (x) => {
+        alert('TODO');
+        /*
+        if (f.defined(x.records.data.length)) {
+            if (x.records.data.length == 0) { return false; }
+        }
+        $scope.d.pdf = null;
+        $scope.d.loadingPdf = true;
+        f.post('Pdf', 'Entry', { month: x.month, year: x.year, records: x.records }).then((d) => {
+            $scope.d.pdf = f.pdfTempPath(d);
+            $scope.d.loadingPdf = false;
+        });
+        */
+    }
+
+    $scope.removePdfLink = () => {
+        $scope.d.pdf = null;
+    }
+
+}])
 
 .controller('adminCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Admin';
@@ -741,7 +817,8 @@
             href: '=',
             src: '=',
             title: '=',
-            ico: '='
+            ico: '=',
+            type: '='
         },
         templateUrl: './assets/partials/directive/link.html'
     };

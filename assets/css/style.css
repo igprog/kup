@@ -12,7 +12,7 @@
 
 /* Sidebar sizes when expanded and expanded */
 .sidebar-expanded {
-    width: 230px;
+    /*width: 230px;*/
 }
 .sidebar-collapsed {
     width: 60px;

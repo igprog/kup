@@ -5,17 +5,17 @@
                 <div class="col-sm-2">
                     <div class="form-group">
                         <label for="accessDate">Datum:</label>
-                        <input ng-model="d.user.accessDate" type="date" class="form-control" name="accessDate">
+                        <input ng-model="d.date" type="date" class="form-control" name="accessDate">
                     </div>
                 </div>
             </div>
             <form class="form-inline">
                 <label for="month" class="mb-2 mr-sm-2">Mjesec:</label>
-                <select ng-model="d.month" class="form-control mb-2 mr-sm-2">
+                <select ng-model="d.fee.month" class="form-control mb-2 mr-sm-2">
                     <option ng-repeat="x in g.months" value="{{x.id}}">{{x.title}}</option>
                 </select>
                 <label for="year" class="mb-2 mr-sm-2"> / </label>
-                <select ng-model="d.year" class="form-control mb-2 mr-sm-2">
+                <select ng-model="d.fee.year" class="form-control mb-2 mr-sm-2">
                     <option ng-repeat="x in g.years" value="{{x}}">{{x}}</option>
                 </select>
             </form>
@@ -31,16 +31,20 @@
         <div class="col-sm-6">
             <div class="form-group">
                 <label for="recordType">Vrsta troška:</label>
-                <select ng-model="d.recordType" class="form-control" name="recordType">
-                    <option ng-repeat="x in g.recordTypes" value="{{x.code}}">{{x.code}} - {{x.title}}</option>
+                <select ng-model="d.fee.recordType" class="form-control" name="recordType">
+                    <option ng-repeat="x in g.recordTypes" value="{{x.id}}">{{x.title}}</option>
                 </select>
             </div>
             <div class="form-group">
                 <label for="amount">Iznos:</label>
-                <input ng-model="d.amount" type="text" class="form-control" name="amount">
+                <input ng-model="d.fee.amount" type="text" class="form-control" name="amount">
+            </div>
+            <div class="form-group">
+                <label for="note">Opis:</label>
+                <input ng-model="d.fee.note" type="text" class="form-control" name="note">
             </div>
             <div class="text-right">
-                <button type="submit" class="btn btn-outline-primary" ng-click="save(d.user)"><i class="fas fa-save"></i> Spremi</button>
+                <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fas fa-save"></i> Spremi</button>
             </div>
         </div>
     </div>

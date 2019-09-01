@@ -76,12 +76,25 @@ public class Account : System.Web.Services.WebService {
     }
 
     public enum RecordType {
-        loan, monthlyFee, bankFee, interest, otherFee
+        loan, manipulativeCosts, withdraw, monthlyFee, bankFee, interest, otherFee
     };
 
-    //public class RecordType {
-    //    public enum Type { Loan, MonthlyFee, otherFee, bankFee, interest }; //Loan
-    //}
+    public class Recapitulation {
+        public string date;
+        public string month;
+        public string year;
+        public double input;  // duguje
+        public double output;  // potrazuje
+        public string recordType;
+        public string note;
+    }
+
+    public class RecapMonthlyTotal {
+        public string month;
+        public Recapitulation total;
+    }
+
+
 
     [WebMethod]
     public string Init() {
@@ -129,7 +142,7 @@ public class Account : System.Web.Services.WebService {
         return JsonConvert.SerializeObject(x, Formatting.Indented);
     }
 
-     [WebMethod]
+    [WebMethod]
     public string SaveMonthlyFee(NewAccount x) {
         try {
             x.recordType = RecordType.monthlyFee.ToString();
@@ -149,6 +162,16 @@ public class Account : System.Web.Services.WebService {
             return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
         }
     }
+
+    [WebMethod]
+    public string SaveOtherFee(NewAccount x) {
+        try {
+            return JsonConvert.SerializeObject(Save(x), Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+        }
+    }
+
 
     //[WebMethod]
     //public string Save(NewAccount x) {
@@ -213,10 +236,10 @@ public class Account : System.Web.Services.WebService {
     //}
 
     [WebMethod]
-    public string Load() {
+    public string Load(int year, string type) {
         try {
             db.Account();
-            string sql = "SELECT * FROM Account";
+            string sql = string.Format(@"SELECT * FROM Account WHERE yr = '{0}' AND recordType = '{1}'", year, type);
             List<NewAccount> xx = new List<NewAccount>();
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
@@ -448,6 +471,65 @@ public class Account : System.Web.Services.WebService {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
         }
     }
+
+    [WebMethod]
+    public string LoadRecapitulation(int year, string type) {
+        try {
+            db.Account();
+            string sql = null;
+            string q = null;
+            if (type == RecordType.loan.ToString()) {
+              //  sql = string.Format(@"SELECT SUBSTRING(l.loanDate, 6, 2), l.loan FROM Loan l WHERE SUBSTRING(loanDate, 1, 4) = '{0}'", year);
+
+                sql = string.Format(@"select a.mo, a.amount, a.recordType from  Account a where yr = '{0}'  and a.recordType = 'withdraw' or a.recordType = 'loan'", year);
+            } 
+            List<Recapitulation> xx = new List<Recapitulation>();
+            List<RecapMonthlyTotal> xxx = new List<RecapMonthlyTotal>();
+            using (SqlConnection connection = new SqlConnection(connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            Recapitulation x = new Recapitulation();
+                            x.date = null;  //TODO
+                            x.month = reader.GetValue(0) == DBNull.Value ? null : Convert.ToString(reader.GetInt32(0));
+                            x.year = year.ToString();
+                            x.input = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
+                            x.recordType = reader.GetValue(2) == DBNull.Value ? null : reader.GetString(2);
+                            //x.note = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
+                            xx.Add(x);
+                        }
+                    }
+                }
+                connection.Close();
+
+                xxx = GetRecapMonthleyTotal(xx);
+                
+
+            }
+            return JsonConvert.SerializeObject(xxx, Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+        }
+    }
+
+    private List<RecapMonthlyTotal> GetRecapMonthleyTotal(List<Recapitulation> data) {
+        List<RecapMonthlyTotal> xx = new List<RecapMonthlyTotal>();
+        for (int i = 1; i <= 12; i++) {
+            RecapMonthlyTotal x = new RecapMonthlyTotal();
+            x.total = new Recapitulation();
+            x.month = g.Month(i);
+            var input = data.Where(a => a.month == x.month && a.recordType == "withdraw");
+            var output = data.Where(a => a.month == x.month && a.recordType == "loan");
+            x.total.input = input.Sum(a => a.input);
+            x.total.output = output.Sum(a => a.input);  // Ovo nije greška (a.input)
+            x.total.note = string.Format("Promet pozajmica {0}", x.month);
+            xx.Add(x);
+        }
+        return xx;
+    }
+
+
 
     public NewAccount Save(NewAccount x) {
         try {
