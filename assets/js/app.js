@@ -715,6 +715,8 @@
     $scope.d = data;
 
     load = (x) => {
+        debugger;
+        x.type = $scope.g.currTplType;
         f.post(service, 'LoadRecapitulation', { year: x.year, type: x.type }).then((d) => {
             $scope.d.records = d;
         });

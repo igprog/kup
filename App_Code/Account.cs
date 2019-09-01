@@ -477,12 +477,20 @@ public class Account : System.Web.Services.WebService {
         try {
             db.Account();
             string sql = null;
-            string q = null;
-            if (type == RecordType.loan.ToString()) {
-              //  sql = string.Format(@"SELECT SUBSTRING(l.loanDate, 6, 2), l.loan FROM Loan l WHERE SUBSTRING(loanDate, 1, 4) = '{0}'", year);
-
-                sql = string.Format(@"select a.mo, a.amount, a.recordType from  Account a where yr = '{0}'  and a.recordType = 'withdraw' or a.recordType = 'loan'", year);
-            } 
+            string note = null;
+            if (type == RecordType.loan.ToString() || type == RecordType.withdraw.ToString()) {
+                sql = string.Format(@"select a.mo, a.amount, a.recordType from Account a where yr = '{0}' and a.recordType = 'withdraw' or a.recordType = 'loan'", year);
+                note = "Promet pozajmica";
+            }
+            if (type == RecordType.monthlyFee.ToString()){
+                //TODO: duguje
+                sql = string.Format(@"select a.mo, a.amount, a.recordType from Account a where yr = '{0}' and a.recordType = 'monthlyFee'", year);
+                note = "Ulog";
+            }
+            if (type == RecordType.manipulativeCosts.ToString()) {
+                sql = string.Format(@"select a.mo, a.amount, a.recordType from Account a where yr = '{0}' and a.recordType = 'manipulativeCosts'", year);
+                note = "Manipulativni troškovi";
+            }
             List<Recapitulation> xx = new List<Recapitulation>();
             List<RecapMonthlyTotal> xxx = new List<RecapMonthlyTotal>();
             using (SqlConnection connection = new SqlConnection(connectionString)) {
@@ -496,14 +504,14 @@ public class Account : System.Web.Services.WebService {
                             x.year = year.ToString();
                             x.input = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
                             x.recordType = reader.GetValue(2) == DBNull.Value ? null : reader.GetString(2);
-                            //x.note = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
+                            x.note = note;
                             xx.Add(x);
                         }
                     }
                 }
                 connection.Close();
 
-                xxx = GetRecapMonthleyTotal(xx);
+                xxx = GetRecapMonthleyTotal(xx, type);
                 
 
             }
@@ -513,17 +521,32 @@ public class Account : System.Web.Services.WebService {
         }
     }
 
-    private List<RecapMonthlyTotal> GetRecapMonthleyTotal(List<Recapitulation> data) {
+    private List<RecapMonthlyTotal> GetRecapMonthleyTotal(List<Recapitulation> data, string type) {
+        string inputType = null, outputType = null;
+        if(type == RecordType.loan.ToString()) {
+            inputType = RecordType.withdraw.ToString();
+            outputType = RecordType.loan.ToString(); 
+        }
+        if (type == RecordType.monthlyFee.ToString()) {
+            inputType = RecordType.monthlyFee.ToString();
+            outputType = null;
+        }
+        if (type == RecordType.manipulativeCosts.ToString()) {
+            inputType = RecordType.manipulativeCosts.ToString();
+            outputType = null;
+        }
         List<RecapMonthlyTotal> xx = new List<RecapMonthlyTotal>();
         for (int i = 1; i <= 12; i++) {
             RecapMonthlyTotal x = new RecapMonthlyTotal();
             x.total = new Recapitulation();
-            x.month = g.Month(i);
-            var input = data.Where(a => a.month == x.month && a.recordType == "withdraw");
-            var output = data.Where(a => a.month == x.month && a.recordType == "loan");
+            x.month = i.ToString();
+            var input = data.Where(a => a.month == x.month && a.recordType == inputType);
             x.total.input = input.Sum(a => a.input);
-            x.total.output = output.Sum(a => a.input);  // Ovo nije greška (a.input)
-            x.total.note = string.Format("Promet pozajmica {0}", x.month);
+            if(!string.IsNullOrEmpty(outputType)) {
+                var output = data.Where(a => a.month == x.month && a.recordType == outputType);
+                x.total.output = output.Sum(a => a.input);  // Ovo nije greška (a.input)
+            }
+            x.total.note = string.Format("{0} {1}", data.Select(a => a.note).FirstOrDefault(), x.month);
             xx.Add(x);
         }
         return xx;
