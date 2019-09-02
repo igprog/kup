@@ -16,14 +16,13 @@ using Igprog;
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
 public class Account : System.Web.Services.WebService {
-    string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
+    //string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
     Global g = new Global();
     public Account() {
     }
 
     public class NewAccount {
-
         public string id;
         public User.NewUser user;
         public double amount;
@@ -33,7 +32,6 @@ public class Account : System.Web.Services.WebService {
         public string recordType;
         public string loanId;
         public string note;
-
         public double monthlyFee;
         public double loan;
         public string loanDate;
@@ -42,26 +40,6 @@ public class Account : System.Web.Services.WebService {
         public double restToRepayment;
         public double totalObligation;
         public double repaid;
-
-        //TODO: list data, total
-
-        /*
-    public string id;
-    public User.NewUser user;
-    public int month;
-    public int year;
-    public double monthlyfee;
-    public string loanId;
-    public double loan;
-    public string loanDate;
-    public double repayment;
-    public string repaymentDate;
-    public double restToRepayment;
-    public double totalObligation;
-    public double repaid;
-    public double accountBalance;
-    public string note;
-    */
     }
 
     public class Total {
@@ -94,8 +72,6 @@ public class Account : System.Web.Services.WebService {
         public Recapitulation total;
     }
 
-
-
     [WebMethod]
     public string Init() {
         NewAccount x = new NewAccount();
@@ -109,8 +85,6 @@ public class Account : System.Web.Services.WebService {
         x.recordType = null;
         x.loanId = null;
         x.note = null;
-
-
         x.monthlyFee = 0;
         x.loan = 0;
         x.loanDate = null;
@@ -119,26 +93,6 @@ public class Account : System.Web.Services.WebService {
         x.repaid = 0;
         x.restToRepayment = 0;
         x.totalObligation = 0;
-
-
-        /*
-        x.id = Guid.NewGuid().ToString();
-        x.user = new User.NewUser();
-        x.month = 1;
-        x.year = DateTime.Now.Year;
-        x.monthlyFee = 0;
-        x.loanId = null;
-        x.loan = 0;
-        x.loanDate = null;
-        x.repayment = 0;
-        x.repaymentDate = null;
-        x.repaid = 0;
-        x.restToRepayment = 0;
-        x.totalObligation = 0;
-        x.accountBalance = 0;
-        x.note = null;
-        */
-
         return JsonConvert.SerializeObject(x, Formatting.Indented);
     }
 
@@ -172,76 +126,13 @@ public class Account : System.Web.Services.WebService {
         }
     }
 
-
-    //[WebMethod]
-    //public string Save(NewAccount x) {
-    //    try {
-    //        db.Account();
-    //      //  double lastRepayment = GetRecord(x.user.id, x.month, x.year).repayment;  // ***** in case of update repaiment  *****
-    //        string sql = string.Format(@"BEGIN TRAN
-    //                                        IF EXISTS (SELECT * from Account WITH (updlock,serializable) WHERE id = '{0}')
-    //                                            BEGIN
-    //                                               UPDATE Account SET userId = '{1}', amount = '{2}', recordDate = '{3}', mo = '{4}', yr = '{5}' recordType = '{6}', loanId = '{7}', note = '{8}' WHERE id = '{0}'
-    //                                            END
-    //                                        ELSE
-    //                                            BEGIN
-    //                                               INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-    //                                               VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
-    //                                            END
-    //                                    COMMIT TRAN", x.id, x.user.id, x.amount, x.recordDate, x.month, x.year, x.recordType, x.loanId, x.note);
-    //        using (SqlConnection connection = new SqlConnection(connectionString)) {
-    //            connection.Open();
-    //            using (SqlCommand command = new SqlCommand(sql, connection)) {
-    //                command.ExecuteNonQuery();
-    //            }
-    //            connection.Close();
-    //        }
-    //        return JsonConvert.SerializeObject(x, Formatting.Indented);
-    //        //TODO: CheckLoan
-    //        //return JsonConvert.SerializeObject(CheckLoan(x, x.user.id, x.date), Formatting.Indented);
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
-    //    }
-    //}
-
-    //[WebMethod]
-    //public string Save(NewAccount x) {
-    //    try {
-    //        db.Account();
-    //        double lastRepayment = GetRecord(x.user.id, x.month, x.year).repayment;  // ***** in case of update repaiment  *****
-    //        string sql = string.Format(@"BEGIN TRAN
-    //                                        IF EXISTS (SELECT * from Account WITH (updlock,serializable) WHERE id = '{0}')
-    //                                            BEGIN
-    //                                               UPDATE Account SET userId = '{1}', mo = '{2}', yr = '{3}', monthlyFee = '{4}', loanId = '{5}', loan = '{6}', loanDate = '{7}', repayment = '{8}', repaymentDate = '{9}', repaid = '{10}', restToRepayment = '{11}', accountBalance = '{12}', note = '{13}' WHERE id = '{0}'
-    //                                            END
-    //                                        ELSE
-    //                                            BEGIN
-    //                                               INSERT INTO Account (id, userId, mo, yr, monthlyFee, loanId, loan, loanDate, repayment, repaymentDate, repaid, restToRepayment, accountBalance, note)
-    //                                               VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}')
-    //                                            END
-    //                                    COMMIT TRAN", x.id, x.user.id, x.month, x.year, x.monthlyFee, x.loanId, x.loan, x.loanDate, x.repayment, x.repaymentDate, x.repaid - lastRepayment + x.repayment, x.restToRepayment + lastRepayment - x.repayment, x.accountBalance, x.note);
-    //        using (SqlConnection connection = new SqlConnection(connectionString)) {
-    //            connection.Open();
-    //            using (SqlCommand command = new SqlCommand(sql, connection)) {
-    //                command.ExecuteNonQuery();
-    //            }
-    //            connection.Close();
-    //        }
-    //        return JsonConvert.SerializeObject(CheckLoan(x, x.user.id, x.month, x.year), Formatting.Indented);
-    //    } catch (Exception e) {
-    //        return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
-    //    }
-    //}
-
     [WebMethod]
     public string Load(int year, string type) {
         try {
             db.Account();
             string sql = string.Format(@"SELECT * FROM Account WHERE yr = '{0}' AND recordType = '{1}'", year, type);
             List<NewAccount> xx = new List<NewAccount>();
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     using (SqlDataReader reader = command.ExecuteReader()) {
@@ -391,75 +282,11 @@ public class Account : System.Web.Services.WebService {
         }
     }
 
-    //[WebMethod]
-    //public string GetMonthlyRecords(int month, int year, string buisinessUnitCode) {
-    //    try {
-    //        User u = new User();
-    //        List<User.NewUser> users = u.GetUsers(buisinessUnitCode);
-    //        db.Account();
-    //        Accounts xx = new Accounts();
-    //        xx.data = new List<NewAccount>();
-    //        foreach(User.NewUser user in users) {
-    //            NewAccount x = new NewAccount();
-    //            x = GetRecord(user.id, month, year);
-    //            if (string.IsNullOrEmpty(x.id)) {
-    //                x.id = Guid.NewGuid().ToString();
-    //                x.user = user;
-    //                x.month = month;
-    //                x.year = year;
-    //                x.monthlyFee = user.monthlyFee;
-    //                x.loanId = null;
-    //                x.loan = 0;
-    //                x.loanDate = null;
-    //                x.repayment = 0;
-    //                x.repaymentDate = null;
-    //                x.repaid = 0;
-    //                x.restToRepayment = 0;
-    //                x.totalObligation = 0;
-    //                x.accountBalance = 0;
-    //                x.note = null;
-    //                x = CheckLoan(x, user.id, month, year);
-    //            }
-    //            x.user = user;
-    //            xx.data.Add(x);
-    //        }
-    //        xx.total = new Total();
-    //        xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
-    //        xx.total.repayment = xx.data.Sum(a => a.repayment);
-    //        xx.total.totalObligation = xx.data.Sum(a => a.totalObligation);
-    //        return JsonConvert.SerializeObject(xx, Formatting.Indented);
-    //    } catch (Exception e) {
-    //        return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
-    //    }
-    //}
-
-
-    //TODO:
-    
-    //[WebMethod]
-    //public string GetYearlyRecordsByUserId(string userId, int year) {
-    //    try {
-    //        User u = new User();
-    //        //List<User.NewUser> users = u.GetUsers(buisinessUnitCode);
-    //        db.Account();
-    //        List<NewAccount> xx = new List<NewAccount>();
-    //       // foreach(User.NewUser user in users) {
-    //            NewAccount x = new NewAccount();
-    //            x = GetRecord(userId, null, year);
-    //            xx.Add(x);
-    //       // }
-    //        return JsonConvert.SerializeObject(xx, Formatting.Indented);
-    //    } catch (Exception e) {
-    //        return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
-    //    }
-    //}
-   
-
     [WebMethod]
     public string Delete(string id) {
         try {
             string sql = string.Format("DELETE FROM Account WHERE id = '{0}'", id);
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     command.ExecuteReader();
@@ -477,15 +304,15 @@ public class Account : System.Web.Services.WebService {
         try {
             db.Account();
             string sql = null;
-            string _sql = string.Format("select a.mo, a.amount, a.recordType, a.note from Account a where yr = '{0}'", year);
+            string _sql = string.Format("SELECT a.mo, a.amount, a.recordType, a.note FROM Account a WHERE yr = '{0}'", year);
             if (type == RecordType.loan.ToString() || type == RecordType.withdraw.ToString()) {
-                sql = string.Format(@"{0} and a.recordType = 'withdraw' or a.recordType = 'loan'", _sql);
+                sql = string.Format(@"{0} AND a.recordType = 'withdraw' OR a.recordType = 'loan'", _sql);
             } else {
-                sql = string.Format(@"{0} and a.recordType = '{1}'", _sql, type);
+                sql = string.Format(@"{0} AND a.recordType = '{1}'", _sql, type);
             }
             List<Recapitulation> xx = new List<Recapitulation>();
             List<RecapMonthlyTotal> xxx = new List<RecapMonthlyTotal>();
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     using (SqlDataReader reader = command.ExecuteReader()) {
@@ -502,7 +329,7 @@ public class Account : System.Web.Services.WebService {
                     }
                 }
                 connection.Close();
-                xxx = GetRecapMonthleyTotal(xx, type);
+                xxx = GetRecapMonthleyTotal(xx, type, year);
             }
             return JsonConvert.SerializeObject(xxx, Formatting.Indented);
         } catch (Exception e) {
@@ -510,7 +337,7 @@ public class Account : System.Web.Services.WebService {
         }
     }
 
-    private List<RecapMonthlyTotal> GetRecapMonthleyTotal(List<Recapitulation> data, string type) {
+    private List<RecapMonthlyTotal> GetRecapMonthleyTotal(List<Recapitulation> data, string type, int year) {
         string inputType = null, outputType = null;
         if (type == RecordType.loan.ToString()) {
             inputType = RecordType.loan.ToString();
@@ -531,18 +358,21 @@ public class Account : System.Web.Services.WebService {
                 var input = data.Where(a => a.month == x.month && a.recordType == inputType);
                 x.total.input = input.Sum(a => a.input);
             }
-            if(!string.IsNullOrEmpty(outputType)) {
+            if (!string.IsNullOrEmpty(outputType)) {
                 var output = data.Where(a => a.month == x.month && a.recordType == outputType);
                 x.total.output = output.Sum(a => a.input);  // !!! Ovo nije greška (uvijek se vrijednost (amount iz Account.tbl) sprema u (a.input)
             }
-            if(x.total.input > 0 || x.total.output > 0) {
+            if (x.total.input > 0 || x.total.output > 0) {
+                if (type == RecordType.monthlyFee.ToString()) {
+                    x.total.output = GetMonthlyFeeRequired(i, year);
+                }
                 x.total.note = data.Find(a => a.month == i.ToString()).note;
                 x.month = g.Month(i);
-                if(type == RecordType.manipulativeCosts.ToString()) {
-                    x.total.note = string.Format("{0}% Manipulativni troškovni {1}", g.manipulativeCostsPerc(), x.month);
+                if (type == RecordType.manipulativeCosts.ToString()) {
+                    x.total.note = string.Format("{0}% Manipulativni troškovni {1}/{2}", g.manipulativeCostsPerc(), x.month, year);
                 }
                 if (type == RecordType.monthlyFee.ToString()) {
-                    x.total.note = string.Format("Promet uloga {0}", x.month);
+                    x.total.note = string.Format("Promet uloga {0}/{1}", x.month, year);
                 }
                 xx.Add(x);
             }
@@ -550,6 +380,23 @@ public class Account : System.Web.Services.WebService {
         return xx;
     }
 
+    private double GetMonthlyFeeRequired(int month, int year) {
+        double x = 0;
+            db.Account();
+            string sql = string.Format("SELECT SUM(CONVERT(DECIMAL, u.monthlyFee)) FROM Users u WHERE CONVERT(DATETIME, u.accessDate) <= '{0}' AND u.isActive = 1", g.ReffDate(month == null ? 1 : month, year));
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                        }
+                    }
+                }
+                connection.Close();
+            }
+        return x;
+    }
 
 
     public NewAccount Save(NewAccount x) {
@@ -568,7 +415,7 @@ public class Account : System.Web.Services.WebService {
                                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
                                                 END
                                         COMMIT TRAN", x.id, x.user.id, x.amount, x.recordDate, x.month, x.year, x.recordType, x.loanId, x.note);
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     command.ExecuteNonQuery();
@@ -606,39 +453,15 @@ public class Account : System.Web.Services.WebService {
         return x;
     }
 
-
-    //NewAccount ReadData(SqlDataReader reader) {
-    //    NewAccount x = new NewAccount();
-    //    x.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
-    //    x.user = new User.NewUser();
-    //    x.user.id = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
-    //    x.month = reader.GetValue(2) == DBNull.Value ? 1 : reader.GetInt32(2);
-    //    x.year = reader.GetValue(3) == DBNull.Value ? DateTime.Now.Year :reader.GetInt32(3);
-    //    x.monthlyFee = reader.GetValue(4) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(4));
-    //    x.loanId = reader.GetValue(5) == DBNull.Value ? null : reader.GetString(5);
-    //    x.loan = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
-    //    x.loanDate = reader.GetValue(7) == DBNull.Value ? null : reader.GetString(7);
-    //    x.repayment = reader.GetValue(8) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(8));
-    //    x.repaymentDate = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);
-    //    x.repaid = reader.GetValue(10) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(10));
-    //    x.restToRepayment = reader.GetValue(11) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(11));
-    //    x.totalObligation = x.monthlyFee + x.repaid;
-    //    x.accountBalance = reader.GetValue(12) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(12));
-    //    x.note = reader.GetValue(13) == DBNull.Value ? null : reader.GetString(13);
-    //    return x;
-    //}
-
-
         
     public NewAccount GetRecord(string userId, int month, int year, string recordType) {
-        //string sql = string.Format("SELECT * FROM Account WHERE userId = '{0}' AND mo = '{1}' AND yr = '{2}'", userId, month, year);
         string sql = string.Format(@"SELECT * FROM Account WHERE userId = '{0}' AND mo = '{1}' AND yr = '{2}' {3}"
                                 , userId
                                 , month
                                 , year
                                 , !string.IsNullOrEmpty(recordType) ? string.Format("AND recordType = '{0}'", recordType) : "");
         NewAccount x = new NewAccount();
-        using (SqlConnection connection = new SqlConnection(connectionString)) {
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
@@ -652,65 +475,7 @@ public class Account : System.Web.Services.WebService {
         return x;
     }
 
-    //public NewAccount GetRecord(string userId, int month, int year) {
-    //    string sql = string.Format("SELECT * FROM Account WHERE userId = '{0}' AND mo = '{1}' AND yr = '{2}'", userId, month, year);
-    //    NewAccount x = new NewAccount();
-    //    using (SqlConnection connection = new SqlConnection(connectionString)) {
-    //        connection.Open();
-    //        using (SqlCommand command = new SqlCommand(sql, connection)) {
-    //            using (SqlDataReader reader = command.ExecuteReader()) {
-    //                while (reader.Read()) {
-    //                    x = ReadData(reader);
-    //                }
-    //            }
-    //        }
-    //        connection.Close();
-    //    }
-    //    return x;
-    //}
-
-    //public NewAccount GetRecord(string userId, int month, int year) {
-    //    string sql = string.Format("SELECT * FROM Account WHERE userId = '{0}' AND mo = '{1}' AND yr = '{2}'", userId, month, year);
-    //    NewAccount x = new NewAccount();
-    //    using (SqlConnection connection = new SqlConnection(connectionString)) {
-    //        connection.Open();
-    //        using (SqlCommand command = new SqlCommand(sql, connection)) {
-    //            using (SqlDataReader reader = command.ExecuteReader()) {
-    //                while (reader.Read()) {
-    //                    x = ReadData(reader);
-    //                }
-    //            }
-    //        }
-    //        connection.Close();
-    //    }
-    //    return x;
-    //}
-
-
-
-    //public List<NewAccount> GetRecords(string userId, int? year) {
-    //    db.Account();
-    //    string sql = string.Format("SELECT * FROM Account WHERE userId = '{0}' {1}"
-    //        , userId
-    //        , year > 0 ? string.Format("AND SUBSTRING(recordDate, 1, 4) = '{0}' ORDER BY SUBSTRING(recordDate, 6, 2) ASC", year) : "");
-    //    List<NewAccount> xx = new List<NewAccount>();
-    //    using (SqlConnection connection = new SqlConnection(connectionString)) {
-    //        connection.Open();
-    //        using (SqlCommand command = new SqlCommand(sql, connection)) {
-    //            using (SqlDataReader reader = command.ExecuteReader()) {
-    //                while (reader.Read()) {
-    //                    NewAccount x = new NewAccount();
-    //                    x = ReadData(reader);
-    //                    xx.Add(x);
-    //                }
-    //            }
-    //        }
-    //        connection.Close();
-    //    }
-    //    return xx;
-    //}
-
-
+   
     public List<NewAccount> GetRecords(string userId, int? year) {
         db.Account();
         db.Loan();
@@ -718,7 +483,7 @@ public class Account : System.Web.Services.WebService {
             , userId
             , year > 0 ? string.Format("AND yr = '{0}' ORDER BY mo ASC", year) : "");
         List<NewAccount> xx = new List<NewAccount>();
-        using (SqlConnection connection = new SqlConnection(connectionString)) {
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
@@ -748,26 +513,7 @@ public class Account : System.Web.Services.WebService {
             , g.Month(x.month)
             , !string.IsNullOrEmpty(x.loanId) ? string.Format(" AND l.id = '{0}'", x.loanId) : "");
 
-        //string sql = string.Format(@"
-        //            SELECT l.id, l.loan, l.repayment FROM Loan l
-        //            WHERE l.userId = '{0}' AND {1}"
-        //            , userId
-        //            , string.IsNullOrEmpty(x.loanId) 
-        //                    ? string.Format("l.isRepaid = 0 AND (CAST(l.loanDate AS datetime) <= CAST('{0}-{1}-01' AS datetime))", x.year, x.month)
-        //                    : string.Format("l.id = '{0}'", x.loanId));
-
-        //string sql = string.Format(@"
-        //            SELECT l.id, l.loan, l.repayment FROM Loan l
-        //            WHERE l.userId = '{0}' AND l.isRepaid = 0", userId);
-
-        //string sql = string.Format(@"
-        //            SELECT l.id, l.loan, l.repayment FROM Loan l
-        //            LEFT OUTER JOIN Account a
-        //            ON l.id = a.loanId
-        //            WHERE l.userId = '{0}' AND l.isRepaid = 0
-        //            GROUP BY l.id, l.loan, l.repayment"
-        //                , userId);
-        using (SqlConnection connection = new SqlConnection(connectionString)) {
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
@@ -796,7 +542,7 @@ public class Account : System.Web.Services.WebService {
                         , x.month
                         , x.year
                         , !string.IsNullOrEmpty(recordType) ? string.Format("AND recordType = '{0}'", recordType) : "");
-        using (SqlConnection connection = new SqlConnection(connectionString)) {
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
@@ -818,7 +564,7 @@ public class Account : System.Web.Services.WebService {
                     SELECT SUM(CONVERT(decimal, a.amount)) FROM Account a
                     WHERE a.userId = '{0}' AND a.recordType = 'loan' AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) <= CAST('{1}-{2}-01' AS datetime)) AND a.loanId = '{3}'"
                        , x.user.id, x.year, g.Month(x.month), x.loanId);
-        using (SqlConnection connection = new SqlConnection(connectionString)) {
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
@@ -831,51 +577,5 @@ public class Account : System.Web.Services.WebService {
         }
         return repaid;
     }
-
-    //public double TotalLoan(NewAccount x) {
-    //    double total = 0;
-    //    string sql = string.Format(@"SELECT SUM(CONVERT(decimal, loan)) FROM Loan WHERE userId = '{0}' AND loanId = '{1}'", x.user.id, x.loanId);
-    //    using (SqlConnection connection = new SqlConnection(connectionString)) {
-    //        connection.Open();
-    //        using (SqlCommand command = new SqlCommand(sql, connection)) {
-    //            using (SqlDataReader reader = command.ExecuteReader()) {
-    //                while (reader.Read()) {
-    //                    total = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
-    //                }
-    //            }
-    //        }
-    //        connection.Close();
-    //    }
-    //    return total;
-    //}
-
-
-    //public NewAccount CheckLoan(NewAccount x, string userId, int month, int year) {
-    //    string sql = string.Format(@"
-    //                SELECT l.id, l.loan, l.repayment, a.repaid, a.restToRepayment FROM Loan l
-    //                LEFT OUTER JOIN Account a
-    //                ON l.id = a.loanId
-    //                WHERE l.userId = '{0}' AND l.isRepaid = 0 AND {1}
-    //                GROUP BY l.id, l.loan, l.repayment, a.repaid, a.restToRepayment"
-    //                    , userId
-    //                    , string.Format("CONVERT(datetime, l.loanDate) >= '{0}' AND CONVERT(datetime, l.loanDate) < '{1}'", g.ReffDate(month, year), g.ReffDate(month + 1, year)));
-    //    using (SqlConnection connection = new SqlConnection(connectionString)) {
-    //        connection.Open();
-    //        using (SqlCommand command = new SqlCommand(sql, connection)) {
-    //            using (SqlDataReader reader = command.ExecuteReader()) {
-    //                while (reader.Read()) {
-    //                    x.loanId = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
-    //                    x.loan = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
-    //                    x.repayment = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
-    //                    x.repaid = reader.GetValue(3) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(3));
-    //                    x.restToRepayment = reader.GetValue(4) == DBNull.Value ? x.loan : Convert.ToDouble(reader.GetString(4));
-    //                    x.totalObligation = x.monthlyFee + x.repayment;
-    //                }
-    //            }
-    //        }
-    //        connection.Close();
-    //    }
-    //    return x;
-    //}
 
 }

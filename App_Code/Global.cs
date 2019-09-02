@@ -14,6 +14,10 @@ namespace Igprog {
         public Global() {
         }
 
+        public string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
+        public double manipulativeCostsCoeff = Convert.ToDouble(ConfigurationManager.AppSettings["manipulativeCostsCoeff"]);
+        public double defaultDedline = Convert.ToDouble(ConfigurationManager.AppSettings["defaultDedline"]);  // ***** Months to repayment *****
+
         public string ReffDate(int? month, int year) {
             if(month == 13) {
                 month = 1;

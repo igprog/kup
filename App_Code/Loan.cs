@@ -16,11 +16,11 @@ using Igprog;
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
 public class Loan : System.Web.Services.WebService {
-    string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
+    //string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
     Global g = new Global();
-    double manipulativeCostsCoeff = Convert.ToDouble(ConfigurationManager.AppSettings["manipulativeCostsCoeff"]);
-    double defaultDedline = Convert.ToDouble(ConfigurationManager.AppSettings["defaultDedline"]);  // ***** Months to repayment *****
+    //double manipulativeCostsCoeff = Convert.ToDouble(ConfigurationManager.AppSettings["manipulativeCostsCoeff"]);
+    //double defaultDedline = Convert.ToDouble(ConfigurationManager.AppSettings["defaultDedline"]);  // ***** Months to repayment *****
     public Loan() {
     }
 
@@ -72,11 +72,11 @@ public class Loan : System.Web.Services.WebService {
         x.manipulativeCosts = 0;
         x.actualLoan = 0;
         x.withdraw = 0;
-        x.dedline = defaultDedline;
+        x.dedline = g.defaultDedline;
         x.restToRepayment = 0;
         x.isRepaid = 0;
         x.note = null;
-        x.manipulativeCostsCoeff = manipulativeCostsCoeff;
+        x.manipulativeCostsCoeff = g.manipulativeCostsCoeff;
         x.buisinessUnit = new BuisinessUnit.NewUnit();
         return JsonConvert.SerializeObject(x, Formatting.Indented);
     }
@@ -117,7 +117,7 @@ public class Loan : System.Web.Services.WebService {
 
                                                 END
                                         COMMIT TRAN", x.id, x.user.id, x.loan, x.loanDate, x.repayment, x.manipulativeCosts, x.withdraw, x.dedline, x.isRepaid, x.note, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), manipulativeCostsId, withdrawId);
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     command.ExecuteNonQuery();
@@ -145,7 +145,7 @@ public class Loan : System.Web.Services.WebService {
                             , string.IsNullOrEmpty(buisinessUnitCode) ? "" : string.Format("AND u.buisinessUnitCode = '{0}'", buisinessUnitCode));
             Loans xx = new Loans();
             xx.data = new List<NewLoan>();
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     using (SqlDataReader reader = command.ExecuteReader()) {
@@ -179,7 +179,7 @@ public class Loan : System.Web.Services.WebService {
     public string Delete(string id) {
         try {
             string sql = string.Format("DELETE FROM Loan WHERE id = '{0}'", id);
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     command.ExecuteReader();
@@ -204,7 +204,7 @@ public class Loan : System.Web.Services.WebService {
         x.actualLoan = x.loan - x.manipulativeCosts;
         x.withdraw = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
         //TODO:  x.restToRepayment;
-        x.dedline = reader.GetValue(7) == DBNull.Value ? defaultDedline : Convert.ToDouble(reader.GetString(7));
+        x.dedline = reader.GetValue(7) == DBNull.Value ? g.defaultDedline : Convert.ToDouble(reader.GetString(7));
         x.isRepaid = reader.GetValue(8) == DBNull.Value ? 0 : reader.GetInt32(8);
         x.note = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);
         x.user.firstName = reader.GetValue(10) == DBNull.Value ? null : reader.GetString(10);
@@ -218,7 +218,7 @@ public class Loan : System.Web.Services.WebService {
     public NewLoan GetRecord(string userId, int month, int year) {
         string sql = string.Format("SELECT * FROM Loan WHERE userId = '{0}' AND mo = '{1}' AND yr = '{2}'", userId, month, year);
         NewLoan x = new NewLoan();
-        using (SqlConnection connection = new SqlConnection(connectionString)) {
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
@@ -256,7 +256,7 @@ public class Loan : System.Web.Services.WebService {
         string sql = null;
         string loanId = null;
         sql = string.Format(@"SELECT id FROM Loan WHERE userId = '{0}' AND isRepaid = 0", x.user.id);
-        using (SqlConnection connection = new SqlConnection(connectionString)) {
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
@@ -276,7 +276,7 @@ public class Loan : System.Web.Services.WebService {
                                     UPDATE Loan SET isRepaid = 1 WHERE id = '{7}'
                                 END
                             COMMIT TRAN", Guid.NewGuid().ToString(), x.user.id, x.user.restToRepayment, x.loanDate, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), "loan", loanId, "Otplata novom pozajmicom");
-        using (SqlConnection connection = new SqlConnection(connectionString)) {
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 command.ExecuteNonQuery();
