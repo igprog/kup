@@ -49,6 +49,11 @@ namespace Igprog {
             return string.Format("{0:N} {1}", value, currency);
         }
 
+        public string manipulativeCostsPerc() {
+            double manipulativeCostsCoeff = Convert.ToDouble(ConfigurationManager.AppSettings["manipulativeCostsCoeff"]);
+            return string.Format("{0}", Math.Round(manipulativeCostsCoeff * 100), 0);
+        }
+
         public string Month(int month) {
            return month < 10 ? string.Format("0{0}", month) : month.ToString();
         }

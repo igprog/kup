@@ -477,19 +477,11 @@ public class Account : System.Web.Services.WebService {
         try {
             db.Account();
             string sql = null;
-            string note = null;
+            string _sql = string.Format("select a.mo, a.amount, a.recordType, a.note from Account a where yr = '{0}'", year);
             if (type == RecordType.loan.ToString() || type == RecordType.withdraw.ToString()) {
-                sql = string.Format(@"select a.mo, a.amount, a.recordType from Account a where yr = '{0}' and a.recordType = 'withdraw' or a.recordType = 'loan'", year);
-                note = "Promet pozajmica";
-            }
-            if (type == RecordType.monthlyFee.ToString()){
-                //TODO: duguje
-                sql = string.Format(@"select a.mo, a.amount, a.recordType from Account a where yr = '{0}' and a.recordType = 'monthlyFee'", year);
-                note = "Ulog";
-            }
-            if (type == RecordType.manipulativeCosts.ToString()) {
-                sql = string.Format(@"select a.mo, a.amount, a.recordType from Account a where yr = '{0}' and a.recordType = 'manipulativeCosts'", year);
-                note = "Manipulativni troškovi";
+                sql = string.Format(@"{0} and a.recordType = 'withdraw' or a.recordType = 'loan'", _sql);
+            } else {
+                sql = string.Format(@"{0} and a.recordType = '{1}'", _sql, type);
             }
             List<Recapitulation> xx = new List<Recapitulation>();
             List<RecapMonthlyTotal> xxx = new List<RecapMonthlyTotal>();
@@ -499,21 +491,18 @@ public class Account : System.Web.Services.WebService {
                     using (SqlDataReader reader = command.ExecuteReader()) {
                         while (reader.Read()) {
                             Recapitulation x = new Recapitulation();
-                            x.date = null;  //TODO
+                            x.date = null;  //TODO: Zadnji dan u mjesecu
                             x.month = reader.GetValue(0) == DBNull.Value ? null : Convert.ToString(reader.GetInt32(0));
                             x.year = year.ToString();
                             x.input = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
                             x.recordType = reader.GetValue(2) == DBNull.Value ? null : reader.GetString(2);
-                            x.note = note;
+                            x.note = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
                             xx.Add(x);
                         }
                     }
                 }
                 connection.Close();
-
                 xxx = GetRecapMonthleyTotal(xx, type);
-                
-
             }
             return JsonConvert.SerializeObject(xxx, Formatting.Indented);
         } catch (Exception e) {
@@ -523,16 +512,14 @@ public class Account : System.Web.Services.WebService {
 
     private List<RecapMonthlyTotal> GetRecapMonthleyTotal(List<Recapitulation> data, string type) {
         string inputType = null, outputType = null;
-        if(type == RecordType.loan.ToString()) {
-            inputType = RecordType.withdraw.ToString();
-            outputType = RecordType.loan.ToString(); 
-        }
-        if (type == RecordType.monthlyFee.ToString()) {
-            inputType = RecordType.monthlyFee.ToString();
-            outputType = null;
-        }
-        if (type == RecordType.manipulativeCosts.ToString()) {
-            inputType = RecordType.manipulativeCosts.ToString();
+        if (type == RecordType.loan.ToString()) {
+            inputType = RecordType.loan.ToString();
+            outputType = RecordType.withdraw.ToString();
+        } else if (type == RecordType.bankFee.ToString() || type == RecordType.otherFee.ToString()) {
+            inputType = null;
+            outputType = type;
+        } else {
+            inputType = type;
             outputType = null;
         }
         List<RecapMonthlyTotal> xx = new List<RecapMonthlyTotal>();
@@ -540,14 +527,25 @@ public class Account : System.Web.Services.WebService {
             RecapMonthlyTotal x = new RecapMonthlyTotal();
             x.total = new Recapitulation();
             x.month = i.ToString();
-            var input = data.Where(a => a.month == x.month && a.recordType == inputType);
-            x.total.input = input.Sum(a => a.input);
+            if (!string.IsNullOrEmpty(inputType)) {
+                var input = data.Where(a => a.month == x.month && a.recordType == inputType);
+                x.total.input = input.Sum(a => a.input);
+            }
             if(!string.IsNullOrEmpty(outputType)) {
                 var output = data.Where(a => a.month == x.month && a.recordType == outputType);
-                x.total.output = output.Sum(a => a.input);  // Ovo nije greška (a.input)
+                x.total.output = output.Sum(a => a.input);  // !!! Ovo nije greška (uvijek se vrijednost (amount iz Account.tbl) sprema u (a.input)
             }
-            x.total.note = string.Format("{0} {1}", data.Select(a => a.note).FirstOrDefault(), x.month);
-            xx.Add(x);
+            if(x.total.input > 0 || x.total.output > 0) {
+                x.total.note = data.Find(a => a.month == i.ToString()).note;
+                x.month = g.Month(i);
+                if(type == RecordType.manipulativeCosts.ToString()) {
+                    x.total.note = string.Format("{0}% Manipulativni troškovni {1}", g.manipulativeCostsPerc(), x.month);
+                }
+                if (type == RecordType.monthlyFee.ToString()) {
+                    x.total.note = string.Format("Promet uloga {0}", x.month);
+                }
+                xx.Add(x);
+            }
         }
         return xx;
     }
