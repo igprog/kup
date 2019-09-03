@@ -16,7 +16,6 @@ using Igprog;
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
 public class Account : System.Web.Services.WebService {
-    //string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
     Global g = new Global();
     public Account() {
@@ -72,10 +71,15 @@ public class Account : System.Web.Services.WebService {
         public Recapitulation total;
     }
 
+    public class RecapYearlyTotal {
+        public int year;
+        public List<RecapMonthlyTotal> data;
+        public Recapitulation total;
+    }
+
     [WebMethod]
     public string Init() {
         NewAccount x = new NewAccount();
-
         x.id = Guid.NewGuid().ToString();
         x.user = new User.NewUser();
         x.amount = 0;
@@ -310,15 +314,16 @@ public class Account : System.Web.Services.WebService {
             } else {
                 sql = string.Format(@"{0} AND a.recordType = '{1}'", _sql, type);
             }
+            
             List<Recapitulation> xx = new List<Recapitulation>();
-            List<RecapMonthlyTotal> xxx = new List<RecapMonthlyTotal>();
+            RecapYearlyTotal xxx = new RecapYearlyTotal();
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     using (SqlDataReader reader = command.ExecuteReader()) {
                         while (reader.Read()) {
                             Recapitulation x = new Recapitulation();
-                            x.date = null;  //TODO: Zadnji dan u mjesecu
+                            x.date = null;
                             x.month = reader.GetValue(0) == DBNull.Value ? null : Convert.ToString(reader.GetInt32(0));
                             x.year = year.ToString();
                             x.input = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
@@ -329,7 +334,11 @@ public class Account : System.Web.Services.WebService {
                     }
                 }
                 connection.Close();
-                xxx = GetRecapMonthleyTotal(xx, type, year);
+                xxx.year = year;
+                xxx.data = GetRecapMonthleyTotal(xx, type, year);
+                xxx.total = new Recapitulation();
+                xxx.total.input = GetYearlyTotal(xxx.data, "input"); // xxx.data.Sum(a => a.total.input);
+                xxx.total.output = GetYearlyTotal(xxx.data, "output");  // xxx.data.Sum(a => a.total.output);
             }
             return JsonConvert.SerializeObject(xxx, Formatting.Indented);
         } catch (Exception e) {
@@ -350,10 +359,28 @@ public class Account : System.Web.Services.WebService {
             outputType = null;
         }
         List<RecapMonthlyTotal> xx = new List<RecapMonthlyTotal>();
+
+        //TODO: Pocetno stanje
+        if(type == RecordType.loan.ToString() || type == RecordType.monthlyFee.ToString()) {
+            RecapMonthlyTotal x = new RecapMonthlyTotal();
+            x.month = "PS";
+            x.total = new Recapitulation();
+            x.total.date = "01.01";
+            x.total.note = "Početno stanje";
+            if (type == RecordType.loan.ToString()) {
+                x.total.output = GetStartBalance(year, type);  // duguje
+            }
+            if (type == RecordType.monthlyFee.ToString()) {
+                x.total.input = GetStartBalance(year, type) + g.startAccountBalance;  // potražuje 
+            }
+            xx.Add(x);
+        }
+
         for (int i = 1; i <= 12; i++) {
             RecapMonthlyTotal x = new RecapMonthlyTotal();
-            x.total = new Recapitulation();
             x.month = i.ToString();
+            x.total = new Recapitulation();
+            x.total.date = g.SetDayMonthDate(Convert.ToInt32(DateTime.DaysInMonth(year, i).ToString()), i);
             if (!string.IsNullOrEmpty(inputType)) {
                 var input = data.Where(a => a.month == x.month && a.recordType == inputType);
                 x.total.input = input.Sum(a => a.input);
@@ -368,11 +395,14 @@ public class Account : System.Web.Services.WebService {
                 }
                 x.total.note = data.Find(a => a.month == i.ToString()).note;
                 x.month = g.Month(i);
-                if (type == RecordType.manipulativeCosts.ToString()) {
-                    x.total.note = string.Format("{0}% Manipulativni troškovni {1}/{2}", g.manipulativeCostsPerc(), x.month, year);
+                if (type == RecordType.loan.ToString()) {
+                    x.total.note = string.Format("Promet pozajmica {0}/{1}", x.month, year);
                 }
                 if (type == RecordType.monthlyFee.ToString()) {
                     x.total.note = string.Format("Promet uloga {0}/{1}", x.month, year);
+                }
+                if (type == RecordType.manipulativeCosts.ToString()) {
+                    x.total.note = string.Format("{0}% Manipulativni troškovni {1}/{2}", g.manipulativeCostsPerc(), x.month, year);
                 }
                 xx.Add(x);
             }
@@ -382,22 +412,46 @@ public class Account : System.Web.Services.WebService {
 
     private double GetMonthlyFeeRequired(int month, int year) {
         double x = 0;
-            db.Account();
-            string sql = string.Format("SELECT SUM(CONVERT(DECIMAL, u.monthlyFee)) FROM Users u WHERE CONVERT(DATETIME, u.accessDate) <= '{0}' AND u.isActive = 1", g.ReffDate(month == null ? 1 : month, year));
-            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(sql, connection)) {
-                    using (SqlDataReader reader = command.ExecuteReader()) {
-                        while (reader.Read()) {
-                            x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
-                        }
+        string sql = string.Format("SELECT SUM(CONVERT(DECIMAL, u.monthlyFee)) FROM Users u WHERE CONVERT(DATETIME, u.accessDate) <= '{0}' AND u.isActive = 1", g.ReffDate(month == null ? 1 : month, year));
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
                     }
                 }
-                connection.Close();
             }
+            connection.Close();
+        }
         return x;
     }
 
+    private double GetStartBalance(int year, string type) {
+        double x = 0;
+        string sql = string.Format("SELECT SUM(CONVERT(DECIMAL, a.amount)) FROM Account a WHERE CONVERT(DATETIME, CONCAT(a.yr, '-', a.mo, '-01')) <= '{0}' AND a.recordType = '{1}'"
+            , g.ReffDate(1, year), type);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
+    }
+
+    private double GetYearlyTotal(List<RecapMonthlyTotal> data, string type) {
+        double x = 0;
+        foreach(var i in data) {
+            x += type == "input" ? i.total.input : i.total.output;
+        }
+        return x;
+    }
 
     public NewAccount Save(NewAccount x) {
         try {
@@ -501,8 +555,6 @@ public class Account : System.Web.Services.WebService {
         return xx;
     }
 
-    //TODO:
-   
       public NewAccount CheckLoan(NewAccount x, string userId) {
 
         string sql = string.Format(@"

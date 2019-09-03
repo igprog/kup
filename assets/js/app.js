@@ -709,13 +709,13 @@
         month: $scope.g.month,
         year: $scope.g.year,
         type: $scope.g.currTplType,
+        title: $scope.g.currTplTitle,
         pdf: null,
         loadingPdf: false
     }
     $scope.d = data;
 
     load = (x) => {
-        debugger;
         x.type = $scope.g.currTplType;
         f.post(service, 'LoadRecapitulation', { year: x.year, type: x.type }).then((d) => {
             $scope.d.records = d;
@@ -727,18 +727,15 @@
     }
 
     $scope.print = (x) => {
-        alert('TODO');
-        /*
-        if (f.defined(x.records.data.length)) {
-            if (x.records.data.length == 0) { return false; }
+        if (f.defined(x.records.length)) {
+            if (x.records.length == 0) { return false; }
         }
         $scope.d.pdf = null;
         $scope.d.loadingPdf = true;
-        f.post('Pdf', 'Entry', { month: x.month, year: x.year, records: x.records }).then((d) => {
+        f.post('Pdf', 'Recapitulation', { month: x.month, records: x.records, title: x.title }).then((d) => {
             $scope.d.pdf = f.pdfTempPath(d);
             $scope.d.loadingPdf = false;
         });
-        */
     }
 
     $scope.removePdfLink = () => {

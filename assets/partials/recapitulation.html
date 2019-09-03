@@ -16,7 +16,7 @@
             <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" check-link download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
         </div>
     </div>
-    <div ng-if="d.records.length>0" class="table-responsive">
+    <div ng-if="d.records.data.length>0" class="table-responsive">
         <table class="table table-hover">
             <thead>
                 <tr>
@@ -28,19 +28,19 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="x in d.records track by $index">
-                    <td>TODO</td>
+                <tr ng-repeat="x in d.records.data track by $index">
+                    <td>{{x.total.date}}</td>
                     <td>{{x.month}}</td>
                     <td>{{x.total.note}}</td>
                     <td class="text-right">{{x.total.output | number:2}}</td>
                     <td class="text-right">{{x.total.input | number:2}}</td>
                 </tr>
             </tbody>
-            <tfoot ng-if="d.records.length>0" class="thead-light">
+            <tfoot ng-if="d.records.data.length>0" class="thead-light">
                 <tr class="text-right">
                     <th colspan="3">Ukupno:</th>
-                    <th>TODO</th>
-                    <th>TODO</th>
+                    <th>{{d.records.total.output | number:2}}</th>
+                    <th>{{d.records.total.input | number:2}}</th>
                 </tr>
             </tfoot>
         </table>

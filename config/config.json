@@ -4,5 +4,6 @@
   "apptitle": "Kasa Uzajamne Pomoći",
   "debug": true,
   "showadminpage": true,
-  "currency": "kn"
+  "currency": "kn",
+  "manipulativeCostsPerc": 2
 }
