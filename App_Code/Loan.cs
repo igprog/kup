@@ -18,6 +18,7 @@ using Igprog;
 public class Loan : System.Web.Services.WebService {
     DataBase db = new DataBase();
     Global g = new Global();
+    Settings s = new Settings();
     public Loan() {
     }
 
@@ -69,11 +70,11 @@ public class Loan : System.Web.Services.WebService {
         x.manipulativeCosts = 0;
         x.actualLoan = 0;
         x.withdraw = 0;
-        x.dedline = g.defaultDedline;
+        x.dedline = s.Data().defaultDedline;
         x.restToRepayment = 0;
         x.isRepaid = 0;
         x.note = null;
-        x.manipulativeCostsCoeff = g.manipulativeCostsCoeff;
+        x.manipulativeCostsCoeff = s.Data().manipulativeCostsCoeff;
         x.buisinessUnit = new BuisinessUnit.NewUnit();
         return JsonConvert.SerializeObject(x, Formatting.Indented);
     }
@@ -201,7 +202,7 @@ public class Loan : System.Web.Services.WebService {
         x.actualLoan = x.loan - x.manipulativeCosts;
         x.withdraw = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
         //TODO:  x.restToRepayment;
-        x.dedline = reader.GetValue(7) == DBNull.Value ? g.defaultDedline : Convert.ToDouble(reader.GetString(7));
+        x.dedline = reader.GetValue(7) == DBNull.Value ? s.Data().defaultDedline : Convert.ToDouble(reader.GetString(7));
         x.isRepaid = reader.GetValue(8) == DBNull.Value ? 0 : reader.GetInt32(8);
         x.note = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);
         x.user.firstName = reader.GetValue(10) == DBNull.Value ? null : reader.GetString(10);

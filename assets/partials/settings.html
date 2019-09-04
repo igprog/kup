@@ -1,0 +1,36 @@
+﻿<div ng-controller="settingsCtrl">
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <td>Početno stanje računa:</td>
+                        <td><input ng-model="d.startAccountBalance" class="form-control text-right" /></td>
+                    </tr>
+                    <tr>
+                        <td>Valuta:</td>
+                        <td><input ng-model="d.currency" class="form-control text-right" /></td>
+                    </tr>
+                    <tr>
+                        <td>Zadani mjesečni ulog:</td>
+                        <td><input ng-model="d.monthlyFee" class="form-control text-right" /></td>
+                    </tr>
+                    <tr>
+                        <td>Manipulativni troškovi (koeficjent):</td>
+                        <td><input ng-model="d.manipulativeCostsCoeff" class="form-control text-right" /></td>
+                    </tr>
+                    <tr>
+                        <td>Zadani rok otplate (mjeseci):</td>
+                        <td><input ng-model="d.defaultDedline" class="form-control text-right" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="text-right">
+                            <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fa fa-save"></i> Spremi</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <pre ng-if="config.debug">{{d | json}}</pre>
+</div>

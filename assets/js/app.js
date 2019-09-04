@@ -134,7 +134,8 @@
             months: f.months(),
             years: f.years(),
             buisinessUnits: [],
-            recordTypes: f.recordTypes()
+            recordTypes: f.recordTypes(),
+            clearView: false
         }
         f.post('BuisinessUnit', 'Load', {}).then((d) => {
             data.buisinessUnits = d;
@@ -172,10 +173,12 @@
     }
 
     $scope.toggleTpl = (tpl, title, currTplType) => {
+        debugger;
         $scope.g.currTpl = f.currTpl(tpl);
         $scope.g.currTplTitle = title;
-        if (f.defined(currTplType)) {
+        if (f.defined(currTplType)) {   // ***** Only for recapitualtion *****
             $scope.g.currTplType = currTplType;
+            $scope.g.clearView = true;
         }
     }
 
@@ -719,6 +722,7 @@
         x.type = $scope.g.currTplType;
         f.post(service, 'LoadRecapitulation', { year: x.year, type: x.type }).then((d) => {
             $scope.d.records = d;
+            $scope.g.clearView = false;
         });
     }
 
@@ -741,6 +745,25 @@
     $scope.removePdfLink = () => {
         $scope.d.pdf = null;
     }
+
+}])
+
+.controller('settingsCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+    var service = 'Settings';
+
+    $scope.save = (x) => {
+        f.post(service, 'Save', { x: JSON.stringify(x) }).then((d) => {
+            $scope.d = d;
+        });
+    }
+
+    var load = () => {
+        f.post(service, 'Load', {}).then((d) => {
+            $scope.d = d;
+        });
+    }
+    load();
+
 
 }])
 

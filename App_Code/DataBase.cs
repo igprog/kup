@@ -101,7 +101,7 @@ namespace Igprog {
         }
 
         private void CreateTable(string sql) {
-            try{
+            try {
                 using (SqlConnection connection = new SqlConnection(connectionString)) {
                     connection.Open();
                     using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -109,8 +109,7 @@ namespace Igprog {
                     }
                     connection.Close();
                 }
-            }
-            catch (Exception e) { }
+            } catch (Exception e) { }
         }
         #endregion
 

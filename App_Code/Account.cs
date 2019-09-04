@@ -18,6 +18,7 @@ using Igprog;
 public class Account : System.Web.Services.WebService {
     DataBase db = new DataBase();
     Global g = new Global();
+    Settings s = new Settings();
     public Account() {
     }
 
@@ -371,7 +372,7 @@ public class Account : System.Web.Services.WebService {
                 x.total.output = GetStartBalance(year, type);  // duguje
             }
             if (type == RecordType.monthlyFee.ToString()) {
-                x.total.input = GetStartBalance(year, type) + g.startAccountBalance;  // potražuje 
+                x.total.input = GetStartBalance(year, type) + s.Data().startAccountBalance;  // potražuje 
             }
             xx.Add(x);
         }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.IO;
 using System.Configuration;
-
+using Igprog;
 
 /// <summary>
 /// Global
@@ -14,10 +14,11 @@ namespace Igprog {
         public Global() {
         }
 
+
         public string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
-        public double manipulativeCostsCoeff = Convert.ToDouble(ConfigurationManager.AppSettings["manipulativeCostsCoeff"]);
-        public double defaultDedline = Convert.ToDouble(ConfigurationManager.AppSettings["defaultDedline"]);  // ***** Broj mjeseci za otplatu rata pozajmice *****
-        public double startAccountBalance = Convert.ToDouble(ConfigurationManager.AppSettings["startAccountBalance"]);  // ***** Pocetno stanje na racunu *****
+        //public double manipulativeCostsCoeff = Convert.ToDouble(ConfigurationManager.AppSettings["manipulativeCostsCoeff"]);
+        //public double defaultDedline = Convert.ToDouble(ConfigurationManager.AppSettings["defaultDedline"]);  // ***** Broj mjeseci za otplatu rata pozajmice *****
+        //public double startAccountBalance = Convert.ToDouble(ConfigurationManager.AppSettings["startAccountBalance"]);  // ***** Pocetno stanje na racunu *****
 
         public string ReffDate(int? month, int year) {
             if(month == 13) {

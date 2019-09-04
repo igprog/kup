@@ -19,7 +19,9 @@ public class User : System.Web.Services.WebService {
     string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
     Account a = new Account();
-    double monthlyFee = Convert.ToDouble(ConfigurationManager.AppSettings["monthlyFee"]);
+    Settings s = new Settings();
+
+    //double monthlyFee = Convert.ToDouble(ConfigurationManager.AppSettings["monthlyFee"]);
     string sqlString = @"SELECT u.id, u.buisinessUnitCode, u.firstName, u.lastName, u.pin, u.birthDate, u.accessDate, u.terminationDate, u.isActive, u.monthlyFee, b.id, b.title FROM Users u
                         LEFT OUTER JOIN BuisinessUnit b
                         ON u.buisinessUnitCode = b.code";
@@ -59,7 +61,7 @@ public class User : System.Web.Services.WebService {
         x.accessDate = DateTime.Today.ToString();
         x.terminationDate = null;
         x.isActive = 1;
-        x.monthlyFee = monthlyFee;
+        x.monthlyFee = s.Data().monthlyFee;
         x.restToRepayment = 0;
         //x.activeLoanId = null;
         x.records = new List<Account.NewAccount>();
