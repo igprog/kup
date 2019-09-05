@@ -602,7 +602,7 @@
     }])
 
 .controller('entryCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
-    var service = 'Entry';
+    var service = 'Account';
     var data = {
         records: {},
         month: $scope.g.month,
@@ -613,7 +613,7 @@
     $scope.d = data;
 
     var load = (x) => {
-        f.post(service, 'Load', { month: x.month, year: x.year }).then((d) => {
+        f.post(service, 'LoadEntry', { month: x.month, year: x.year }).then((d) => {
             $scope.d.records = d;
         });
     }

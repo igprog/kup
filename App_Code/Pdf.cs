@@ -247,6 +247,7 @@ public class Pdf : System.Web.Services.WebService {
             Paragraph p = new Paragraph();
             p.Add(new Paragraph(string.Format("{0}", title), GetFont(12, Font.BOLD)));
             p.Add(new Paragraph(string.Format("{0} god.", records.year), GetFont(10, Font.NORMAL)));
+            p.Add(new Paragraph(string.Format("Konto: {0}", records.account), GetFont(10, Font.NORMAL)));
             doc.Add(p);
 
             PdfPTable table = new PdfPTable(4);

@@ -32,5 +32,44 @@
             </div>
         </div>
     </div>
+    <hr />
+    <div class="row">
+        <div class="col-sm-5">
+            <label>Konto</label>
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <td>Žiro račun:</td>
+                        <td><input ng-model="d.account.giroAccount" class="form-control text-right" /></td>
+                    </tr>
+                    <tr>
+                        <td>Pozajmice:</td>
+                        <td><input ng-model="d.account.loan" class="form-control text-right" /></td>
+                    </tr>
+                    <tr>
+                        <td>Ulozi:</td>
+                        <td><input ng-model="d.account.monthlyFee" class="form-control text-right" /></td>
+                    </tr>
+                    <tr>
+                        <td>Manipulativni troškovi:</td>
+                        <td><input ng-model="d.account.manipulativeCosts" class="form-control text-right" /></td>
+                    </tr>
+                    <tr>
+                        <td>Erste:</td>
+                        <td><input ng-model="d.account.bankFee" class="form-control text-right" /></td>
+                    </tr>
+                    <tr>
+                        <td>Ostali troškovi:</td>
+                        <td><input ng-model="d.account.otherFee" class="form-control text-right" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="text-right">
+                            <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fa fa-save"></i> Spremi</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
     <pre ng-if="config.debug">{{d | json}}</pre>
 </div>

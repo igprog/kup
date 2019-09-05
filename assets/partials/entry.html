@@ -32,42 +32,18 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Žiro račun</td>
-                    <td class="text-right">TODO</td>
-                    <td class="text-right">TODO</td>
-                    <td class="text-right">TODO</td>
-                </tr>
-                <tr>
-                    <td>Pozajmice</td>
-                    <td class="text-right">{{d.records.total.repayment | number:2}}</td>
-                    <td class="text-right">{{d.records.total.repaid | number:2}}</td>
-                    <td class="text-right">{{d.records.total.restToRepayment | number:2}}</td>
-                </tr>
-                <tr>
-                    <td>Ulozi</td>
-                    <td class="text-right">{{d.records.total.monthlyFee | number:2}}</td>
-                    <td class="text-right">TODO</td>
-                    <td class="text-right">TODO</td>
-                </tr>
-                <tr>
-                    <td>Erste B (RN 123456789)</td>
-                    <td class="text-right">TODO</td>
-                    <td class="text-right">TODO</td>
-                    <td class="text-right">TODO</td>
-                </tr>
-                <tr>
-                    <td>Manipulativni troškovi (2%)</td>
-                    <td class="text-right">{{x.records.total.manipulativeCosts | number:2}}</td>
-                    <td class="text-right">TODO</td>
-                    <td class="text-right">TODO</td>
+                <tr ng-repeat="x in d.records.data">
+                    <td>{{x.note}}</td>
+                    <td class="text-right">{{x.account}}</td>
+                    <td class="text-right"><span ng-if="x.output==0">-</span><span ng-if="x.output>0">{{x.output | number:2}}</span></td>
+                    <td class="text-right"><span ng-if="x.input==0">-</span><span ng-if="x.input>0">{{x.input | number:2}}</span></td>
                 </tr>
             </tbody>
             <tfoot class="thead-light">
                 <tr class="text-right">
-                    <th colspan="2"></th>
-                    <th>TODO</th>
-                    <th>TODO</th>
+                    <th colspan="2">Ukupno:</th>
+                    <th>{{d.records.total.output | number:2}}</th>
+                    <th>{{d.records.total.input | number:2}}</th>
                 </tr>
             </tfoot>
         </table>

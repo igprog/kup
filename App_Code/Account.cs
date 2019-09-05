@@ -59,12 +59,13 @@ public class Account : System.Web.Services.WebService {
 
     public class Recapitulation {
         public string date;
-        public string month;
-        public string year;
+        public int month;
+        public int year;
         public double input;  // duguje
         public double output;  // potrazuje
         public string recordType;
         public string note;
+        public string account;  // konto
     }
 
     public class RecapMonthlyTotal {
@@ -74,8 +75,25 @@ public class Account : System.Web.Services.WebService {
 
     public class RecapYearlyTotal {
         public int year;
+        public string type;
+        public string account;  // Konto
         public List<RecapMonthlyTotal> data;
         public Recapitulation total;
+    }
+
+    public class EntryTotal {
+        public List<Recapitulation> data;
+        public Recapitulation total;
+    }
+
+    // ***** Konto *****
+    public class AccountNo {
+        public string giroAccount;
+        public string loan;
+        public string monthlyFee;
+        public string manipulativeCosts;
+        public string bankFee;
+        public string otherFee;
     }
 
     [WebMethod]
@@ -304,8 +322,80 @@ public class Account : System.Web.Services.WebService {
         }
     }
 
+    /***** Temeljnica *****/
+    [WebMethod]
+    public string LoadEntry(int year, int month) {
+        try {
+            db.Account();
+            string sql = string.Format(@"SELECT SUM(CONVERT(decimal, a.amount)), a.recordType, a.note FROM Account a WHERE yr = '{0}' and mo = '{1}'
+                                        GROUP BY a.recordType, a.note", year, month);
+            EntryTotal xx = new EntryTotal();
+            xx.data = new List<Recapitulation>();
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            Recapitulation x = new Recapitulation();
+                            x.date = null;
+                            x.month = month;
+                            x.year = year;
+                            x.input = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                            x.recordType = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
+                            x.note = reader.GetValue(2) == DBNull.Value ? null : reader.GetString(2);
+                            xx.data.Add(x);
+                        }
+                    }
+                }
+                connection.Close();
+                xx.data = PrepareEntryData(xx.data);
+                xx.total = new Recapitulation();
+                xx.total.input = xx.data.Sum(a => a.input);
+                xx.total.output = xx.data.Sum(a => a.output);
+            }
+            return JsonConvert.SerializeObject(xx, Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+        }
+    }
+
+    private List<Recapitulation> PrepareEntryData(List<Recapitulation> xx) {
+        List<Recapitulation> xxx = new List<Recapitulation>();
+        Recapitulation r = new Recapitulation();
+        r.note = "Žiro račun";
+        r.output = 99999;  // TODO
+        r.input = 66666;  // TODO
+        r.account = GetAccountNo("giroaccount");
+        xxx.Add(r);
+        foreach (Recapitulation x in xx) {
+            x.account = GetAccountNo(x.recordType);
+            if (x.recordType == RecordType.loan.ToString()) {
+                x.output = xx.Where(a => a.recordType == "withdraw").Sum(a => a.input);
+                x.note = "Pozajmice";
+            }
+            if (x.recordType == RecordType.monthlyFee.ToString()) {
+                x.output = GetMonthlyFeeRequired(x.month, x.year);
+                x.input = 0;
+                x.note = "Ulozi";
+            }
+            if (x.recordType == RecordType.bankFee.ToString() || x.recordType == RecordType.otherFee.ToString()) {
+                x.output = x.input;
+                x.input = 0;
+            }
+            if (x.recordType == RecordType.manipulativeCosts.ToString()) {
+                x.note = string.Format("Manipulativni troškovni {0}%", g.manipulativeCostsPerc());
+            }
+            if(x.recordType != RecordType.withdraw.ToString()) {
+                xxx.Add(x);
+            }
+        }
+        return xxx;
+    }
+
+
     [WebMethod]
     public string LoadRecapitulation(int year, string type) {
+        // TODO: Konto
         try {
             db.Account();
             string sql = null;
@@ -325,8 +415,8 @@ public class Account : System.Web.Services.WebService {
                         while (reader.Read()) {
                             Recapitulation x = new Recapitulation();
                             x.date = null;
-                            x.month = reader.GetValue(0) == DBNull.Value ? null : Convert.ToString(reader.GetInt32(0));
-                            x.year = year.ToString();
+                            x.month = reader.GetValue(0) == DBNull.Value ? 0 : reader.GetInt32(0);
+                            x.year = year;
                             x.input = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
                             x.recordType = reader.GetValue(2) == DBNull.Value ? null : reader.GetString(2);
                             x.note = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
@@ -336,6 +426,8 @@ public class Account : System.Web.Services.WebService {
                 }
                 connection.Close();
                 xxx.year = year;
+                xxx.type = type;
+                xxx.account = GetAccountNo(type); // "TODO";  // TODO: Konto
                 xxx.data = GetRecapMonthleyTotal(xx, type, year);
                 xxx.total = new Recapitulation();
                 xxx.total.input = GetYearlyTotal(xxx.data, "input"); // xxx.data.Sum(a => a.total.input);
@@ -345,6 +437,29 @@ public class Account : System.Web.Services.WebService {
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
         }
+    }
+
+    private string GetAccountNo(string type) {
+        string x = null;
+        if (type == "giroaccount") {
+            x = s.Data().account.giroAccount;
+        }
+        if (type == RecordType.loan.ToString()) {
+            x = s.Data().account.loan;
+        }
+        if (type == RecordType.monthlyFee.ToString()) {
+            x = s.Data().account.monthlyFee;
+        }
+        if (type == RecordType.manipulativeCosts.ToString()) {
+            x = s.Data().account.manipulativeCosts;
+        }
+        if (type == RecordType.bankFee.ToString()) {
+            x = s.Data().account.bankFee;
+        }
+        if (type == RecordType.otherFee.ToString()) {
+            x = s.Data().account.otherFee;
+        }
+        return x;
     }
 
     private List<RecapMonthlyTotal> GetRecapMonthleyTotal(List<Recapitulation> data, string type, int year) {
@@ -383,18 +498,18 @@ public class Account : System.Web.Services.WebService {
             x.total = new Recapitulation();
             x.total.date = g.SetDayMonthDate(Convert.ToInt32(DateTime.DaysInMonth(year, i).ToString()), i);
             if (!string.IsNullOrEmpty(inputType)) {
-                var input = data.Where(a => a.month == x.month && a.recordType == inputType);
+                var input = data.Where(a => a.month.ToString() == x.month && a.recordType == inputType);
                 x.total.input = input.Sum(a => a.input);
             }
             if (!string.IsNullOrEmpty(outputType)) {
-                var output = data.Where(a => a.month == x.month && a.recordType == outputType);
+                var output = data.Where(a => a.month.ToString() == x.month && a.recordType == outputType);
                 x.total.output = output.Sum(a => a.input);  // !!! Ovo nije greška (uvijek se vrijednost (amount iz Account.tbl) sprema u (a.input)
             }
             if (x.total.input > 0 || x.total.output > 0) {
                 if (type == RecordType.monthlyFee.ToString()) {
                     x.total.output = GetMonthlyFeeRequired(i, year);
                 }
-                x.total.note = data.Find(a => a.month == i.ToString()).note;
+                x.total.note = data.Find(a => a.month.ToString() == i.ToString()).note;
                 x.month = g.Month(i);
                 if (type == RecordType.loan.ToString()) {
                     x.total.note = string.Format("Promet pozajmica {0}/{1}", x.month, year);
@@ -483,7 +598,7 @@ public class Account : System.Web.Services.WebService {
         }
     }
 
-     NewAccount ReadData(SqlDataReader reader) {
+    NewAccount ReadData(SqlDataReader reader) {
         NewAccount x = new NewAccount();
         x.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
         x.user = new User.NewUser();
@@ -507,8 +622,7 @@ public class Account : System.Web.Services.WebService {
 
         return x;
     }
-
-        
+ 
     public NewAccount GetRecord(string userId, int month, int year, string recordType) {
         string sql = string.Format(@"SELECT * FROM Account WHERE userId = '{0}' AND mo = '{1}' AND yr = '{2}' {3}"
                                 , userId
@@ -530,7 +644,6 @@ public class Account : System.Web.Services.WebService {
         return x;
     }
 
-   
     public List<NewAccount> GetRecords(string userId, int? year) {
         db.Account();
         db.Loan();
@@ -556,8 +669,7 @@ public class Account : System.Web.Services.WebService {
         return xx;
     }
 
-      public NewAccount CheckLoan(NewAccount x, string userId) {
-
+    public NewAccount CheckLoan(NewAccount x, string userId) {
         string sql = string.Format(@"
                     SELECT l.id, l.loan, l.repayment FROM Loan l
                     WHERE l.userId = '{0}' AND (CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-01' AS datetime)) {3}"

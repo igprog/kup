@@ -16,6 +16,9 @@
             <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" check-link download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
         </div>
     </div>
+    <div class="text-right">
+        Konto: {{d.records.account}}
+    </div>
     <div ng-if="d.records.data.length>0 && !g.clearView" class="table-responsive">
         <table class="table table-hover">
             <thead>

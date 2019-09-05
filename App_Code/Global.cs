@@ -11,6 +11,7 @@ using Igprog;
 /// </summary>
 namespace Igprog {
     public class Global {
+        Settings s = new Settings();
         public Global() {
         }
 
@@ -66,8 +67,8 @@ namespace Igprog {
         }
 
         public string manipulativeCostsPerc() {
-            double manipulativeCostsCoeff = Convert.ToDouble(ConfigurationManager.AppSettings["manipulativeCostsCoeff"]);
-            return string.Format("{0}", Math.Round(manipulativeCostsCoeff * 100), 0);
+           // double manipulativeCostsCoeff = s.Data().manipulativeCostsCoeff; //  Convert.ToDouble(ConfigurationManager.AppSettings["manipulativeCostsCoeff"]);
+            return string.Format("{0}", Math.Round(s.Data().manipulativeCostsCoeff * 100), 0);
         }
 
         public string Month(int month) {

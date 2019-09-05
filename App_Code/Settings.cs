@@ -24,6 +24,7 @@ public class Settings : System.Web.Services.WebService {
         public double monthlyFee;
         public double manipulativeCostsCoeff;
         public int defaultDedline;
+        public Account.AccountNo account;
     }
 
     public NewSettings Data() {
