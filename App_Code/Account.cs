@@ -496,7 +496,7 @@ public class Account : System.Web.Services.WebService {
             RecapMonthlyTotal x = new RecapMonthlyTotal();
             x.month = i.ToString();
             x.total = new Recapitulation();
-            x.total.date = g.SetDayMonthDate(Convert.ToInt32(DateTime.DaysInMonth(year, i).ToString()), i);
+            x.total.date = g.SetDayMonthDate(g.GetLastDayInMonth(year, i), i);
             if (!string.IsNullOrEmpty(inputType)) {
                 var input = data.Where(a => a.month.ToString() == x.month && a.recordType == inputType);
                 x.total.input = input.Sum(a => a.input);

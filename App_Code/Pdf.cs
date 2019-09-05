@@ -229,6 +229,94 @@ public class Pdf : System.Web.Services.WebService {
         }
     }
 
+     [WebMethod]
+    public string Entry(int month, int year, Account.EntryTotal records) {
+        try {
+            GetFont(8, Font.ITALIC).SetColor(255, 122, 56);
+            Rectangle ps = PageSize.A4;
+            Document doc = new Document();
+            string path = Server.MapPath("~/upload/pdf/temp/");
+            g.DeleteFolder(path);
+            g.CreateFolder(path);
+            string fileName = Guid.NewGuid().ToString();
+            string filePath = Path.Combine(path, string.Format("{0}.pdf", fileName));
+            PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
+
+            doc.Open();
+
+            Paragraph p = new Paragraph();
+            p.Add(new Paragraph(string.Format("Temeljnica za knjiženje br.___"), GetFont(12, Font.BOLD)));
+            p.Add(new Paragraph(string.Format("Knjižiti na dan {0}", g.SetDayMonthDate(g.GetLastDayInMonth(year, month), month)), GetFont(10, Font.BOLD)));
+            doc.Add(p);
+
+            PdfPTable table = new PdfPTable(5);
+            table.WidthPercentage = 100f;
+            table.SetWidths(new float[] { 3f, 1f, 1f, 1f, 1f });
+            table.AddCell(new PdfPCell(new Phrase("SADRŽAJ", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+            table.AddCell(new PdfPCell(new Phrase("KONTO", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+            table.AddCell(new PdfPCell(new Phrase("DUGUJE", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("POTRAŽUJE", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("Stranica dnevnika", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+          
+            foreach (Account.Recapitulation x in records.data) {
+                PdfPCell cell1 = new PdfPCell(new Phrase(x.note, GetFont()));
+                cell1.Border = 0;
+                table.AddCell(cell1);
+                PdfPCell cell2 = new PdfPCell(new Phrase(string.Format("{0:N}", x.account), GetFont()));
+                cell2.Border = 0;
+                table.AddCell(cell2);
+                PdfPCell cell3 = new PdfPCell(new Phrase(string.Format("{0:N}", x.output), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell3.Border = 0;
+                table.AddCell(cell3);
+                PdfPCell cell4 = new PdfPCell(new Phrase(string.Format("{0:N}", x.input), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell4.Border = 0;
+                table.AddCell(cell4);
+                PdfPCell cell5 = new PdfPCell(new Phrase("TODO", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell5.Border = 0;
+                table.AddCell(cell5);
+            }
+            doc.Add(table);
+
+            table = new PdfPTable(5);
+            table.WidthPercentage = 100f;
+            table.SetWidths(new float[] { 3f, 1f, 1f, 1f, 1f });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 40, PaddingTop = 5, PaddingBottom = 15 });
+            table.AddCell(new PdfPCell(new Phrase("Ukupno:", GetFont(true))) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 40, PaddingTop = 5, PaddingBottom = 15, HorizontalAlignment = Element.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase(string.Format("{0:N}", g.Currency(records.total.output)), GetFont(true))) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 40, PaddingTop = 5, PaddingBottom = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase(string.Format("{0:N}", g.Currency(records.total.input)), GetFont(true))) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 40, PaddingTop = 5, PaddingBottom = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 40, PaddingTop = 5, PaddingBottom = 15 });
+            doc.Add(table);
+
+            table = new PdfPTable(4);
+            table.WidthPercentage = 100f;
+            table.SetWidths(new float[] { 1f, 1f, 1f, 1f });
+            table.AddCell(new PdfPCell(new Phrase(string.Format(@"Kontrolirao:
+       
+                                                                     
+Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX, Padding = 2, MinimumHeight = 40, HorizontalAlignment = Element.ALIGN_LEFT });
+            table.AddCell(new PdfPCell(new Phrase(string.Format(@"Knjižio:
+ 
+                                                                           
+Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX, Padding = 2, MinimumHeight = 40, HorizontalAlignment = Element.ALIGN_LEFT });
+            table.AddCell(new PdfPCell(new Phrase(string.Format(@"Rukovodilac računovodstva:
+ 
+                                                                           
+"), GetFont(8))) { Border = PdfPCell.BOX, Padding = 2, MinimumHeight = 40, HorizontalAlignment = Element.ALIGN_LEFT });
+            table.AddCell(new PdfPCell(new Phrase(string.Format(@"Rukovodilac radne organizacije:
+  
+                                                                          
+"), GetFont(8))) { Border = PdfPCell.BOX, Padding = 2, MinimumHeight = 40, HorizontalAlignment = Element.ALIGN_LEFT });
+            doc.Add(table);
+
+            doc.Close();
+
+            return JsonConvert.SerializeObject(fileName, Formatting.Indented);
+        } catch (Exception e) {
+            return e.Message;
+        }
+    }
+
+
     [WebMethod]
     public string Recapitulation(int month, Account.RecapYearlyTotal records, string title) {
         try {

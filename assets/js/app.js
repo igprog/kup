@@ -623,8 +623,6 @@
     }
 
     $scope.print = (x) => {
-        alert('TODO');
-        /*
         if (f.defined(x.records.data.length)) {
             if (x.records.data.length == 0) { return false; }
         }
@@ -634,7 +632,7 @@
             $scope.d.pdf = f.pdfTempPath(d);
             $scope.d.loadingPdf = false;
         });
-        */
+       
     }
 
     $scope.removePdfLink = () => {

@@ -15,11 +15,7 @@ namespace Igprog {
         public Global() {
         }
 
-
         public string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
-        //public double manipulativeCostsCoeff = Convert.ToDouble(ConfigurationManager.AppSettings["manipulativeCostsCoeff"]);
-        //public double defaultDedline = Convert.ToDouble(ConfigurationManager.AppSettings["defaultDedline"]);  // ***** Broj mjeseci za otplatu rata pozajmice *****
-        //public double startAccountBalance = Convert.ToDouble(ConfigurationManager.AppSettings["startAccountBalance"]);  // ***** Pocetno stanje na racunu *****
 
         public string ReffDate(int? month, int year) {
             if(month == 13) {
@@ -49,6 +45,10 @@ namespace Igprog {
             return string.Format("{0}.{1}", day_, month_);
         }
 
+        public int GetLastDayInMonth(int year, int month) {
+            return Convert.ToInt32(DateTime.DaysInMonth(year, month));
+        }
+
         public void CreateFolder(string path) {
             if (!Directory.Exists(path)) {
                 Directory.CreateDirectory(path);
@@ -62,12 +62,10 @@ namespace Igprog {
         }
 
         public string Currency(double value) {
-            string currency = ConfigurationManager.AppSettings["currency"];
-            return string.Format("{0:N} {1}", value, currency);
+            return string.Format("{0:N} {1}", value, s.Data().currency);
         }
 
         public string manipulativeCostsPerc() {
-           // double manipulativeCostsCoeff = s.Data().manipulativeCostsCoeff; //  Convert.ToDouble(ConfigurationManager.AppSettings["manipulativeCostsCoeff"]);
             return string.Format("{0}", Math.Round(s.Data().manipulativeCostsCoeff * 100), 0);
         }
 
