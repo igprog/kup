@@ -296,9 +296,9 @@ public class Account : System.Web.Services.WebService {
                 xx.data.Add(x);
             }
             xx.total = new Total();
-          //  xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
-           // xx.total.repayment = xx.data.Sum(a => a.repayment);
-          //  xx.total.totalObligation = xx.data.Sum(a => a.totalObligation);
+            xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
+            xx.total.repayment = xx.data.Sum(a => a.repayment);
+            xx.total.totalObligation = xx.data.Sum(a => a.totalObligation);
             return JsonConvert.SerializeObject(xx, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);

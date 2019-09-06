@@ -396,10 +396,10 @@
         load(x);
     }
 
-    $scope.load_recap = (x) => {
-        x.month = null;
-        load(x);
-    }
+    //$scope.load_recap = (x) => {
+    //    x.month = null;
+    //    load(x);
+    //}
 
     $scope.print = (x) => {
         if (f.defined(x.loans.length)) {
