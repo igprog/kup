@@ -160,6 +160,59 @@ public class Pdf : System.Web.Services.WebService {
     }
 
     [WebMethod]
+    public string LoanCard(int year, User.NewUser user) {
+        try {
+            GetFont(8, Font.ITALIC).SetColor(255, 122, 56);
+            Rectangle ps = PageSize.A4;
+            Document doc = new Document(ps.Rotate());
+            string path = Server.MapPath("~/upload/pdf/temp/");
+            g.DeleteFolder(path);
+            g.CreateFolder(path);
+            string fileName = Guid.NewGuid().ToString();
+            string filePath = Path.Combine(path, string.Format("{0}.pdf", fileName));
+            PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
+
+            doc.Open();
+
+            Paragraph p = new Paragraph();
+            p.Add(new Paragraph(string.Format("{0} {1}", user.lastName, user.firstName), GetFont(12, Font.BOLD)));
+            p.Add(new Paragraph(string.Format("Mat. br.{0}", "TODO"), GetFont(10, Font.BOLD)));
+            p.Add(new Paragraph(string.Format("{0} god", year), GetFont(10, Font.BOLD)));
+            p.Add(new Paragraph(string.Format("Obustave: {0}", "TODO"), GetFont(10, Font.BOLD)));
+            p.Add(new Paragraph(string.Format("Iznos duga: {0}", "TODO"), GetFont(10, Font.BOLD)));
+            doc.Add(p);
+
+            PdfPTable table = new PdfPTable(3);
+            table.WidthPercentage = 100f;
+            table.SetWidths(new float[] { 3f, 1f, 1f });
+            table.AddCell(new PdfPCell(new Phrase("Osnov za knjiženje", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+            table.AddCell(new PdfPCell(new Phrase("OTPLATA", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+            table.AddCell(new PdfPCell(new Phrase("SALDO", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+
+            foreach (Account.NewAccount x in user.records) {
+                if(x.recordType == Account.RecordType.loan.ToString()) {
+                    PdfPCell cell1 = new PdfPCell(new Phrase(string.Format("{0} {1}", g.Month(x.month), x.note), GetFont()));
+                    cell1.Border = 0;
+                    table.AddCell(cell1);
+                    PdfPCell cell2 = new PdfPCell(new Phrase(string.Format("{0:N}", x.amount), GetFont()));
+                    cell2.Border = 0;
+                    table.AddCell(cell2);
+                    PdfPCell cell3 = new PdfPCell(new Phrase(string.Format("{0:N}", x.restToRepayment), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                    cell3.Border = 0;
+                    table.AddCell(cell3);
+                }
+            }
+            doc.Add(table);
+
+            doc.Close();
+
+            return JsonConvert.SerializeObject(fileName, Formatting.Indented);
+        } catch (Exception e) {
+            return e.Message;
+        }
+    }
+
+    [WebMethod]
     public string Suspension(int month, int year, string buisinessUnitCode, Account.Accounts records) {
         try {
             GetFont(8, Font.ITALIC).SetColor(255, 122, 56);

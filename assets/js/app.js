@@ -259,13 +259,13 @@
         });
     }
 
-    $scope.printCard = (x) => {
+    $scope.print = (x, method) => {
         if (f.defined(x.user.records.length)) {
             if (x.user.records.length == 0) { return false; }
         }
         $scope.d.pdf = null;
         $scope.d.loadingPdf = true;
-        f.post('Pdf', 'Card', { year: x.year, user: x.user }).then((d) => {
+        f.post('Pdf', method, { year: x.year, user: x.user }).then((d) => {
             $scope.d.pdf = f.pdfTempPath(d);
             $scope.d.loadingPdf = false;
         });

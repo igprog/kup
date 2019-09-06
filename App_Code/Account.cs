@@ -57,6 +57,8 @@ public class Account : System.Web.Services.WebService {
         loan, manipulativeCosts, withdraw, monthlyFee, bankFee, interest, otherFee
     };
 
+    public string giroaccount = "giroaccount";
+
     public class Recapitulation {
         public string date;
         public int month;
@@ -365,7 +367,7 @@ public class Account : System.Web.Services.WebService {
         r.note = "Žiro račun";
         r.output = 99999;  // TODO
         r.input = 66666;  // TODO
-        r.account = GetAccountNo("giroaccount");
+        r.account = GetAccountNo(giroaccount);
         xxx.Add(r);
         foreach (Recapitulation x in xx) {
             x.account = GetAccountNo(x.recordType);
@@ -402,6 +404,8 @@ public class Account : System.Web.Services.WebService {
             string _sql = string.Format("SELECT a.mo, a.amount, a.recordType, a.note FROM Account a WHERE yr = '{0}'", year);
             if (type == RecordType.loan.ToString() || type == RecordType.withdraw.ToString()) {
                 sql = string.Format(@"{0} AND a.recordType = 'withdraw' OR a.recordType = 'loan'", _sql);
+            } else if (type == giroaccount) {
+                sql = _sql;
             } else {
                 sql = string.Format(@"{0} AND a.recordType = '{1}'", _sql, type);
             }
@@ -441,7 +445,7 @@ public class Account : System.Web.Services.WebService {
 
     private string GetAccountNo(string type) {
         string x = null;
-        if (type == "giroaccount") {
+        if (type == giroaccount) {
             x = s.Data().account.giroAccount;
         }
         if (type == RecordType.loan.ToString()) {
@@ -477,7 +481,7 @@ public class Account : System.Web.Services.WebService {
         List<RecapMonthlyTotal> xx = new List<RecapMonthlyTotal>();
 
         //TODO: Pocetno stanje
-        if(type == RecordType.loan.ToString() || type == RecordType.monthlyFee.ToString()) {
+        if(type == RecordType.loan.ToString() || type == RecordType.monthlyFee.ToString() || type == giroaccount) {
             RecapMonthlyTotal x = new RecapMonthlyTotal();
             x.month = "PS";
             x.total = new Recapitulation();
@@ -489,6 +493,9 @@ public class Account : System.Web.Services.WebService {
             if (type == RecordType.monthlyFee.ToString()) {
                 x.total.input = GetStartBalance(year, type) + s.Data().startAccountBalance;  // potražuje 
             }
+            if(type == giroaccount) {
+                x.total.input = GetStartBalance(year, type) + s.Data().startAccountBalance;
+            }
             xx.Add(x);
         }
 
@@ -498,7 +505,12 @@ public class Account : System.Web.Services.WebService {
             x.total = new Recapitulation();
             x.total.date = g.SetDayMonthDate(g.GetLastDayInMonth(year, i), i);
             if (!string.IsNullOrEmpty(inputType)) {
-                var input = data.Where(a => a.month.ToString() == x.month && a.recordType == inputType);
+                var input = inputType != giroaccount
+                    ? data.Where(a => a.month.ToString() == x.month && a.recordType == inputType)
+                    : data.Where(a => a.month.ToString() == x.month && a.recordType == RecordType.loan.ToString()
+                                                                    || a.recordType == RecordType.monthlyFee.ToString()
+                                                                    || a.recordType == RecordType.manipulativeCosts.ToString()
+                                                                    || a.recordType == RecordType.interest.ToString());
                 x.total.input = input.Sum(a => a.input);
             }
             if (!string.IsNullOrEmpty(outputType)) {
@@ -509,17 +521,18 @@ public class Account : System.Web.Services.WebService {
                 if (type == RecordType.monthlyFee.ToString()) {
                     x.total.output = GetMonthlyFeeRequired(i, year);
                 }
-                x.total.note = data.Find(a => a.month.ToString() == i.ToString()).note;
-                x.month = g.Month(i);
                 if (type == RecordType.loan.ToString()) {
                     x.total.note = string.Format("Promet pozajmica {0}/{1}", x.month, year);
-                }
-                if (type == RecordType.monthlyFee.ToString()) {
+                } else if (type == RecordType.monthlyFee.ToString()) {
                     x.total.note = string.Format("Promet uloga {0}/{1}", x.month, year);
-                }
-                if (type == RecordType.manipulativeCosts.ToString()) {
+                }else if (type == RecordType.manipulativeCosts.ToString()) {
                     x.total.note = string.Format("{0}% Manipulativni troškovni {1}/{2}", g.manipulativeCostsPerc(), x.month, year);
+                } else if (type == giroaccount) {
+                    x.total.note = string.Format("Promet Žiro-Računa {0}/{1}", x.month, year);
+                } else {
+                    x.total.note = data.Where(a => a.month.ToString() == i.ToString()).FirstOrDefault().note;
                 }
+                x.month = g.Month(i);
                 xx.Add(x);
             }
         }
@@ -545,8 +558,17 @@ public class Account : System.Web.Services.WebService {
 
     private double GetStartBalance(int year, string type) {
         double x = 0;
-        string sql = string.Format("SELECT SUM(CONVERT(DECIMAL, a.amount)) FROM Account a WHERE CONVERT(DATETIME, CONCAT(a.yr, '-', a.mo, '-01')) <= '{0}' AND a.recordType = '{1}'"
-            , g.ReffDate(1, year), type);
+        //string sql = string.Format("SELECT SUM(CONVERT(DECIMAL, a.amount)) FROM Account a WHERE CONVERT(DATETIME, CONCAT(a.yr, '-', a.mo, '-01')) <= '{0}' AND a.recordType = '{1}'"
+        //    , g.ReffDate(1, year), type);
+
+        string sql = string.Format(@"SELECT SUM(CONVERT(DECIMAL, a.amount)) FROM Account a WHERE CONVERT(DATETIME, CONCAT(a.yr, '-', a.mo, '-01')) <= '{0}' {1}"
+         , g.ReffDate(1, year)
+         , type != giroaccount ? string.Format("AND a.recordType = '{0}'", type) : string.Format("AND (a.recordType = '{0}' OR a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}')"
+                                                                                             , RecordType.loan.ToString()
+                                                                                             , RecordType.monthlyFee.ToString()
+                                                                                             , RecordType.manipulativeCosts.ToString()
+                                                                                             , RecordType.interest.ToString()));
+
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
