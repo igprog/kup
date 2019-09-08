@@ -369,7 +369,6 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
         }
     }
 
-
     [WebMethod]
     public string Recapitulation(int month, Account.RecapYearlyTotal records, string title) {
         try {
@@ -412,6 +411,22 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
                 PdfPCell cell4 = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.input), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 cell4.Border = 0;
                 table.AddCell(cell4);
+
+                /****** Accumulation *****/
+                PdfPCell cell1_ = new PdfPCell(new Phrase("", GetFont()));
+                cell1_.Border = 0;
+                table.AddCell(cell1_);
+                PdfPCell cell2_ = new PdfPCell(new Phrase("", GetFont()));
+                cell2_.Border = 0;
+                table.AddCell(cell2_);
+                PdfPCell cell3_ = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.outputAccumulation), GetFont(6, Font.ITALIC))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell3_.Border = 0;
+                table.AddCell(cell3_);
+                PdfPCell cell4_ = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.inputAccumulation), GetFont(6, Font.ITALIC))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell4_.Border = 0;
+                table.AddCell(cell4_);
+                /****** Accumulation *****/
+
             }
             doc.Add(table);
 

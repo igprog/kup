@@ -35,8 +35,8 @@
                     <td>{{x.total.date}}</td>
                     <td>{{x.month}}</td>
                     <td>{{x.total.note}}</td>
-                    <td class="text-right">{{x.total.output | number:2}}</td>
-                    <td class="text-right">{{x.total.input | number:2}}</td>
+                    <td class="text-right">{{x.total.output | number:2}}<br /><em class="text-muted small">{{x.total.outputAccumulation | number:2}}</em></td>
+                    <td class="text-right">{{x.total.input | number:2}}<br /><em class="text-muted small">{{x.total.inputAccumulation | number:2}}</em></td>
                 </tr>
             </tbody>
             <tfoot ng-if="d.records.data.length>0" class="thead-light">
