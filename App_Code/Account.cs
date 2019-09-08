@@ -468,11 +468,15 @@ public class Account : System.Web.Services.WebService {
 
     private List<RecapMonthlyTotal> GetRecapMonthleyTotal(List<Recapitulation> data, string type, int year) {
         string inputType = null, outputType = null;
-        if (type == RecordType.loan.ToString()) {
+        if (type == RecordType.loan.ToString())
+        {
             inputType = RecordType.loan.ToString();
             outputType = RecordType.withdraw.ToString();
         } else if (type == RecordType.bankFee.ToString() || type == RecordType.otherFee.ToString()) {
             inputType = null;
+            outputType = type;
+        } else if (type == giroaccount) {
+            inputType = type;
             outputType = type;
         } else {
             inputType = type;
@@ -481,7 +485,7 @@ public class Account : System.Web.Services.WebService {
         List<RecapMonthlyTotal> xx = new List<RecapMonthlyTotal>();
 
         //TODO: Pocetno stanje
-        if(type == RecordType.loan.ToString() || type == RecordType.monthlyFee.ToString() || type == giroaccount) {
+        if (type == RecordType.loan.ToString() || type == RecordType.monthlyFee.ToString() || type == giroaccount) {
             RecapMonthlyTotal x = new RecapMonthlyTotal();
             x.month = "PS";
             x.total = new Recapitulation();
@@ -493,7 +497,7 @@ public class Account : System.Web.Services.WebService {
             if (type == RecordType.monthlyFee.ToString()) {
                 x.total.input = GetStartBalance(year, type) + s.Data().startAccountBalance;  // potražuje 
             }
-            if(type == giroaccount) {
+            if (type == giroaccount) {
                 x.total.input = GetStartBalance(year, type) + s.Data().startAccountBalance;
             }
             xx.Add(x);
@@ -507,14 +511,18 @@ public class Account : System.Web.Services.WebService {
             if (!string.IsNullOrEmpty(inputType)) {
                 var input = inputType != giroaccount
                     ? data.Where(a => a.month.ToString() == x.month && a.recordType == inputType)
-                    : data.Where(a => a.month.ToString() == x.month && a.recordType == RecordType.loan.ToString()
+                    : data.Where(a => a.month.ToString() == x.month && (a.recordType == RecordType.loan.ToString()
                                                                     || a.recordType == RecordType.monthlyFee.ToString()
                                                                     || a.recordType == RecordType.manipulativeCosts.ToString()
-                                                                    || a.recordType == RecordType.interest.ToString());
+                                                                    || a.recordType == RecordType.interest.ToString()));
                 x.total.input = input.Sum(a => a.input);
             }
             if (!string.IsNullOrEmpty(outputType)) {
-                var output = data.Where(a => a.month.ToString() == x.month && a.recordType == outputType);
+                var output = outputType != giroaccount
+                    ? data.Where(a => a.month.ToString() == x.month && a.recordType == outputType)
+                    : data.Where(a => a.month.ToString() == x.month && (a.recordType == RecordType.withdraw.ToString()
+                                                                    || a.recordType == RecordType.bankFee.ToString()
+                                                                    || a.recordType == RecordType.otherFee.ToString()));
                 x.total.output = output.Sum(a => a.input);  // !!! Ovo nije greška (uvijek se vrijednost (amount iz Account.tbl) sprema u (a.input)
             }
             if (x.total.input > 0 || x.total.output > 0) {
