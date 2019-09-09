@@ -19,27 +19,27 @@
             <hr />
             <div class="form-group">
                 <label for="loan">Iznos pozajmice:</label>
-                <input ng-model="d.loan.loan" type="text" class="form-control" name="loan" ng-change="calculate(d.loan)">
+                <input ng-model="d.loan.loan" type="text" class="form-control" name="loan" ng-change="calculate(d.loan)" allow-only-numbers>
             </div>
             <div class="form-group">
                 <label for="dedline">Rok otplate (mj):</label>
-                <input ng-model="d.loan.dedline" type="text" class="form-control" name="dedline" ng-change="calculate(d.loan)">
+                <input ng-model="d.loan.dedline" type="text" class="form-control" name="dedline" ng-change="calculate(d.loan)" allow-only-numbers>
             </div>
             <div class="form-group">
                 <label for="repayment">Mjesečna rata:</label>
-                <input ng-model="d.loan.repayment" type="text" class="form-control" name="repayment" ng-change="calculateDedline(d.loan)">
+                <input ng-model="d.loan.repayment" type="text" class="form-control" name="repayment" ng-change="calculateDedline(d.loan)" allow-only-numbers>
             </div>
             <div class="form-group">
                 <label for="manipulativeCosts">Manipulativni troškovi ({{d.loan.manipulativeCostsCoeff * 100}}%):</label>
-                <input ng-model="d.loan.manipulativeCosts" type="text" class="form-control" name="manipulativeCosts" ng-change="calculate(d.loan)">
+                <input ng-model="d.loan.manipulativeCosts" type="text" class="form-control" name="manipulativeCosts" ng-change="calculate(d.loan)" allow-only-numbers>
             </div>
             <div class="form-group">
                 <label for="actualLoan">Pozajmica:</label>
-                <input ng-model="d.loan.actualLoan" type="text" class="form-control" name="actualLoan" ng-change="calculate(d.loan)">
+                <input ng-model="d.loan.actualLoan" type="text" class="form-control" name="actualLoan" ng-change="calculate(d.loan)" allow-only-numbers>
             </div>
             <div class="form-group">
                 <label for="withdraw">Za isplatu:</label>
-                <input ng-model="d.loan.withdraw" type="text" class="form-control" name="withdraw" ng-change="calculate(d.loan)">
+                <input ng-model="d.loan.withdraw" type="text" class="form-control" name="withdraw" ng-change="calculate(d.loan)" allow-only-numbers>
             </div>
             <div class="text-right">
                 <button type="submit" class="btn btn-outline-primary" ng-click="save(d, d.date)"><i class="fas fa-save"></i> Spremi</button>

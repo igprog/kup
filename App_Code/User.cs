@@ -241,7 +241,7 @@ public class User : System.Web.Services.WebService {
 
     public double GetRepayedAmount(string id) {
         double x = 0;
-        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, amount)) FROM Account WHERE userId = '{0}' and recordType = 'loan'", id);
+        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, amount)) FROM Account WHERE userId = '{0}' and recordType = '{1}'", id, "repayment");
         using (SqlConnection connection = new SqlConnection(connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {

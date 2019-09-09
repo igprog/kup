@@ -46,7 +46,7 @@
                     <td>{{x.user.id}}</td>
                     <td>{{x.user.lastName}} {{x.user.firstName}}</td>
                     <td class="text-right">{{x.user.monthlyFee | number:2}}</td>
-                    <td class="text-right"><input ng-model="x.monthlyFee" class="form-control text-right" /></td>
+                    <td class="text-right"><input ng-model="x.monthlyFee" class="form-control text-right" allow-only-numbers /></td>
                     <td><input ng-model="x.note" class="form-control" /></td>
                     <td><button class="btn btn-outline-primary" ng-click="save(x, d, $index)"><i class="fas fa-save"></i> Spremi</button></td>
 

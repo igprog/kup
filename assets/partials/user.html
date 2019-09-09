@@ -30,7 +30,7 @@
             </div>
             <div class="form-group">
                 <label for="pin">OIB:</label>
-                <input ng-model="d.user.pin" type="text" class="form-control" name="pin">
+                <input ng-model="d.user.pin" type="text" class="form-control" name="pin" allow-only-numbers>
             </div>
             <div class="form-group">
                 <label for="birthDate">Datum rođenja:</label>
@@ -40,7 +40,7 @@
             <div class="form-group">
                 <label for="monthlyPayment">Mjesečni ulog:</label>
                 <div class="input-group">
-                    <input ng-model="d.user.monthlyFee" type="text" class="form-control" name="monthlyPayment">
+                    <input ng-model="d.user.monthlyFee" type="text" class="form-control" name="monthlyPayment" allow-only-numbers>
                     <div class="input-group-append">
                         <span class="input-group-text">kn</span>
                     </div>

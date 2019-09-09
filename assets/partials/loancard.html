@@ -38,7 +38,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-if="x.recordType=='loan'" ng-repeat="x in d.user.records track by $index">
+                <tr ng-if="x.recordType=='repayment'" ng-repeat="x in d.user.records track by $index">
                     <td>{{x.month}}</td>
                     <td>{{x.amount | number:2}}</td>
                     <td>{{x.restToRepayment | number:2}}</td>
