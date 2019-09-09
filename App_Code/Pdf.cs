@@ -190,7 +190,7 @@ public class Pdf : System.Web.Services.WebService {
             table.AddCell(new PdfPCell(new Phrase("SALDO", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
 
             foreach (Account.NewAccount x in user.records) {
-                if(x.recordType == Account.RecordType.loan.ToString()) {
+                if(x.recordType == Account.RecordType.repayment.ToString()) {
                     PdfPCell cell1 = new PdfPCell(new Phrase(string.Format("{0} {1}", g.Month(x.month), x.note), GetFont()));
                     cell1.Border = 0;
                     table.AddCell(cell1);
