@@ -17,6 +17,17 @@ namespace Igprog {
 
         public string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
 
+        #region RecordType
+        public string repayment = "repayment";
+        public string manipulativeCosts = "manipulativeCosts";
+        public string withdraw = "withdraw";
+        public string monthlyFee = "monthlyFee";
+        public string bankFee = "bankFee";
+        public string interest = "interest";
+        public string otherFee = "otherFee";
+        #endregion RecordType
+        public string giroaccount = "giroaccount";
+
         public string ReffDate(int? month, int year) {
             if(month == 13) {
                 month = 1;

@@ -16,8 +16,9 @@ using Igprog;
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
 public class User : System.Web.Services.WebService {
-    string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
+    //string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
+    Global g = new Global();
     Account a = new Account();
     Settings s = new Settings();
 
@@ -83,13 +84,7 @@ public class User : System.Web.Services.WebService {
                                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
                                                 END
                                         COMMIT TRAN", x.id, x.buisinessUnit.code, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
-
-
-
-            //string sql = string.Format(@"INSERT INTO Users VALUES  
-            //           ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')"
-            //            , x.id, x.buisinessUnit.code, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     command.ExecuteNonQuery();
@@ -117,7 +112,7 @@ public class User : System.Web.Services.WebService {
             db.Users();
             string sql = string.Format("{0} WHERE u.id = '{1}'", sqlString, id);
             NewUser x = new NewUser();
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     using (SqlDataReader reader = command.ExecuteReader()) {
@@ -144,7 +139,7 @@ public class User : System.Web.Services.WebService {
         try {
             db.Users();
             string sql = string.Format(@"UPDATE Users SET isActive = 0 WHERE id = '{0}'", id);
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     command.ExecuteNonQuery();
@@ -164,7 +159,7 @@ public class User : System.Web.Services.WebService {
             string sql = string.Format(@"DELETE FROM Users WHERE id = '{0}';
                         DELETE FROM Account WHERE userId = '{0}';
                         DELETE FROM Loan WHERE userId = '{0}';", id);
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     command.ExecuteNonQuery();
@@ -201,7 +196,7 @@ public class User : System.Web.Services.WebService {
                         , sqlString 
                         , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("WHERE u.buisinessUnitCode = '{0}'", buisinessUnitCode): "");
         List<NewUser> xx = new List<NewUser>();
-        using (SqlConnection connection = new SqlConnection(connectionString)) {
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
@@ -224,7 +219,7 @@ public class User : System.Web.Services.WebService {
                         , sqlString 
                         , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("WHERE u.buisinessUnitCode = '{0}' AND l.isRepaid = 0", buisinessUnitCode): "");
         List<NewUser> xx = new List<NewUser>();
-        using (SqlConnection connection = new SqlConnection(connectionString)) {
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
@@ -240,9 +235,10 @@ public class User : System.Web.Services.WebService {
     }
 
     public double GetRepayedAmount(string id) {
+        db.Account();
         double x = 0;
         string sql = string.Format(@"SELECT SUM(CONVERT(decimal, amount)) FROM Account WHERE userId = '{0}' and recordType = '{1}'", id, "repayment");
-        using (SqlConnection connection = new SqlConnection(connectionString)) {
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
@@ -257,9 +253,10 @@ public class User : System.Web.Services.WebService {
     }
 
     public double GetLoanAmount(string id) {
+        db.Loan();
         double x = 0;
         string sql = string.Format(@"SELECT SUM(CONVERT(decimal, loan)) FROM Loan WHERE userId = '{0}'", id);
-        using (SqlConnection connection = new SqlConnection(connectionString)) {
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {

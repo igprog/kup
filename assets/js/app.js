@@ -872,21 +872,6 @@
     }
 }])
 
-.directive('checkLink', function ($http) {
-    return {
-        restrict: 'A',
-        link: function (scope, element, attrs) {
-            attrs.$observe('href', function (href) {
-                $http.get(href).success(function () {
-                }).error(() => {
-                    element.attr('class', 'btn btn-warning');
-                    element.attr('disabled', 'disabled');
-                });
-            });
-        }
-    };
-})
-
 .directive('allowOnlyNumbers', function () {
     return {
         restrict: 'A',

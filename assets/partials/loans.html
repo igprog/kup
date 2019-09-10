@@ -24,7 +24,7 @@
             <button ng-show="!d.pdf" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d)">
                 <loading-directive title="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf"></loading-directive>
             </button>
-            <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" check-link download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
+            <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
         </div>
     </div>
     <div ng-if="d.loans.data.length>0" class="table-responsive">

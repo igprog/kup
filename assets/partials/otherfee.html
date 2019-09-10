@@ -24,7 +24,7 @@
             <button ng-show="!d.pdf" class="btn btn-outline-danger" ng-disabled="d.loadingPdf==true" ng-click="printCard(d)">
                 <loading-directive title="'PDF'" loadingtitle="'Kreiranje PDF-a...'" value="d.loadingPdf"></loading-directive>
             </button>
-            <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" check-link download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
+            <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
         </div>
     </div>
     <div class="row">
@@ -37,7 +37,7 @@
             </div>
             <div class="form-group">
                 <label for="amount">Iznos:</label>
-                <input ng-model="d.fee.amount" type="text" class="form-control" name="amount">
+                <input ng-model="d.fee.amount" type="text" class="form-control" name="amount" allow-only-numbers>
             </div>
             <div class="form-group">
                 <label for="note">Opis:</label>
