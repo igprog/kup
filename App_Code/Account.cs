@@ -375,7 +375,7 @@ public class Account : System.Web.Services.WebService {
         foreach (Recapitulation x in xx) {
             x.account = GetAccountNo(x.recordType);
             if (x.recordType == g.repayment) {
-                x.output = xx.Where(a => a.recordType == "withdraw").Sum(a => a.input);
+                x.output = xx.Where(a => a.recordType == g.withdraw).Sum(a => a.input);
                 x.note = "Pozajmice";
             }
             if (x.recordType == g.monthlyFee) {
@@ -439,6 +439,7 @@ public class Account : System.Web.Services.WebService {
                 xxx.total = new Recapitulation();
                 xxx.total.input = GetYearlyTotal(xxx.data, "input"); // xxx.data.Sum(a => a.total.input);
                 xxx.total.output = GetYearlyTotal(xxx.data, "output");  // xxx.data.Sum(a => a.total.output);
+                xxx.total.accountBalance = GetYearlyTotal(xxx.data, "accountBalance");
             }
             return JsonConvert.SerializeObject(xxx, Formatting.Indented);
         } catch (Exception e) {
@@ -500,7 +501,7 @@ public class Account : System.Web.Services.WebService {
                 x.total.input = GetStartBalance(year, type);  // potražuje 
             }
             if (type == g.giroaccount) {
-                x.total.input = GetStartBalance(year, type) + s.Data().startAccountBalance;
+                x.total.accountBalance = GetStartBalance(year, type) + s.Data().startAccountBalance;
             }
             xx.Add(x);
         }
@@ -636,7 +637,16 @@ public class Account : System.Web.Services.WebService {
     private double GetYearlyTotal(List<RecapMonthlyTotal> data, string type) {
         double x = 0;
         foreach(var i in data) {
-            x += type == "input" ? i.total.input : i.total.output;
+            if (type == "input") {
+                x += i.total.input;
+            } else if (type == "output") {
+                x += i.total.output;
+            } else if (type == "accountBalance") {
+                x += i.total.accountBalance;
+            } else {
+                x = 0;
+            }
+            //x += type == "input" ? i.total.input : i.total.output;
         }
         return x;
     }

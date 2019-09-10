@@ -19,6 +19,10 @@ using Igprog;
 [System.Web.Script.Services.ScriptService]
 public class Pdf : System.Web.Services.WebService {
     iTextSharp.text.pdf.draw.LineSeparator line = new iTextSharp.text.pdf.draw.LineSeparator(0f, 100f, Color.BLACK, Element.ALIGN_LEFT, 1);
+    string logoPath = HttpContext.Current.Server.MapPath(string.Format("~/assets/img/logo.png"));
+    string headerInfo = @"Kasa uzajamne pomoći
+......................................
+......................................";  //TODO
     Global g = new Global();
     BuisinessUnit bu = new BuisinessUnit();
     public Pdf() {
@@ -38,6 +42,7 @@ public class Pdf : System.Web.Services.WebService {
             PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
 
             doc.Open();
+            AppendHeader(doc, headerInfo);
 
             Paragraph p = new Paragraph();
             p.Add(new Paragraph(string.Format("KUP: {0} / {1}/{2}", buisinessUnitCode, month, year), GetFont(12, Font.BOLD)));
@@ -113,6 +118,7 @@ public class Pdf : System.Web.Services.WebService {
             PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
 
             doc.Open();
+            AppendHeader(doc, headerInfo);
 
             Paragraph p = new Paragraph();
             p.Add(new Paragraph(string.Format("{0} {1}", user.lastName, user.firstName), GetFont(12, Font.BOLD)));
@@ -173,6 +179,7 @@ public class Pdf : System.Web.Services.WebService {
             PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
 
             doc.Open();
+            AppendHeader(doc, headerInfo);
 
             Paragraph p = new Paragraph();
             p.Add(new Paragraph(string.Format("{0} {1}", user.lastName, user.firstName), GetFont(12, Font.BOLD)));
@@ -226,6 +233,7 @@ public class Pdf : System.Web.Services.WebService {
             PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
 
             doc.Open();
+            AppendHeader(doc, headerInfo);
 
             Paragraph p = new Paragraph();
             p.Add(new Paragraph(string.Format("KUP - obustava na Plaći za {0}/{1} {2}", g.Month(month), year, bu.Get(buisinessUnitCode).title), GetFont(12, Font.BOLD)));
@@ -296,6 +304,7 @@ public class Pdf : System.Web.Services.WebService {
             PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
 
             doc.Open();
+            AppendHeader(doc, headerInfo);
 
             Paragraph p = new Paragraph();
             p.Add(new Paragraph(string.Format("Temeljnica za knjiženje br.___"), GetFont(12, Font.BOLD)));
@@ -383,18 +392,26 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
             PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
 
             doc.Open();
-
+            AppendHeader(doc, headerInfo);
             Paragraph p = new Paragraph();
             p.Add(new Paragraph(string.Format("{0}", title), GetFont(12, Font.BOLD)));
             p.Add(new Paragraph(string.Format("{0} god.", records.year), GetFont(10, Font.NORMAL)));
             p.Add(new Paragraph(string.Format("Konto: {0}", records.account), GetFont(10, Font.NORMAL)));
             doc.Add(p);
 
-            PdfPTable table = new PdfPTable(4);
+            PdfPTable table = new PdfPTable(records.type == g.giroaccount ? 5 : 4);
             table.WidthPercentage = 100f;
-            table.SetWidths(new float[] { 1f, 4f, 1f, 1f });
+            if (records.type == g.giroaccount) {
+                table.SetWidths(new float[] { 1f, 4f, 1f, 1f, 1f });
+            } else {
+                table.SetWidths(new float[] { 1f, 4f, 1f, 1f });
+            }
+            
             table.AddCell(new PdfPCell(new Phrase("Datum", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
             table.AddCell(new PdfPCell(new Phrase("Sadržaj", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+            if (records.type == g.giroaccount) {
+                table.AddCell(new PdfPCell(new Phrase("Stanje", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            }
             table.AddCell(new PdfPCell(new Phrase("Duguje", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase("Potražuje", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
           
@@ -405,12 +422,17 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
                 PdfPCell cell2 = new PdfPCell(new Phrase(string.Format("{0} {1}", x.month, x.total.note), GetFont()));
                 cell2.Border = 0;
                 table.AddCell(cell2);
-                PdfPCell cell3 = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.output), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
-                cell3.Border = 0;
-                table.AddCell(cell3);
-                PdfPCell cell4 = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.input), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                if (records.type == g.giroaccount) {
+                    PdfPCell cell3 = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.accountBalance), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                    cell3.Border = 0;
+                    table.AddCell(cell3);
+                }
+                PdfPCell cell4 = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.output), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 cell4.Border = 0;
                 table.AddCell(cell4);
+                PdfPCell cell5 = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.input), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell5.Border = 0;
+                table.AddCell(cell5);
 
                 /****** Accumulation *****/
                 PdfPCell cell1_ = new PdfPCell(new Phrase("", GetFont()));
@@ -419,21 +441,33 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
                 PdfPCell cell2_ = new PdfPCell(new Phrase("", GetFont()));
                 cell2_.Border = 0;
                 table.AddCell(cell2_);
-                PdfPCell cell3_ = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.outputAccumulation), GetFont(6, Font.ITALIC))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
-                cell3_.Border = 0;
-                table.AddCell(cell3_);
-                PdfPCell cell4_ = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.inputAccumulation), GetFont(6, Font.ITALIC))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                if (records.type == g.giroaccount) {
+                    PdfPCell cell3_ = new PdfPCell(new Phrase("", GetFont()));
+                    cell3_.Border = 0;
+                    table.AddCell(cell3_);
+                }
+                PdfPCell cell4_ = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.outputAccumulation), GetFont(6, Font.ITALIC))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 cell4_.Border = 0;
                 table.AddCell(cell4_);
+                PdfPCell cell5_ = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.inputAccumulation), GetFont(6, Font.ITALIC))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell5_.Border = 0;
+                table.AddCell(cell5_);
                 /****** Accumulation *****/
 
             }
             doc.Add(table);
 
-            table = new PdfPTable(4);
+            table = new PdfPTable(records.type == g.giroaccount ? 5 : 4);
             table.WidthPercentage = 100f;
-            table.SetWidths(new float[] { 1f, 4f, 1f, 1f });
+            if (records.type == g.giroaccount) {
+                table.SetWidths(new float[] { 1f, 4f, 1f, 1f, 1f });
+            } else {
+                table.SetWidths(new float[] { 1f, 4f, 1f, 1f });
+            }
             table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+            if (records.type == g.giroaccount) {
+                table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            }
             table.AddCell(new PdfPCell(new Phrase("Ukupno:", GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase(string.Format("{0:N}", records.total.output), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase(string.Format("{0:N}", records.total.input), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
@@ -464,6 +498,23 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
     }
     private Font GetFont(int size, bool x) {
         return GetFont(size, x == true ? Font.BOLD : Font.NORMAL);
+    }
+
+    private void AppendHeader(Document doc, string headerInfo) {
+        PdfPTable table = new PdfPTable(2);
+        table.WidthPercentage = 100f;
+        if (File.Exists(logoPath)) {
+            Image logo = Image.GetInstance(logoPath);
+            logo.Alignment = Image.ALIGN_RIGHT;
+            logo.ScaleToFit(160f, 30f);
+            logo.SpacingAfter = 15f;
+            table.AddCell(new PdfPCell(logo) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 15, PaddingBottom = 10 });
+        } else {
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 15, PaddingBottom = 10 });
+        }
+        table.AddCell(new PdfPCell(new Phrase(headerInfo, GetFont(8))) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 15, PaddingBottom = 10, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+        doc.Add(table);
+        doc.Add(new Chunk(line));
     }
 
 
