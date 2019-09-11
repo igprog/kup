@@ -189,6 +189,7 @@
     var init = () => {
         f.post('User', 'Init', {}).then((d) => {
             $scope.d.user = d;
+            $scope.d.user.accessDate = new Date($scope.d.user.accessDate);
         });
     }
 

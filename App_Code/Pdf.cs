@@ -28,19 +28,16 @@ public class Pdf : System.Web.Services.WebService {
     public Pdf() {
     }
 
+    public class PrintDoc {
+        public Document doc;
+        public string fileName;
+    }
+
     [WebMethod]
     public string Loans(int month, int year, string buisinessUnitCode, Loan.Loans loans) {
         try {
-            GetFont(8, Font.ITALIC).SetColor(255, 122, 56);
-            Rectangle ps = PageSize.A4;
-            Document doc = new Document(ps.Rotate());
-            string path = Server.MapPath("~/upload/pdf/temp/");
-            g.DeleteFolder(path);
-            g.CreateFolder(path);
-            string fileName = Guid.NewGuid().ToString();
-            string filePath = Path.Combine(path, string.Format("{0}.pdf", fileName));
-            PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
-
+            PrintDoc pd = PreparePrintDoc(true);
+            Document doc = pd.doc;
             doc.Open();
             AppendHeader(doc, headerInfo);
 
@@ -98,7 +95,7 @@ public class Pdf : System.Web.Services.WebService {
 
             doc.Close();
 
-            return JsonConvert.SerializeObject(fileName, Formatting.Indented);
+            return JsonConvert.SerializeObject(pd.fileName, Formatting.Indented);
         } catch (Exception e) {
             return e.Message;
         }
@@ -107,16 +104,8 @@ public class Pdf : System.Web.Services.WebService {
     [WebMethod]
     public string Card(int year, User.NewUser user) {
         try {
-            GetFont(8, Font.ITALIC).SetColor(255, 122, 56);
-            Rectangle ps = PageSize.A4;
-            Document doc = new Document(ps.Rotate());
-            string path = Server.MapPath("~/upload/pdf/temp/");
-            g.DeleteFolder(path);
-            g.CreateFolder(path);
-            string fileName = Guid.NewGuid().ToString();
-            string filePath = Path.Combine(path, string.Format("{0}.pdf", fileName));
-            PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
-
+            PrintDoc pd = PreparePrintDoc(true);
+            Document doc = pd.doc;
             doc.Open();
             AppendHeader(doc, headerInfo);
 
@@ -136,22 +125,22 @@ public class Pdf : System.Web.Services.WebService {
             table.AddCell(new PdfPCell(new Phrase("Potražuje", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
           
             foreach (Account.NewAccount x in user.records) {
-                PdfPCell cell1 = new PdfPCell(new Phrase("TODO", GetFont()));
+                PdfPCell cell1 = new PdfPCell(new Phrase(x.recordDate, GetFont()));
                 cell1.Border = 0;
                 table.AddCell(cell1);
-                PdfPCell cell2 = new PdfPCell(new Phrase("TODO", GetFont()));
+                PdfPCell cell2 = new PdfPCell(new Phrase(x.month, GetFont()));
                 cell2.Border = 0;
                 table.AddCell(cell2);
-                PdfPCell cell3 = new PdfPCell(new Phrase(x.note, GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                PdfPCell cell3 = new PdfPCell(new Phrase(x.note, GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_LEFT };
                 cell3.Border = 0;
                 table.AddCell(cell3);
-                PdfPCell cell4 = new PdfPCell(new Phrase("TODO", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                PdfPCell cell4 = new PdfPCell(new Phrase(x.recordType == g.monthlyFee ? string.Format("{0:N}", x.amount) : "", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 cell4.Border = 0;
                 table.AddCell(cell4);
-                PdfPCell cell5 = new PdfPCell(new Phrase("TODO", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                PdfPCell cell5 = new PdfPCell(new Phrase(x.recordType == g.repayment ? string.Format("{0:N}", x.restToRepayment) : "", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 cell5.Border = 0;
                 table.AddCell(cell5);
-                PdfPCell cell6 = new PdfPCell(new Phrase("TODO", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                PdfPCell cell6 = new PdfPCell(new Phrase(x.recordType == g.repayment ? string.Format("{0:N}", x.amount) : "", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 cell6.Border = 0;
                 table.AddCell(cell6);
             }
@@ -159,7 +148,7 @@ public class Pdf : System.Web.Services.WebService {
 
             doc.Close();
 
-            return JsonConvert.SerializeObject(fileName, Formatting.Indented);
+            return JsonConvert.SerializeObject(pd.fileName, Formatting.Indented);
         } catch (Exception e) {
             return e.Message;
         }
@@ -168,16 +157,8 @@ public class Pdf : System.Web.Services.WebService {
     [WebMethod]
     public string LoanCard(int year, User.NewUser user) {
         try {
-            GetFont(8, Font.ITALIC).SetColor(255, 122, 56);
-            Rectangle ps = PageSize.A4;
-            Document doc = new Document(ps.Rotate());
-            string path = Server.MapPath("~/upload/pdf/temp/");
-            g.DeleteFolder(path);
-            g.CreateFolder(path);
-            string fileName = Guid.NewGuid().ToString();
-            string filePath = Path.Combine(path, string.Format("{0}.pdf", fileName));
-            PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
-
+            PrintDoc pd = PreparePrintDoc(true);
+            Document doc = pd.doc;
             doc.Open();
             AppendHeader(doc, headerInfo);
 
@@ -213,7 +194,7 @@ public class Pdf : System.Web.Services.WebService {
 
             doc.Close();
 
-            return JsonConvert.SerializeObject(fileName, Formatting.Indented);
+            return JsonConvert.SerializeObject(pd.fileName, Formatting.Indented);
         } catch (Exception e) {
             return e.Message;
         }
@@ -222,16 +203,8 @@ public class Pdf : System.Web.Services.WebService {
     [WebMethod]
     public string Suspension(int month, int year, string buisinessUnitCode, Account.Accounts records) {
         try {
-            GetFont(8, Font.ITALIC).SetColor(255, 122, 56);
-            Rectangle ps = PageSize.A4;
-            Document doc = new Document();
-            string path = Server.MapPath("~/upload/pdf/temp/");
-            g.DeleteFolder(path);
-            g.CreateFolder(path);
-            string fileName = Guid.NewGuid().ToString();
-            string filePath = Path.Combine(path, string.Format("{0}.pdf", fileName));
-            PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
-
+            PrintDoc pd = PreparePrintDoc(false);
+            Document doc = pd.doc;
             doc.Open();
             AppendHeader(doc, headerInfo);
 
@@ -284,7 +257,7 @@ public class Pdf : System.Web.Services.WebService {
 
             doc.Close();
 
-            return JsonConvert.SerializeObject(fileName, Formatting.Indented);
+            return JsonConvert.SerializeObject(pd.fileName, Formatting.Indented);
         } catch (Exception e) {
             return e.Message;
         }
@@ -293,16 +266,8 @@ public class Pdf : System.Web.Services.WebService {
      [WebMethod]
     public string Entry(int month, int year, Account.EntryTotal records) {
         try {
-            GetFont(8, Font.ITALIC).SetColor(255, 122, 56);
-            Rectangle ps = PageSize.A4;
-            Document doc = new Document();
-            string path = Server.MapPath("~/upload/pdf/temp/");
-            g.DeleteFolder(path);
-            g.CreateFolder(path);
-            string fileName = Guid.NewGuid().ToString();
-            string filePath = Path.Combine(path, string.Format("{0}.pdf", fileName));
-            PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
-
+            PrintDoc pd = PreparePrintDoc(true);
+            Document doc = pd.doc;
             doc.Open();
             AppendHeader(doc, headerInfo);
 
@@ -372,7 +337,7 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
 
             doc.Close();
 
-            return JsonConvert.SerializeObject(fileName, Formatting.Indented);
+            return JsonConvert.SerializeObject(pd.fileName, Formatting.Indented);
         } catch (Exception e) {
             return e.Message;
         }
@@ -381,16 +346,8 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
     [WebMethod]
     public string Recapitulation(int month, Account.RecapYearlyTotal records, string title) {
         try {
-            GetFont(8, Font.ITALIC).SetColor(255, 122, 56);
-            Rectangle ps = PageSize.A4;
-            Document doc = new Document(ps.Rotate());
-            string path = Server.MapPath("~/upload/pdf/temp/");
-            g.DeleteFolder(path);
-            g.CreateFolder(path);
-            string fileName = Guid.NewGuid().ToString();
-            string filePath = Path.Combine(path, string.Format("{0}.pdf", fileName));
-            PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
-
+            PrintDoc pd = PreparePrintDoc(true);
+            Document doc = pd.doc;
             doc.Open();
             AppendHeader(doc, headerInfo);
             Paragraph p = new Paragraph();
@@ -475,7 +432,7 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
 
             doc.Close();
 
-            return JsonConvert.SerializeObject(fileName, Formatting.Indented);
+            return JsonConvert.SerializeObject(pd.fileName, Formatting.Indented);
         } catch (Exception e) {
             return e.Message;
         }
@@ -498,6 +455,25 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
     }
     private Font GetFont(int size, bool x) {
         return GetFont(size, x == true ? Font.BOLD : Font.NORMAL);
+    }
+
+    private PrintDoc PreparePrintDoc(bool rotate) {
+        PrintDoc x = new PrintDoc();
+        GetFont(8, Font.ITALIC).SetColor(255, 122, 56);
+        Rectangle ps = PageSize.A4;
+        Document doc = new Document();
+        if (rotate) {
+            doc = new Document(ps.Rotate());
+        }
+        string path = Server.MapPath("~/upload/pdf/temp/");
+        g.DeleteFolder(path);
+        g.CreateFolder(path);
+        string fileName = Guid.NewGuid().ToString();
+        string filePath = Path.Combine(path, string.Format("{0}.pdf", fileName));
+        PdfWriter.GetInstance(doc, new FileStream(filePath, FileMode.Create));
+        x.doc = doc;
+        x.fileName = fileName;
+        return x;
     }
 
     private void AppendHeader(Document doc, string headerInfo) {

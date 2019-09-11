@@ -29,7 +29,6 @@
                 <tr>
                     <th colspan="4"></th>
                     <th colspan="2" class="text-center">Pozajmica</th>
-                    <th></th>
                 </tr>
                 <tr>
                     <th>Datum</th>
@@ -38,7 +37,6 @@
                     <th>Ulog ({{config.currency}})</th>
                     <th>Duguje ({{config.currency}})</th>
                     <th>Potražuje ({{config.currency}})</th>
-                    <!--<th></th>-->
                 </tr>
             </thead>
             <tbody>
@@ -49,7 +47,6 @@
                     <td><span ng-if="x.recordType=='monthlyFee'">{{x.amount | number:2}}</span></td>
                     <td><span ng-if="x.recordType=='repayment'">{{x.restToRepayment | number:2}}</span></td>
                     <td><span ng-if="x.recordType=='repayment'">{{x.amount | number:2}}</span></td>
-                    <!--<td><button class="btn btn-outline-primary" ng-click="saveRecord(x, $index)"><i class="fas fa-save"></i> Spremi</button></td>-->
                 </tr>
             </tbody>
         </table>
