@@ -33,13 +33,10 @@
                 <tr>
                     <th>Mat. br.</th>
                     <th>Prezime i ime</th>
-                    <!--<th>Šifra</th>-->
-                    <!--<th class="text-right">Ulog ({{config.currency}})</th>-->
-                    <th class="text-right">Rata ({{config.currency}})</th>
-                    <th class="text-right">Otplata ({{config.currency}})</th>
+                    <th class="text-right">Ugovorena rata ({{config.currency}})</th>
+                    <th class="text-right">Uplaćeno ({{config.currency}})</th>
                     <th class="text-right">Ostatak za otplatu ({{config.currency}})</th>
                     <th>Napomena</th>
-                    <!--<th class="text-right">Ukupno ({{config.currency}})</th>-->
                     <th></th>
                 </tr>
             </thead>
@@ -47,9 +44,7 @@
                 <tr ng-repeat="x in d.records.data track by $index">
                     <td>{{x.user.id}}</td>
                     <td>{{x.user.lastName}} {{x.user.firstName}}</td>
-                    <!--<td>TODO</td>-->
-                    <!--<td class="text-right">{{x.monthlyFee | number:2}}</td>-->
-                    <td class="text-right">{{x.repayment | number:2}}</td>
+                    <td class="text-right">{{x.repayment | number:2}}<button class="btn btn-outline-primary ml-2" ng-click="setRepayment(x, $index)"><i class="fa fa-arrow-circle-right"></i></button></td>
                     <td class="text-right"><input ng-model="x.amount" class="form-control text-right" allow-only-numbers/></td>
                     <td class="text-right">{{x.restToRepayment | number:2}}</td>
                     <td><input ng-model="x.note" class="form-control" /></td>
@@ -58,11 +53,9 @@
             </tbody>
             <tfoot ng-if="d.records.data.length>0" class="thead-light">
                 <tr class="text-right">
-                    <th colspan="5">Ukupno:</th>
-                    <!--<th>{{d.records.total.monthlyFee | number:2}}</th>-->
+                    <th colspan="3">Ukupno:</th>
                     <th>{{d.records.total.repayment | number:2}}</th>
-                    <!--<th>{{d.records.total.totalObligation | number:2}}</th>-->
-                    <th></th>
+                    <th colspan="3"></th>
                 </tr>
             </tfoot>
         </table>

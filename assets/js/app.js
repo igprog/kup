@@ -173,7 +173,6 @@
     }
 
     $scope.toggleTpl = (tpl, title, currTplType) => {
-        debugger;
         $scope.g.currTpl = f.currTpl(tpl);
         $scope.g.currTplTitle = title;
         if (f.defined(currTplType)) {   // ***** Only for recapitualtion *****
@@ -516,6 +515,10 @@
         return getMonthlyRecords(x);
     }
 
+    $scope.setMonthlyFee = (x, idx) => {
+        $scope.d.records.data[idx].monthlyFee = x.user.monthlyFee;
+    }
+
     $scope.save = (x, d, idx) => {
         x.month = d.month;
         x.year = d.year;
@@ -567,19 +570,22 @@
             return getMonthlyRecords(x);
         }
 
+        $scope.setRepayment = (x, idx) => {
+            $scope.d.records.data[idx].amount = x.repayment;
+        }
+
         $scope.save = (x, d, idx) => {
             x.month = d.month;
             x.year = d.year;
-            //x.amount = x.repayment;
-            //TODO
-            if (x.repayment > x.restToRepayment) {
+            if (x.amount > x.restToRepayment) {
                 alert('Rata je veća od duga!');
                 return false;
             }
             f.post('Account', 'SaveRepayment', { x: x }).then((d) => {
                 //TODO:
-                $scope.d.user.records[idx].repaid = d.repaid;
-                $scope.d.user.records[idx].restToRepayment = d.restToRepayment;
+                $scope.d.records.data[idx].repaid = d.repaid;
+                $scope.d.records.data[idx].amount = d.amount;
+                $scope.d.records.data[idx].restToRepayment = d.restToRepayment;
             });
         }
 

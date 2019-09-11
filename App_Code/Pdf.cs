@@ -191,9 +191,7 @@ public class Pdf : System.Web.Services.WebService {
                 }
             }
             doc.Add(table);
-
             doc.Close();
-
             return JsonConvert.SerializeObject(pd.fileName, Formatting.Indented);
         } catch (Exception e) {
             return e.Message;
@@ -492,6 +490,5 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
         doc.Add(table);
         doc.Add(new Chunk(line));
     }
-
 
 }
