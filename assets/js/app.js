@@ -251,9 +251,8 @@
     }
 
     var validate = (x) => {
-        x.accessDate = document.getElementById('accessDate').innerText;
-        x.birthDate = document.getElementById('birthDate').innerText;
-
+        //x.accessDate = document.getElementById('accessDate').innerText;
+        //x.birthDate = document.getElementById('birthDate').innerText;
         if (!f.isValidDate(x.accessDate)) {
             alert('Neispravan datum pristupa!');
             return false;
@@ -266,23 +265,9 @@
     }
 
     $scope.save = (x) => {
-
         x.accessDate = document.getElementById('accessDate').innerText;
         x.birthDate = document.getElementById('birthDate').innerText;
         return validate(x);
-
-        //x.accessDate = document.getElementById('accessDate').innerText;
-        //x.birthDate = document.getElementById('birthDate').innerText;
-
-        //if (!f.isValidDate(x.accessDate)) {
-        //    alert('Neispravan datum pristupa!');
-        //    return false;
-        //}
-        //if (!f.isValidDate(x.birthDate)) {
-        //    alert('Neispravan datum rođenja!');
-        //    return false;
-        //}
-
         f.post(service, 'Save', { x: x }).then((d) => {
             alert(d);
         });
@@ -326,7 +311,7 @@
         if (method == 'NewUser') {
             x.user.accessDate = document.getElementById('accessDate').innerText;
             x.user.birthDate = document.getElementById('birthDate').innerText;
-            if (!validate(x)) {
+            if (!validate(x.user)) {
                 $scope.d.loadingPdf = false;
                 return false;
             }
@@ -340,13 +325,11 @@
                 $scope.d.loadingPdf = false;
             });
         }
-        
     }
 
     $scope.removePdfLink = () => {
         $scope.d.pdf = null;
     }
-
 
 }])
 
@@ -490,40 +473,6 @@
     }
 
 }])
-
-//.controller('accountCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
-//    var service = 'Account';
-//    var data = {
-//        records: {},
-//        account: {},
-//        month: $scope.g.month,
-//        year: $scope.g.year,
-//        buisinessUnitCode: null
-//    }
-//    $scope.d = data;
-
-//    var getMonthlyRecords = (x) => {
-//        f.post(service, 'GetMonthlyRecords', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
-//            $scope.d.records = d;
-//        });
-//    }
-
-//    $scope.getMonthlyRecords = (x) => {
-//        return getMonthlyRecords(x);
-//    }
-
-//    $scope.save = (x, idx) => {
-//        if (x.repayment > x.restToRepayment) {
-//            alert('Rata je veća od duga!');
-//            return false;
-//        }
-//        f.post(service, 'Save', { x: x }).then((d) => {
-//            $scope.d.records.data[idx].repaid = d.repaid;
-//            $scope.d.records.data[idx].restToRepayment = d.restToRepayment;
-//        });
-//    }
-
-//}])
 
 .controller('suspensionCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
         var service = 'Account';
