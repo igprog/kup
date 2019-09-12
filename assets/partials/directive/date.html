@@ -1,14 +1,14 @@
-﻿<div class="form-inline m-2">
-    <select ng-model="day" class="form-control m-1" ng-click="getDate()">
-        <option value="{{x}}" ng-repeat="x in d.days">{{x}}</option>
+﻿<div class="form-inline m-2 {{d.alert?'bg-danger':''}}">
+    <select ng-model="day" class="form-control m-1" ng-click="getDate(id)">
+        <option value="{{x.id}}" ng-repeat="x in d.days">{{x.title}}</option>
     </select>
-    <select ng-model="mo" class="form-control m-1" ng-click="getDate()">
+    <select ng-model="mo" class="form-control m-1" ng-click="getDate(id)">
         <option value="{{x.id}}" ng-repeat="x in d.months">{{x.title}}</option>
     </select>
-    <select ng-model="yr" class="form-control m-1" ng-click="getDate()">
-        <option value="2017">2017</option>
-        <option value="2018">2018</option>
-        <option value="2019">2019</option>
+    <select ng-model="yr" class="form-control m-1" ng-click="getDate(id)">
+        <option value="{{x}}" ng-repeat="x in d.years">{{x}}</option>
     </select>
+    <strong ng-if="d.alert" class="text-white pl-2">{{d.alert}}</strong>
+    <label id="{{id}}" hidden></label>
 </div>
 

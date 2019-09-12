@@ -31,7 +31,10 @@
         days: () => {
             var days = [];
             for (var i = 1; i <= 31; i++) {
-                days.push(i);
+                days.push({
+                    id: i,
+                    title: i < 10 ? '0' + i : i
+                })
             }
             return days;
         },
@@ -51,10 +54,10 @@
                 { id: 12, title: 'prosinac' }
             ]
         },
-        years: () => {
+        years: (fromYear) => {
             var year = new Date().getFullYear();
             var years = [];
-            for (var i = 2018; i <= year; i++) {
+            for (var i = fromYear; i <= year; i++) {
                 years.push(i);
             }
             return years;
@@ -81,6 +84,29 @@
         },
         defined: (x) => {
             return x === undefined ? false : true;
+        },
+        isValidDate(str) {
+            var parts = str.split('-');
+            if (parts.length < 3)
+                return false;
+            else {
+                var year = parseInt(parts[0]);
+                var month = parseInt(parts[1]);
+                var day = parseInt(parts[2]);
+                if (isNaN(day) || isNaN(month) || isNaN(year)) { return false; }
+                if (day < 1 || year < 1) return false;
+                if (month > 12 || month < 1) return false;
+                if ((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && day > 31) return false;
+                if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) return false;
+                if (month == 2) {
+                    if (((year % 4) == 0 && (year % 100) != 0) || ((year % 400) == 0 && (year % 100) == 0)) {
+                        if (day > 29) return false;
+                    } else {
+                        if (day > 28) return false;
+                    }
+                }
+                return true;
+            }
         },
         recordTypes: () => {
             return [
@@ -132,7 +158,7 @@
             month: new Date().getMonth() + 1,
             year: new Date().getFullYear(),
             months: f.months(),
-            years: f.years(),
+            years: f.years(2018),
             buisinessUnits: [],
             recordTypes: f.recordTypes(),
             clearView: false
@@ -225,8 +251,18 @@
     }
 
     $scope.save = (x) => {
-        x.accessDate = f.setDate(x.accessDate);
-        x.birthDate = f.setDate(x.birthDate);
+        x.accessDate = document.getElementById('accessDate').innerText;
+        x.birthDate = document.getElementById('birthDate').innerText;
+
+        if (!f.isValidDate(x.accessDate)) {
+            alert('Neispravan datum pristupa!');
+            return false;
+        }
+        if (!f.isValidDate(x.birthDate)) {
+            alert('Neispravan datum rođenja!');
+            return false;
+        }
+
         f.post(service, 'Save', { x: x }).then((d) => {
             alert(d);
         });
@@ -857,16 +893,24 @@
     return {
         restrict: 'E',
         scope: {
-            fromYear: '=',
+            fromyear: '=',
+            id: '='
         },
         templateUrl: './assets/partials/directive/date.html',
         controller: 'dateCtrl'
     };
 })
 .controller('dateCtrl', ['$scope', 'f', ($scope, f) => {
+
+    var getYears = () => {
+        return f.years(f.defined($scope.fromyear) ? $scope.fromyear : new Date().getFullYear());
+    }
+
     var d = {
         days: f.days(),
-        months: f.months()
+        months: f.months(),
+        years: getYears(),
+        alert: null
     }
     $scope.d = d;
 
@@ -874,9 +918,18 @@
         return (x < 10 ? '0' + x : x);
     }
 
-    $scope.getDate = () => {
-        $scope.$parent.date = $scope.yr + '-' + format($scope.mo) + '-' + format($scope.day);
+    $scope.getDate = (id) => {
+        if (f.defined($scope.yr) && f.defined($scope.mo) && f.defined($scope.day)) {
+            var date = $scope.yr + '-' + format($scope.mo) + '-' + format($scope.day);
+            document.getElementById(id).innerText = $scope.yr + '-' + format($scope.mo) + '-' + format($scope.day);
+            if (!f.isValidDate(date)) {
+                $scope.d.alert = 'Datum nije ispravan!';
+            } else {
+                $scope.d.alert = null;
+            }
+        }
     }
+
 }])
 
 .directive('allowOnlyNumbers', function () {
