@@ -25,6 +25,11 @@ public class Settings : System.Web.Services.WebService {
         public double manipulativeCostsCoeff;
         public int defaultDedline;
         public Account.AccountNo account;
+        public PrintSettings printSettings;
+    }
+
+    public class PrintSettings {
+        public string headerInfo;
     }
 
     public NewSettings Data() {

@@ -250,18 +250,38 @@
         load(null);
     }
 
-    $scope.save = (x) => {
+    var validate = (x) => {
         x.accessDate = document.getElementById('accessDate').innerText;
         x.birthDate = document.getElementById('birthDate').innerText;
 
         if (!f.isValidDate(x.accessDate)) {
             alert('Neispravan datum pristupa!');
             return false;
-        }
-        if (!f.isValidDate(x.birthDate)) {
+        } else if (!f.isValidDate(x.birthDate)) {
             alert('Neispravan datum rođenja!');
             return false;
+        } else {
+            return true;
         }
+    }
+
+    $scope.save = (x) => {
+
+        x.accessDate = document.getElementById('accessDate').innerText;
+        x.birthDate = document.getElementById('birthDate').innerText;
+        return validate(x);
+
+        //x.accessDate = document.getElementById('accessDate').innerText;
+        //x.birthDate = document.getElementById('birthDate').innerText;
+
+        //if (!f.isValidDate(x.accessDate)) {
+        //    alert('Neispravan datum pristupa!');
+        //    return false;
+        //}
+        //if (!f.isValidDate(x.birthDate)) {
+        //    alert('Neispravan datum rođenja!');
+        //    return false;
+        //}
 
         f.post(service, 'Save', { x: x }).then((d) => {
             alert(d);
@@ -296,15 +316,31 @@
     }
 
     $scope.print = (x, method) => {
-        if (f.defined(x.user.records.length)) {
-            if (x.user.records.length == 0) { return false; }
+        if (method != 'NewUser') {
+            if (f.defined(x.user.records.length)) {
+                if (x.user.records.length == 0) { return false; }
+            }
         }
         $scope.d.pdf = null;
         $scope.d.loadingPdf = true;
-        f.post('Pdf', method, { year: x.year, user: x.user }).then((d) => {
-            $scope.d.pdf = f.pdfTempPath(d);
-            $scope.d.loadingPdf = false;
-        });
+        if (method == 'NewUser') {
+            x.user.accessDate = document.getElementById('accessDate').innerText;
+            x.user.birthDate = document.getElementById('birthDate').innerText;
+            if (!validate(x)) {
+                $scope.d.loadingPdf = false;
+                return false;
+            }
+            f.post('Pdf', method, { user: x.user }).then((d) => {
+                $scope.d.pdf = f.pdfTempPath(d);
+                $scope.d.loadingPdf = false;
+            });
+        } else {
+            f.post('Pdf', method, { year: x.year, user: x.user }).then((d) => {
+                $scope.d.pdf = f.pdfTempPath(d);
+                $scope.d.loadingPdf = false;
+            });
+        }
+        
     }
 
     $scope.removePdfLink = () => {

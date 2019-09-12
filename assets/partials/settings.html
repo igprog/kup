@@ -71,5 +71,24 @@
             </div>
         </div>
     </div>
+    <hr />
+    <div class="row">
+        <div class="col-sm-5">
+            <label>Postavke ispisa</label>
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <td>Tekst zaglavlja:</td>
+                        <td><textarea ng-model="d.printSettings.headerInfo"class="form-control" rows="3"></textarea>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="text-right">
+                            <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fa fa-save"></i> Spremi</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
     <pre ng-if="config.debug">{{d | json}}</pre>
 </div>

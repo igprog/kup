@@ -20,10 +20,8 @@ using Igprog;
 public class Pdf : System.Web.Services.WebService {
     iTextSharp.text.pdf.draw.LineSeparator line = new iTextSharp.text.pdf.draw.LineSeparator(0f, 100f, Color.BLACK, Element.ALIGN_LEFT, 1);
     string logoPath = HttpContext.Current.Server.MapPath(string.Format("~/assets/img/logo.png"));
-    string headerInfo = @"Kasa uzajamne pomoći
-......................................
-......................................";  //TODO
     Global g = new Global();
+    Settings s = new Settings();
     BuisinessUnit bu = new BuisinessUnit();
     public Pdf() {
     }
@@ -34,12 +32,75 @@ public class Pdf : System.Web.Services.WebService {
     }
 
     [WebMethod]
+    public string NewUser(User.NewUser user) {
+        try {
+            PrintDoc pd = PreparePrintDoc(false);
+            Document doc = pd.doc;
+            doc.Open();
+            AppendHeader(doc);
+
+            Paragraph p = new Paragraph();
+            p.Add(new Paragraph(string.Format("Mjesto: {0} - {1}", user.buisinessUnit.code, bu.Get(user.buisinessUnit.code).title), GetFont()));
+            p.Add(new Paragraph(string.Format("Datum: {0} ", user.accessDate), GetFont()));
+            p.Add(new Paragraph(string.Format("IME I PREZIME {0} {1}", user.lastName, user.firstName), GetFont(10)));
+            p.Add(new Paragraph(string.Format(@"
+"), GetFont()));
+            doc.Add(p);
+
+            PdfPTable table = new PdfPTable(1);
+            table.AddCell(new PdfPCell(new Phrase("UPRAVNOM ODBORU KASE UZAJAMNE POMOĆI", GetFont(10))) { Padding = 2, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_CENTER });
+            doc.Add(table);
+
+            p = new Paragraph();
+            p.Add(new Paragraph(string.Format(@"
+Molim naslov da mi odobri upis u članstvo kase uzajamne pomoći."), GetFont()));
+            doc.Add(p);
+
+            table = new PdfPTable(2);
+            table.SetWidths(new float[] { 3f, 1f });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfCell.NO_BORDER, Padding = 2, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfCell.NO_BORDER, Padding = 2, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("(potpis člana)", GetFont())) { Border = PdfCell.NO_BORDER, Padding = 2, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_CENTER });
+            doc.Add(table);
+
+            p = new Paragraph();
+            p.Add(new Paragraph(string.Format(@"
+Molba primljena dana: {0}", user.accessDate), GetFont()));
+            doc.Add(p);
+
+            table = new PdfPTable(2);
+            table.SetWidths(new float[] { 1f, 1f });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfCell.NO_BORDER, Padding = 2, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfCell.NO_BORDER, Padding = 2, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("(predsjednik UPRAVNOG ODBORA KUP-a)", GetFont())) { Border = PdfCell.NO_BORDER, Padding = 2, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_CENTER });
+            doc.Add(table);
+
+            table = new PdfPTable(2);
+            table.SetWidths(new float[] { 3f, 1f });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfCell.NO_BORDER, Padding = 2, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfCell.NO_BORDER, Padding = 2, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("(blagajnik KUP-a)", GetFont())) { Border = PdfCell.NO_BORDER, Padding = 2, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_CENTER });
+            doc.Add(table);
+
+
+            doc.Close();
+
+            return JsonConvert.SerializeObject(pd.fileName, Formatting.Indented);
+        } catch (Exception e) {
+            return e.Message;
+        }
+    }
+
+    [WebMethod]
     public string Loans(int month, int year, string buisinessUnitCode, Loan.Loans loans) {
         try {
             PrintDoc pd = PreparePrintDoc(true);
             Document doc = pd.doc;
             doc.Open();
-            AppendHeader(doc, headerInfo);
+            AppendHeader(doc);
 
             Paragraph p = new Paragraph();
             p.Add(new Paragraph(string.Format("KUP: {0} / {1}/{2}", buisinessUnitCode, month, year), GetFont(12, Font.BOLD)));
@@ -107,7 +168,7 @@ public class Pdf : System.Web.Services.WebService {
             PrintDoc pd = PreparePrintDoc(true);
             Document doc = pd.doc;
             doc.Open();
-            AppendHeader(doc, headerInfo);
+            AppendHeader(doc);
 
             Paragraph p = new Paragraph();
             p.Add(new Paragraph(string.Format("{0} {1}", user.lastName, user.firstName), GetFont(12, Font.BOLD)));
@@ -160,7 +221,7 @@ public class Pdf : System.Web.Services.WebService {
             PrintDoc pd = PreparePrintDoc(true);
             Document doc = pd.doc;
             doc.Open();
-            AppendHeader(doc, headerInfo);
+            AppendHeader(doc);
 
             Paragraph p = new Paragraph();
             p.Add(new Paragraph(string.Format("{0} {1}", user.lastName, user.firstName), GetFont(12, Font.BOLD)));
@@ -204,7 +265,7 @@ public class Pdf : System.Web.Services.WebService {
             PrintDoc pd = PreparePrintDoc(false);
             Document doc = pd.doc;
             doc.Open();
-            AppendHeader(doc, headerInfo);
+            AppendHeader(doc);
 
             Paragraph p = new Paragraph();
             p.Add(new Paragraph(string.Format("KUP - obustava na Plaći za {0}/{1} {2}", g.Month(month), year, bu.Get(buisinessUnitCode).title), GetFont(12, Font.BOLD)));
@@ -267,7 +328,7 @@ public class Pdf : System.Web.Services.WebService {
             PrintDoc pd = PreparePrintDoc(true);
             Document doc = pd.doc;
             doc.Open();
-            AppendHeader(doc, headerInfo);
+            AppendHeader(doc);
 
             Paragraph p = new Paragraph();
             p.Add(new Paragraph(string.Format("Temeljnica za knjiženje br.___"), GetFont(12, Font.BOLD)));
@@ -347,7 +408,7 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
             PrintDoc pd = PreparePrintDoc(true);
             Document doc = pd.doc;
             doc.Open();
-            AppendHeader(doc, headerInfo);
+            AppendHeader(doc);
             Paragraph p = new Paragraph();
             p.Add(new Paragraph(string.Format("{0}", title), GetFont(12, Font.BOLD)));
             p.Add(new Paragraph(string.Format("{0} god.", records.year), GetFont(10, Font.NORMAL)));
@@ -474,7 +535,7 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
         return x;
     }
 
-    private void AppendHeader(Document doc, string headerInfo) {
+    private void AppendHeader(Document doc) {
         PdfPTable table = new PdfPTable(2);
         table.WidthPercentage = 100f;
         if (File.Exists(logoPath)) {
@@ -486,7 +547,7 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
         } else {
             table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 15, PaddingBottom = 10 });
         }
-        table.AddCell(new PdfPCell(new Phrase(headerInfo, GetFont(8))) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 15, PaddingBottom = 10, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+        table.AddCell(new PdfPCell(new Phrase(s.Data().printSettings.headerInfo, GetFont(8))) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 15, PaddingBottom = 10, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
         doc.Add(table);
         doc.Add(new Chunk(line));
     }

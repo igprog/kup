@@ -1,51 +1,63 @@
-﻿<div ng-controller="userCtrl" class="row">
-    <div class="col-sm-6">
-        <form>
+﻿<div ng-controller="userCtrl">
+    <div class="row">
+        <div class="col-sm-6">
             <div class="form-group">
                 <label for="accessDate">Datum pristupa:</label>
                 <date-directive id="'accessDate'"></date-directive>
             </div>
-            <hr />
-            <div class="form-group">
-                <label for="buissinesUnitCode">Poslovna jedinica:</label>
-                <select ng-model="d.user.buisinessUnit.code" class="form-control" name="buissinesUnitCode">
-                    <option ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.code}} - {{x.title}}</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="id">Matični broj:</label>
-                <input ng-model="d.user.id" type="text" class="form-control" name="id">
-            </div>
-            <div class="form-group">
-                <label for="lastName">Prezime:</label>
-                <input ng-model="d.user.lastName" type="text" class="form-control" name="lastName">
-            </div>
-            <div class="form-group">
-                <label for="firstName">Ime:</label>
-                <input ng-model="d.user.firstName" type="text" class="form-control" name="firstName">
-            </div>
-            <div class="form-group">
-                <label for="pin">OIB:</label>
-                <input ng-model="d.user.pin" type="text" class="form-control" name="pin" allow-only-numbers>
-            </div>
-            <div class="form-group">
-                <label for="birthDate">Datum rođenja:</label>
-                <date-directive id="'birthDate'" fromyear="'1950'"></date-directive>
-            </div>
-            <hr />
-            <div class="form-group">
-                <label for="monthlyPayment">Mjesečni ulog:</label>
-                <div class="input-group">
-                    <input ng-model="d.user.monthlyFee" type="text" class="form-control" name="monthlyPayment" allow-only-numbers>
-                    <div class="input-group-append">
-                        <span class="input-group-text">kn</span>
+        </div>
+        <div class="col-sm-6 text-right">
+            <button ng-show="!d.pdf && !g.clearView" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d, 'NewUser')">
+                <loading-directive title="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf"></loading-directive>
+            </button>
+            <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
+        </div>
+        <hr />
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <form>
+                <div class="form-group">
+                    <label for="buissinesUnitCode">Poslovna jedinica:</label>
+                    <select ng-model="d.user.buisinessUnit.code" class="form-control" name="buissinesUnitCode">
+                        <option ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.code}} - {{x.title}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="id">Matični broj:</label>
+                    <input ng-model="d.user.id" type="text" class="form-control" name="id">
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Prezime:</label>
+                    <input ng-model="d.user.lastName" type="text" class="form-control" name="lastName">
+                </div>
+                <div class="form-group">
+                    <label for="firstName">Ime:</label>
+                    <input ng-model="d.user.firstName" type="text" class="form-control" name="firstName">
+                </div>
+                <div class="form-group">
+                    <label for="pin">OIB:</label>
+                    <input ng-model="d.user.pin" type="text" class="form-control" name="pin" allow-only-numbers>
+                </div>
+                <div class="form-group">
+                    <label for="birthDate">Datum rođenja:</label>
+                    <date-directive id="'birthDate'" fromyear="'1950'"></date-directive>
+                </div>
+                <hr />
+                <div class="form-group">
+                    <label for="monthlyPayment">Mjesečni ulog:</label>
+                    <div class="input-group">
+                        <input ng-model="d.user.monthlyFee" type="text" class="form-control" name="monthlyPayment" allow-only-numbers>
+                        <div class="input-group-append">
+                            <span class="input-group-text">kn</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="text-right">
-                <button type="submit" class="btn btn-outline-primary" ng-click="save(d.user)"><i class="fas fa-save"></i> Spremi</button>
-            </div>
-        </form>
+                <div class="text-right">
+                    <button type="submit" class="btn btn-outline-primary" ng-click="save(d.user)"><i class="fas fa-save"></i> Spremi</button>
+                </div>
+            </form>
+        </div>
     </div>
     <pre ng-if="config.debug">{{d | json}}</pre>
 </div>
