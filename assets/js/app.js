@@ -374,7 +374,8 @@
     var data = {
         users: [],
         loan: {},
-        date: new Date()
+        pdf: null,
+        loadingPdf: false
     };
     $scope.d = data;
 
@@ -408,10 +409,21 @@
         }
     }
 
-
+    // TODO: staviti u globalne funkcije
+    var validate = (x) => {
+        if (!f.isValidDate(x.loanDate)) {
+            alert('Neispravan datum!');
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     $scope.save = (x, date) => {
-        x.loan.loanDate = f.setDate(date);
+        x.loan.loanDate = document.getElementById('loanDate').innerText; // f.setDate(date);
+        if (!validate(x.loan)) {
+            return false;
+        }
         x.loan.user.restToRepayment = x.user.restToRepayment;
         f.post(service, 'Save', { x: x.loan }).then((d) => {
             alert(d);
@@ -421,9 +433,26 @@
     $scope.getUser = (id) => {
         if (id !== null) {
             f.post('User', 'Get', { id: id, year: null }).then((d) => {
-                $scope.d.user = d;
+                $scope.d.loan.user = d;
             });
         }
+    }
+
+    $scope.print = (x) => {
+        x.loan.loanDate = document.getElementById('loanDate').innerText;
+        if (!validate(x.loan)) {
+            return false;
+        }
+        $scope.d.pdf = null;
+        $scope.d.loadingPdf = true;
+        f.post('Pdf', 'Loan', { loan: x.loan }).then((d) => {
+            $scope.d.pdf = f.pdfTempPath(d);
+            $scope.d.loadingPdf = false;
+        });
+    }
+
+    $scope.removePdfLink = () => {
+        $scope.d.pdf = null;
     }
 
 }])

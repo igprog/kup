@@ -1,50 +1,67 @@
 ﻿<div ng-controller="loanCtrl">
-    <div class="col-sm-6">
-        <form>
+    <div class="row">
+        <div class="col-sm-6">
             <div class="form-group">
-                <label for="accessDate">Datum:</label>
-                <input ng-model="d.date" type="date" class="form-control" name="accessDate">
+                <label for="loanDate">Datum:</label>
+                <date-directive id="'loanDate'"></date-directive>
             </div>
-            <hr />
-            <div class="form-group">
-                <label for="userId">Korisnik:</label>
-                <select ng-model="d.loan.user.id" class="form-control" name="userId" ng-click="getUser(d.loan.user.id)">
-                    <option ng-repeat="x in d.users" value="{{x.id}}">{{x.id}} - {{x.firstName}} {{x.lastName}}</option>
-                </select>
-            </div>
-            <div>
-                <label for="restToRepayment">Dug: {{d.user.restToRepayment | number:2}} kn</label>
-                <!--<div ng-if="config.debug">{{d.user.activeLoanId}}</div>-->
-            </div>
-            <hr />
-            <div class="form-group">
-                <label for="loan">Iznos pozajmice:</label>
-                <input ng-model="d.loan.loan" type="text" class="form-control" name="loan" ng-change="calculate(d.loan)" allow-only-numbers>
-            </div>
-            <div class="form-group">
-                <label for="dedline">Rok otplate (mj):</label>
-                <input ng-model="d.loan.dedline" type="text" class="form-control" name="dedline" ng-change="calculate(d.loan)" allow-only-numbers>
-            </div>
-            <div class="form-group">
-                <label for="repayment">Mjesečna rata:</label>
-                <input ng-model="d.loan.repayment" type="text" class="form-control" name="repayment" ng-change="calculateDedline(d.loan)" allow-only-numbers>
-            </div>
-            <div class="form-group">
-                <label for="manipulativeCosts">Manipulativni troškovi ({{d.loan.manipulativeCostsCoeff * 100}}%):</label>
-                <input ng-model="d.loan.manipulativeCosts" type="text" class="form-control" name="manipulativeCosts" ng-change="calculate(d.loan)" allow-only-numbers>
-            </div>
-            <div class="form-group">
-                <label for="actualLoan">Pozajmica:</label>
-                <input ng-model="d.loan.actualLoan" type="text" class="form-control" name="actualLoan" ng-change="calculate(d.loan)" allow-only-numbers>
-            </div>
-            <div class="form-group">
-                <label for="withdraw">Za isplatu:</label>
-                <input ng-model="d.loan.withdraw" type="text" class="form-control" name="withdraw" ng-change="calculate(d.loan)" allow-only-numbers>
-            </div>
-            <div class="text-right">
-                <button type="submit" class="btn btn-outline-primary" ng-click="save(d, d.date)"><i class="fas fa-save"></i> Spremi</button>
-            </div>
-        </form>
+        </div>
+        <div class="col-sm-6 text-right">
+            <button ng-show="!d.pdf && !g.clearView" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d)">
+                <loading-directive title="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf"></loading-directive>
+            </button>
+            <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
+        </div>
+        <hr />
     </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <form>
+                <!--<div class="form-group">
+                    <label for="accessDate">Datum:</label>
+                    <input ng-model="d.date" type="date" class="form-control" name="accessDate">
+                </div>
+                <hr />-->
+                <div class="form-group">
+                    <label for="userId">Korisnik:</label>
+                    <select ng-model="d.loan.user.id" class="form-control" name="userId" ng-click="getUser(d.loan.user.id)">
+                        <option ng-repeat="x in d.users" value="{{x.id}}">{{x.id}} - {{x.firstName}} {{x.lastName}}</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="restToRepayment">Dug: {{d.loan.user.restToRepayment | number:2}} kn</label>
+                </div>
+                <hr />
+                <div class="form-group">
+                    <label for="loan">Iznos pozajmice:</label>
+                    <input ng-model="d.loan.loan" type="text" class="form-control" name="loan" ng-change="calculate(d.loan)" allow-only-numbers>
+                </div>
+                <div class="form-group">
+                    <label for="dedline">Rok otplate (mj):</label>
+                    <input ng-model="d.loan.dedline" type="text" class="form-control" name="dedline" ng-change="calculate(d.loan)" allow-only-numbers>
+                </div>
+                <div class="form-group">
+                    <label for="repayment">Mjesečna rata:</label>
+                    <input ng-model="d.loan.repayment" type="text" class="form-control" name="repayment" ng-change="calculateDedline(d.loan)" allow-only-numbers>
+                </div>
+                <div class="form-group">
+                    <label for="manipulativeCosts">Manipulativni troškovi ({{d.loan.manipulativeCostsCoeff * 100}}%):</label>
+                    <input ng-model="d.loan.manipulativeCosts" type="text" class="form-control" name="manipulativeCosts" ng-change="calculate(d.loan)" allow-only-numbers>
+                </div>
+                <div class="form-group">
+                    <label for="actualLoan">Pozajmica:</label>
+                    <input ng-model="d.loan.actualLoan" type="text" class="form-control" name="actualLoan" ng-change="calculate(d.loan)" allow-only-numbers>
+                </div>
+                <div class="form-group">
+                    <label for="withdraw">Za isplatu:</label>
+                    <input ng-model="d.loan.withdraw" type="text" class="form-control" name="withdraw" ng-change="calculate(d.loan)" allow-only-numbers>
+                </div>
+                <div class="text-right">
+                    <button type="submit" class="btn btn-outline-primary" ng-click="save(d, d.date)"><i class="fas fa-save"></i> Spremi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+   
     <pre ng-if="config.debug">{{d.loan | json}}</pre>
 </div>
