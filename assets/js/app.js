@@ -460,7 +460,7 @@
 .controller('loansCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Loan';
     var data = {
-        loans: [],
+        records: {},
         month: f.month(),
         year: f.year(),
         buisinessUnitCode: null,
@@ -472,7 +472,7 @@
 
     var load = (x) => {
         f.post('Loan', 'Load', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
-            $scope.d.loans = d;
+            $scope.d.records = d;
         });
     }
 
@@ -486,12 +486,12 @@
     //}
 
     $scope.print = (x) => {
-        if (f.defined(x.loans.length)) {
-            if(x.loans.length == 0) { return false; }
+        if (f.defined(x.records.length)) {
+            if (x.records.length == 0) { return false; }
         }
         $scope.d.pdf = null;
         $scope.d.loadingPdf = true;
-        f.post('Pdf', 'Loans', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, loans: x.loans }).then((d) => {
+        f.post('Pdf', 'Loans', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, records: x.records }).then((d) => {
             $scope.d.pdf = f.pdfTempPath(d);
             $scope.d.loadingPdf = false;
         });
@@ -580,7 +580,6 @@
     }
 
     $scope.print = (x) => {
-        alert('TODO');
         if (f.defined(x.records.data.length)) {
             if (x.records.data.length == 0) { return false; }
         }
@@ -640,7 +639,6 @@
         }
 
         $scope.print = (x) => {
-            alert('TODO');
             if (f.defined(x.records.data.length)) {
                 if (x.records.data.length == 0) { return false; }
             }
@@ -920,7 +918,14 @@
         return f.years(f.defined($scope.fromyear) ? $scope.fromyear : new Date().getFullYear());
     }
 
+    var format = (x) => {
+        return (x < 10 ? '0' + x : x);
+    }
+
     var d = {
+        day: f.day(),
+        mo: f.month(),
+        yr: f.year(),
         days: f.days(),
         months: f.months(),
         years: getYears(),
@@ -928,14 +933,10 @@
     }
     $scope.d = d;
 
-    var format = (x) => {
-        return (x < 10 ? '0' + x : x);
-    }
-
     $scope.getDate = (id) => {
-        if (f.defined($scope.yr) && f.defined($scope.mo) && f.defined($scope.day)) {
-            var date = $scope.yr + '-' + format($scope.mo) + '-' + format($scope.day);
-            document.getElementById(id).innerText = $scope.yr + '-' + format($scope.mo) + '-' + format($scope.day);
+        if (f.defined($scope.d.yr) && f.defined($scope.d.mo) && f.defined($scope.d.day)) {
+            var date = $scope.d.yr + '-' + format($scope.d.mo) + '-' + format($scope.d.day);
+            document.getElementById(id).innerText = $scope.d.yr + '-' + format($scope.d.mo) + '-' + format($scope.d.day);
             if (!f.isValidDate(date)) {
                 $scope.d.alert = 'Datum nije ispravan!';
             } else {

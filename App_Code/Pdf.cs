@@ -195,7 +195,7 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
     }
 
     [WebMethod]
-    public string Loans(int month, int year, string buisinessUnitCode, Loan.Loans loans) {
+    public string Loans(int month, int year, string buisinessUnitCode, Loan.Loans records) {
         try {
             PrintDoc pd = PreparePrintDoc(true);
             Document doc = pd.doc;
@@ -217,7 +217,7 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
             table.AddCell(new PdfPCell(new Phrase("Neotplaćena pozajmica", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase("Za isplatu", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
 
-            foreach (Loan.NewLoan x in loans.data) {
+            foreach (Loan.NewLoan x in records.data) {
                 PdfPCell cell1 = new PdfPCell(new Phrase(x.user.id, GetFont()));
                 cell1.Border = 0;
                 table.AddCell(cell1);
@@ -247,10 +247,10 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
             table.SetWidths(new float[] { 0.5f, 2f, 1f, 1f, 1f, 1f, 1f });
             table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
             table.AddCell(new PdfPCell(new Phrase("Ukupno:", GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
-            table.AddCell(new PdfPCell(new Phrase(g.Currency(loans.total.loan), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
-            table.AddCell(new PdfPCell(new Phrase(g.Currency(loans.total.manipulativeCosts), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
-            table.AddCell(new PdfPCell(new Phrase(g.Currency(loans.total.actualLoan), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
-            table.AddCell(new PdfPCell(new Phrase(g.Currency(loans.total.restToRepayment), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase(g.Currency(records.total.loan), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase(g.Currency(records.total.manipulativeCosts), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase(g.Currency(records.total.actualLoan), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase(g.Currency(records.total.restToRepayment), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase("TOOD", GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             doc.Add(table);
 
@@ -314,6 +314,128 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
             return e.Message;
         }
     }
+
+    [WebMethod]
+    public string Repayment(int month, int year, string buisinessUnitCode, Account.Accounts records) {
+        try {
+            PrintDoc pd = PreparePrintDoc(true);
+            Document doc = pd.doc;
+            doc.Open();
+            AppendHeader(doc);
+
+            Paragraph p = new Paragraph();
+            p.Add(new Paragraph(string.Format("Otplata pozajmice: {0} / {1}/{2}", buisinessUnitCode, month, year), GetFont(12, Font.BOLD)));
+            doc.Add(p);
+
+            PdfPTable table = new PdfPTable(6);
+            table.WidthPercentage = 100f;
+            table.SetWidths(new float[] { 0.5f, 2f, 1f, 1f, 1f, 1f });
+            table.AddCell(new PdfPCell(new Phrase("Mat br.", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+            table.AddCell(new PdfPCell(new Phrase("Prezime i ime", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+            table.AddCell(new PdfPCell(new Phrase("Ugovorena rata", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("Uplaćeno", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("Otatak za uplatu", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("Napomena", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            
+            foreach (Account.NewAccount x in records.data) {
+                PdfPCell cell1 = new PdfPCell(new Phrase(x.user.id, GetFont()));
+                cell1.Border = 0;
+                table.AddCell(cell1);
+                PdfPCell cell2 = new PdfPCell(new Phrase(string.Format("{0} {1}", x.user.lastName, x.user.firstName), GetFont()));
+                cell2.Border = 0;
+                table.AddCell(cell2);
+                PdfPCell cell3 = new PdfPCell(new Phrase(g.Currency(x.repayment), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell3.Border = 0;
+                table.AddCell(cell3);
+                PdfPCell cell4 = new PdfPCell(new Phrase(g.Currency(x.repaid), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell4.Border = 0;
+                table.AddCell(cell4);
+                PdfPCell cell5 = new PdfPCell(new Phrase(g.Currency(x.restToRepayment), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell5.Border = 0;
+                table.AddCell(cell5);
+                PdfPCell cell6 = new PdfPCell(new Phrase(x.note, GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell6.Border = 0;
+                table.AddCell(cell6);
+            }
+            doc.Add(table);
+
+            table = new PdfPTable(6);
+            table.WidthPercentage = 100f;
+            table.SetWidths(new float[] { 0.5f, 2f, 1f, 1f, 1f, 1f });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+            table.AddCell(new PdfPCell(new Phrase("Ukupno:", GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase(g.Currency(records.total.repayment), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase(g.Currency(records.total.totalObligation), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            doc.Add(table);
+
+            doc.Close();
+
+            return JsonConvert.SerializeObject(pd.fileName, Formatting.Indented);
+        } catch (Exception e) {
+            return e.Message;
+        }
+    }
+
+    [WebMethod]
+    public string MonthlyFee(int month, int year, string buisinessUnitCode, Account.Accounts records) {
+        try {
+            PrintDoc pd = PreparePrintDoc(true);
+            Document doc = pd.doc;
+            doc.Open();
+            AppendHeader(doc);
+
+            Paragraph p = new Paragraph();
+            p.Add(new Paragraph(string.Format("Mjesečni ulog: {0} / {1}/{2}", buisinessUnitCode, month, year), GetFont(12, Font.BOLD)));
+            doc.Add(p);
+
+            PdfPTable table = new PdfPTable(5);
+            table.WidthPercentage = 100f;
+            table.SetWidths(new float[] { 0.5f, 2f, 1f, 1f, 1f });
+            table.AddCell(new PdfPCell(new Phrase("Mat br.", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+            table.AddCell(new PdfPCell(new Phrase("Prezime i ime", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+            table.AddCell(new PdfPCell(new Phrase("Ugovoreni iznos", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("Uplaćeno", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("Napomena", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            
+            foreach (Account.NewAccount x in records.data) {
+                PdfPCell cell1 = new PdfPCell(new Phrase(x.user.id, GetFont()));
+                cell1.Border = 0;
+                table.AddCell(cell1);
+                PdfPCell cell2 = new PdfPCell(new Phrase(string.Format("{0} {1}", x.user.lastName, x.user.firstName), GetFont()));
+                cell2.Border = 0;
+                table.AddCell(cell2);
+                PdfPCell cell3 = new PdfPCell(new Phrase(g.Currency(x.user.monthlyFee), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell3.Border = 0;
+                table.AddCell(cell3);
+                PdfPCell cell4 = new PdfPCell(new Phrase(g.Currency(x.monthlyFee), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell4.Border = 0;
+                table.AddCell(cell4);
+                PdfPCell cell5 = new PdfPCell(new Phrase(x.note, GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell5.Border = 0;
+                table.AddCell(cell5);
+            }
+            doc.Add(table);
+
+            table = new PdfPTable(5);
+            table.WidthPercentage = 100f;
+            table.SetWidths(new float[] { 0.5f, 2f, 1f, 1f, 1f });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+            table.AddCell(new PdfPCell(new Phrase("Ukupno:", GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase(g.Currency(records.total.monthlyFee), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase("", GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            doc.Add(table);
+
+            doc.Close();
+
+            return JsonConvert.SerializeObject(pd.fileName, Formatting.Indented);
+        } catch (Exception e) {
+            return e.Message;
+        }
+    }
+
 
     [WebMethod]
     public string LoanCard(int year, User.NewUser user) {
