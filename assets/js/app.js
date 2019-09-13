@@ -86,6 +86,7 @@
             return x === undefined ? false : true;
         },
         isValidDate(str) {
+            if (str == null) { return false; }
             var parts = str.split('-');
             if (parts.length < 3)
                 return false;
@@ -214,7 +215,9 @@
     var init = () => {
         f.post('User', 'Init', {}).then((d) => {
             $scope.d.user = d;
-            $scope.d.user.accessDate = new Date($scope.d.user.accessDate);
+            if (d.accessDate == null) {
+                $scope.d.user.accessDate = new Date();
+            }
         });
     }
 
@@ -265,18 +268,23 @@
     }
 
     $scope.save = (x) => {
-        debugger;
-        x.accessDate = document.getElementById('accessDate').innerText;
-        x.birthDate = document.getElementById('birthDate').innerText;
+        x.accessDate = f.setDate(x.accessDate);
+        if (x.birthDate != null) {
+            x.birthDate = f.setDate(x.birthDate);
+        }
         if(!validate(x)) { return false }
         f.post(service, 'Save', { x: x }).then((d) => {
             alert(d);
+            $scope.d.user.accessDate = new Date($scope.d.user.accessDate);
+            $scope.d.user.birthDate = new Date($scope.d.user.birthDate);
         });
     }
 
     $scope.get = (tpl, title, id, year) => {
         f.post(service, 'Get', { id: id, year: year }).then((d) => {
             $scope.d.user = d;
+            $scope.d.user.accessDate = new Date(d.accessDate);
+            $scope.d.user.birthDate = new Date(d.birthDate);
             $scope.g.currTpl = f.currTpl(tpl);
             $scope.g.currTplTitle = title;
         });
@@ -310,8 +318,11 @@
         $scope.d.pdf = null;
         $scope.d.loadingPdf = true;
         if (method == 'NewUser') {
-            x.user.accessDate = document.getElementById('accessDate').innerText;
-            x.user.birthDate = document.getElementById('birthDate').innerText;
+            x.user.accessDate = f.setDate(x.user.accessDate);
+            x.user.birthDate = f.setDate(x.user.birthDate);
+
+            //x.user.accessDate = document.getElementById('accessDate').innerText;
+            //x.user.birthDate = document.getElementById('birthDate').innerText;
             if (!validate(x.user)) {
                 $scope.d.loadingPdf = false;
                 return false;
@@ -389,6 +400,7 @@
     var init = () => {
         f.post(service, 'Init', {}).then((d) => {
             $scope.d.loan = d;
+            $scope.d.loan.loanDate = new Date();
             loadUsers(null);
         });
     }
@@ -399,7 +411,7 @@
             $scope.d.loan.manipulativeCosts = (x.loan * x.manipulativeCostsCoeff).toFixed(2);
             $scope.d.loan.repayment = (x.loan / x.dedline).toFixed(2);
             $scope.d.loan.actualLoan = x.loan - $scope.d.loan.manipulativeCosts;
-            $scope.d.loan.withdraw = $scope.d.loan.actualLoan - $scope.d.user.restToRepayment;
+            $scope.d.loan.withdraw = $scope.d.loan.actualLoan - $scope.d.loan.user.restToRepayment;
             //$scope.d.loan.user.activeLoanId = $scope.d.user.activeLoanId;
         }
     }
@@ -420,12 +432,13 @@
         }
     }
 
-    $scope.save = (x, date) => {
-        x.loan.loanDate = document.getElementById('loanDate').innerText; // f.setDate(date);
+    $scope.save = (x) => {
+        //x.loan.loanDate = document.getElementById('loanDate').innerText; // f.setDate(date);
+        x.loan.loanDate = f.setDate(x.loan.loanDate);
         if (!validate(x.loan)) {
             return false;
         }
-        x.loan.user.restToRepayment = x.user.restToRepayment;
+        x.loan.restToRepayment = x.loan.user.restToRepayment;
         f.post(service, 'Save', { x: x.loan }).then((d) => {
             alert(d);
         });
@@ -902,6 +915,7 @@
     };
 })
 
+    /*
 .directive('dateDirective', () => {
     return {
         restrict: 'E',
@@ -967,6 +981,7 @@
     //}
 
 }])
+*/
 
 .directive('allowOnlyNumbers', function () {
     return {

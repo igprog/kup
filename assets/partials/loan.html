@@ -3,7 +3,8 @@
         <div class="col-sm-6">
             <div class="form-group">
                 <label for="loanDate">Datum:</label>
-                <date-directive id="'loanDate'"></date-directive>
+                <input ng-model="d.loan.loanDate" type="date" onkeydown="return false" class="form-control" style="width:180px" />
+                <!--<date-directive id="'loanDate'"></date-directive>-->
             </div>
         </div>
         <div class="col-sm-6 text-right">
@@ -57,7 +58,7 @@
                     <input ng-model="d.loan.withdraw" type="text" class="form-control" name="withdraw" ng-change="calculate(d.loan)" allow-only-numbers>
                 </div>
                 <div class="text-right">
-                    <button type="submit" class="btn btn-outline-primary" ng-click="save(d, d.date)"><i class="fas fa-save"></i> Spremi</button>
+                    <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fas fa-save"></i> Spremi</button>
                 </div>
             </form>
         </div>

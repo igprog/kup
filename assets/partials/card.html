@@ -44,9 +44,13 @@
                     <td>{{x.recordDate}}</td>
                     <td>{{x.month}}</td>
                     <td>{{x.note}}</td>
-                    <td><span ng-if="x.recordType=='monthlyFee'">{{x.amount | number:2}}</span></td>
-                    <td><span ng-if="x.recordType=='repayment'">{{x.restToRepayment | number:2}}</span></td>
-                    <td><span ng-if="x.recordType=='repayment'">{{x.amount | number:2}}</span></td>
+                    <td><span ng-if="x.recordType=='monthlyFee'">{{x.amount | number:2}}</span>
+                    </td>
+                    <td>
+                        <span ng-if="x.recordType=='repayment'">{{x.restToRepayment | number:2}}</span>
+                        <span ng-if="x.recordType=='withdraw'">{{x.amount | number:2}}</span>
+                    </td>
+                    <td><span ng-if="x.recordType=='repayment' || x.recordType=='manipulativeCosts'">{{x.amount | number:2}}</span></td>
                 </tr>
             </tbody>
         </table>

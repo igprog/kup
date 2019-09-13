@@ -1,4 +1,7 @@
 ﻿<div class="form-inline m-2 {{d.alert?'bg-danger':''}}">
+
+    <!--<input ng-model="date" type="date" onkeydown="return false" class="form-control" />-->
+
     <label id="{{id}}" class="mr-2">{{date}}</label>
     <select ng-model="d.day" class="form-control m-1" ng-change="getDate(id)">
         <!--<option ng-selected="d.day==getDay(d.day).id?true:false" ng-value="getDay(d.day).title">{{getDay(d.day).title}}</option>-->
