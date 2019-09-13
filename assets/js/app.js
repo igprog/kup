@@ -265,9 +265,10 @@
     }
 
     $scope.save = (x) => {
+        debugger;
         x.accessDate = document.getElementById('accessDate').innerText;
         x.birthDate = document.getElementById('birthDate').innerText;
-        return validate(x);
+        if(!validate(x)) { return false }
         f.post(service, 'Save', { x: x }).then((d) => {
             alert(d);
         });
@@ -906,7 +907,9 @@
         restrict: 'E',
         scope: {
             fromyear: '=',
-            id: '='
+            id: '=',
+            date: '=',
+            todaybtn: '='
         },
         templateUrl: './assets/partials/directive/date.html',
         controller: 'dateCtrl'
@@ -944,6 +947,24 @@
             }
         }
     }
+
+    $scope.today = (id) => {
+        $scope.d.day = f.day();
+        $scope.d.mo = f.month();
+        $scope.d.yr = f.year();
+        document.getElementById(id).innerText = $scope.d.yr + '-' + format($scope.d.mo) + '-' + format($scope.d.day);
+    }
+
+
+    //TODO
+    //$scope.getDay = (id) => {
+    //    console.log(f.days().find(a => a.id === id).title);
+    //    return f.days().find(a => a.id === id);
+    //}
+    //$scope.getMonth = (id) => {
+    //    console.log(f.months().find(a => a.id === id).title);
+    //    return f.months().find(a => a.id === id);
+    //}
 
 }])
 

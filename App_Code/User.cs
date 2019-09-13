@@ -16,13 +16,10 @@ using Igprog;
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
 public class User : System.Web.Services.WebService {
-    //string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
     Global g = new Global();
     Account a = new Account();
     Settings s = new Settings();
-
-    //double monthlyFee = Convert.ToDouble(ConfigurationManager.AppSettings["monthlyFee"]);
     string sqlString = @"SELECT u.id, u.buisinessUnitCode, u.firstName, u.lastName, u.pin, u.birthDate, u.accessDate, u.terminationDate, u.isActive, u.monthlyFee, b.id, b.title FROM Users u
                         LEFT OUTER JOIN BuisinessUnit b
                         ON u.buisinessUnitCode = b.code";

@@ -1,14 +1,19 @@
 ﻿<div class="form-inline m-2 {{d.alert?'bg-danger':''}}">
-    <select ng-model="d.day" class="form-control m-1" ng-click="getDate(id)">
+    <label id="{{id}}" class="mr-2">{{date}}</label>
+    <select ng-model="d.day" class="form-control m-1" ng-change="getDate(id)">
+        <!--<option ng-selected="d.day==getDay(d.day).id?true:false" ng-value="getDay(d.day).title">{{getDay(d.day).title}}</option>-->
         <option value="{{x.id}}" ng-repeat="x in d.days">{{x.title}}</option>
     </select>
-    <select ng-model="d.mo" class="form-control m-1" ng-click="getDate(id)">
+    <select ng-model="d.mo" class="form-control m-1" ng-change="getDate(id)">
+        <!--<option selected="selected" value="{{getMonth(d.mo).id}}">{{getMonth(d.mo).title}}</option>-->
         <option value="{{x.id}}" ng-repeat="x in d.months">{{x.title}}</option>
     </select>
-    <select ng-model="d.yr" class="form-control m-1" ng-click="getDate(id)">
+    <select ng-model="d.yr" class="form-control m-1" ng-change="getDate(id)">
+        <!--<option selected="selected">{{d.yr}}</option>-->
         <option value="{{x}}" ng-repeat="x in d.years">{{x}}</option>
     </select>
     <strong ng-if="d.alert" class="text-white pl-2">{{d.alert}}</strong>
-    <label id="{{id}}" hidden></label>
+    <button ng-if="todaybtn" ng-click="today(id)" class="btn btn-outline-primary">Danas</button>
+    <!--<label class="pl-2">{{date}}</label>-->
 </div>
 
