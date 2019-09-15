@@ -332,8 +332,8 @@ public class Account : System.Web.Services.WebService {
     public string LoadEntry(int year, int month) {
         try {
             db.Account();
-            string sql = string.Format(@"SELECT SUM(CONVERT(decimal, a.amount)), a.recordType, a.note FROM Account a WHERE yr = '{0}' and mo = '{1}'
-                                        GROUP BY a.recordType, a.note", year, month);
+            string sql = string.Format(@"SELECT SUM(CONVERT(decimal, a.amount)), a.recordType FROM Account a WHERE yr = '{0}' and mo = '{1}'
+                                        GROUP BY a.recordType", year, month);
             EntryTotal xx = new EntryTotal();
             xx.data = new List<Recapitulation>();
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
@@ -347,7 +347,6 @@ public class Account : System.Web.Services.WebService {
                             x.year = year;
                             x.input = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
                             x.recordType = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
-                            x.note = reader.GetValue(2) == DBNull.Value ? null : reader.GetString(2);
                             xx.data.Add(x);
                         }
                     }
@@ -383,9 +382,15 @@ public class Account : System.Web.Services.WebService {
                 x.input = 0;
                 x.note = "Ulozi";
             }
-            if (x.recordType == g.bankFee || x.recordType == g.otherFee) {
+            if (x.recordType == g.bankFee) {
                 x.output = x.input;
                 x.input = 0;
+                x.note = "Troškovi održavanja računa";
+            }
+            if (x.recordType == g.otherFee) {
+                x.output = x.input;
+                x.input = 0;
+                x.note = "Ostali troškovi";
             }
             if (x.recordType == g.manipulativeCosts) {
                 x.note = string.Format("Manipulativni troškovni {0}%", g.manipulativeCostsPerc());

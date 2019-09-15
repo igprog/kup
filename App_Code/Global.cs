@@ -27,6 +27,7 @@ namespace Igprog {
         public string otherFee = "otherFee";
         #endregion RecordType
         public string giroaccount = "giroaccount";
+        public string allUnitsTitle = "Sve poslovne jedinice";
 
         public string ReffDate(int? month, int year) {
             if(month == 13) {

@@ -18,6 +18,7 @@ using Igprog;
 public class BuisinessUnit : System.Web.Services.WebService {
     string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
+    Global g = new Global();
     public BuisinessUnit() { 
     }
 
@@ -70,6 +71,11 @@ public class BuisinessUnit : System.Web.Services.WebService {
             db.BuisinessUnit();
             string sql = "SELECT * FROM BuisinessUnit";
             List<NewUnit> xx = new List<NewUnit>();
+            NewUnit all = new NewUnit();
+            all.code = null;
+            all.id = null;
+            all.title = g.allUnitsTitle;
+            xx.Add(all);
             using (SqlConnection connection = new SqlConnection(connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -128,6 +134,12 @@ public class BuisinessUnit : System.Web.Services.WebService {
                     }
                 }
                 connection.Close();
+            }
+            if(string.IsNullOrEmpty(code))
+            {
+                x.code = code;
+                x.id = null;
+                x.title = g.allUnitsTitle;
             }
             return x;
         } catch (Exception e) {
