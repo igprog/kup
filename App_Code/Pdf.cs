@@ -444,7 +444,6 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
         }
     }
 
-
     [WebMethod]
     public string LoanCard(int year, User.NewUser user) {
         try {
@@ -524,7 +523,7 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
                 PdfPCell cell4 = new PdfPCell(new Phrase(string.Format("{0:N}", x.monthlyFee), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 cell4.Border = 0;
                 table.AddCell(cell4);
-                PdfPCell cell5 = new PdfPCell(new Phrase(string.Format("{0:N}", x.loan), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                PdfPCell cell5 = new PdfPCell(new Phrase(string.Format("{0:N}", x.repayment), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 cell5.Border = 0;
                 table.AddCell(cell5);
                 PdfPCell cell6 = new PdfPCell(new Phrase(string.Format("{0:N}", x.totalObligation), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
