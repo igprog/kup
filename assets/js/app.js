@@ -152,8 +152,8 @@
 
     var loadGlobalData = () => {
         var data = {
-            currTpl: f.currTpl('login'),
-            currTplTitle: null,
+            currTpl: sessionStorage.getItem('islogin') == 'true' ? f.currTpl('dashboard') : f.currTpl('login'),
+            currTplTitle: sessionStorage.getItem('islogin') == 'true' ? 'Naslovna' : null,
             currTplType: null,
             date: new Date(),
             month: new Date().getMonth() + 1,
@@ -176,7 +176,7 @@
             userName: null,
             password: null
         },
-        isLogin: false
+        isLogin: sessionStorage.getItem('islogin') == 'true' ? true : false
     }
     $scope.d = data;
 
@@ -189,14 +189,14 @@
                 $scope.g.currTpl = f.currTpl('login');
             }
             $scope.d.isLogin = d;
-            //TODO: save user to session storage
+            sessionStorage.setItem('islogin', d);
         });
     }
 
     $scope.logout = () => {
         $scope.g.currTpl = f.currTpl('login');
         $scope.d.isLogin = false;
-        //TODO: clear session storage
+        sessionStorage.setItem('islogin', false);
     }
 
     $scope.toggleTpl = (tpl, title, currTplType) => {

@@ -40,11 +40,65 @@
                     <div class="dropdown-menu" aria-labelledby="smallerscreenmenu">
                         <a class="dropdown-item {{x.tpl==null?'bg-light':''}}" href="#" ng-click="toggleTpl(x.tpl, x.title)" ng-repeat="x in config.menu">{{x.title}}</a>
 
-                        <!--<a class="dropdown-item" href="#" ng-click="toggleTpl('dashboard', config.apptitle)">Naslovna</a>
-                        <a class="dropdown-item" href="#" ng-click="toggleTpl('newuser', 'Novi Korisnik')">Novi Korisnik</a>
-                        <a class="dropdown-item" href="#" ng-click="toggleTpl('users', 'Korisnici')">Korisnici</a>
-                        <a class="dropdown-item" href="#" ng-click="toggleTpl('loan', 'Nova Pozajmica')">Nova Pozajmica</a>
-                        <a class="dropdown-item" href="#" ng-click="toggleTpl('account', 'Promet')">Promet</a>-->
+                        <ul>
+                            <link-directive href="'#submenu1'" tpl="'null'" title="'Rekapitulacija'" ico="'calculator'"></link-directive>
+                            <li id='submenu1' class="collapse sidebar-submenu">
+                                <a href="#" class="list-group-item list-group-item-action" ng-click="toggleTpl('recapitulation', 'Ulozi', 'monthlyFee')">
+                                    <span class="fa fa-bars fa-fw mr-3"></span>
+                                    <span class="menu-collapsed">Ulozi</span>
+                                </a>
+                            </li>
+                            <li id='submenu1' class="collapse sidebar-submenu">
+                                <a href="#" class="list-group-item list-group-item-action" ng-click="toggleTpl('recapitulation', 'Manipulativni troškovi (' + config.manipulativeCostsPerc + '% po izvrš. isplat. pozajm.)', 'manipulativeCosts')">
+                                    <span class="fa fa-bars fa-fw mr-3"></span>
+                                    <span class="menu-collapsed">Manipulativni troškovi</span>
+                                </a>
+                            </li>
+                            <li id='submenu1' class="collapse sidebar-submenu">
+                                <a href="#" class="list-group-item list-group-item-action" ng-click="toggleTpl('recapitulation', 'Troškovi održavanja računa (Net. banking i za)', 'bankFee')">
+                                    <span class="fa fa-bars fa-fw mr-3"></span>
+                                    <span class="menu-collapsed">Troškovi održavanja računa</span>
+                                </a>
+                            </li>
+                            <li id='submenu1' class="collapse sidebar-submenu">
+                                <a href="#" class="list-group-item list-group-item-action" ng-click="toggleTpl('recapitulation', 'Kamata po štednji', 'interest')">
+                                    <span class="fa fa-bars fa-fw mr-3"></span>
+                                    <span class="menu-collapsed">Kamata po štednji</span>
+                                </a>
+                            </li>
+                            <li id='submenu1' class="collapse sidebar-submenu">
+                                <a href="#" class="list-group-item list-group-item-action" ng-click="toggleTpl('recapitulation', 'Razni materijalni troškovi', 'otherFee')">
+                                    <span class="fa fa-bars fa-fw mr-3"></span>
+                                    <span class="menu-collapsed">Razni materijalni troškovi</span>
+                                </a>
+                            </li>
+                            <li id='submenu1' class="collapse sidebar-submenu">
+                                <a href="#" class="list-group-item list-group-item-action" ng-click="toggleTpl('recapitulation', 'Žiro - Račun', 'giroaccount')">
+                                    <span class="fa fa-bars fa-fw mr-3"></span>
+                                    <span class="menu-collapsed">Žiro - Račun</span>
+                                </a>
+                            </li>
+                            <link-directive href="'#submenu2'" tpl="'settings'" title="'Postavke'" ico="'cogs'"></link-directive>
+                            <li id='submenu2' class="collapse sidebar-submenu">
+                                <a href="#" class="list-group-item list-group-item-action" ng-click="toggleTpl('settings', 'Generalne postavke')">
+                                    <span class="fa fa-cog fa-fw mr-3"></span>
+                                    <span class="menu-collapsed">Generalne postavke</span>
+                                </a>
+                            </li>
+                            <li id='submenu2' class="collapse sidebar-submenu">
+                                <a href="#" class="list-group-item list-group-item-action" ng-click="toggleTpl('buisinessunit', 'Poslovne jedinice')">
+                                    <span class="fa fa-building fa-fw mr-3"></span>
+                                    <span class="menu-collapsed">Poslovne jedinice</span>
+                                </a>
+                            </li>
+                            <li ng-if="config.showadminpage" id='submenu2' class="collapse sidebar-submenu">
+                                <a href="#" class="list-group-item list-group-item-action" ng-click="toggleTpl('admin', 'Admin')">
+                                    <span class="fa fa-user-lock fa-fw mr-3"></span>
+                                    <span class="menu-collapsed">Admin</span>
+                                </a>
+                            </li>
+                        </ul>
+
                     </div>
                 </li>
             </ul>
