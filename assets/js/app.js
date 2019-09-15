@@ -200,6 +200,7 @@
     }
 
     $scope.toggleTpl = (tpl, title, currTplType) => {
+        if (tpl==null) {return false;}
         $scope.g.currTpl = f.currTpl(tpl);
         $scope.g.currTplTitle = title;
         if (f.defined(currTplType)) {   // ***** Only for recapitualtion *****
@@ -906,7 +907,7 @@
         scope: {
             id: '=',
             href: '=',
-            src: '=',
+            tpl: '=',
             title: '=',
             ico: '=',
             type: '='

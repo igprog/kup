@@ -1,6 +1,9 @@
 ﻿<div id="sidebar-container" class="sidebar-expanded d-none d-md-block">
     <ul class="list-group">
-        <link-directive src="'newuser'" title="'Naslovna'" ico="'home'" ng-click="toggleTpl('dashboard', config.apptitle)"></link-directive>
+
+        <link-directive tpl="x.tpl" title="x.title" ico="x.ico" ng-click="toggleTpl(x.tpl, x.title)" ng-repeat="x in config.menu"></link-directive>
+
+        <!--<link-directive src="null" title="'Naslovna'" ico="'home'" ng-click="toggleTpl('dashboard', config.apptitle)"></link-directive>
         <link-directive src="null" title="'KORISNICI'" ico="null"></link-directive>
         <link-directive src="'newuser'" title="'Novi Korisnik'" ico="'user-plus'" ng-click="toggleTpl('newuser', 'Novi Korisnik')"></link-directive>
         <link-directive src="'users'" title="'Korisnici'" ico="'users'" ng-click="toggleTpl('users', 'Korisnici')"></link-directive>
@@ -13,11 +16,12 @@
         <link-directive src="'loan'" title="'Mjesečni Ulog'" ico="'coins'" ng-click="toggleTpl('monthlyfee', 'Mjesečni Ulog')"></link-directive>
         <link-directive src="'loans'" title="'Pozajmice'" ico="'list'" ng-click="toggleTpl('loans', 'Pozajmice')"></link-directive>
         <link-directive src="'entry'" title="'Ostali Promet'" ico="'file-invoice-dollar'" ng-click="toggleTpl('otherfee', 'Ostali Promet')"></link-directive>
-        <!--<link-directive src="'loan'" title="'Promet'" ico="'coins'" ng-click="toggleTpl('account', 'Promet')"></link-directive>-->
         <link-directive src="'suspension'" title="'Obustave Na Plaći'" ico="'hand-paper'" ng-click="toggleTpl('suspension', 'Obustave Na Plaći')"></link-directive>
         <link-directive src="'entry'" title="'Temeljnica'" ico="'file-alt'" ng-click="toggleTpl('entry', 'Temeljnica')"></link-directive>
-        <link-directive src="null" title="null" ico="null"></link-directive>
-        <link-directive href="'#submenu1'" src="'entry'" title="'Rekapitulacija'" ico="'calculator'"></link-directive>
+        <link-directive src="null" title="null" ico="null"></link-directive>-->
+
+
+        <link-directive href="'#submenu1'" tpl="'null'" title="'Rekapitulacija'" ico="'calculator'"></link-directive>
         <li id='submenu1' class="collapse sidebar-submenu">
             <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('recapitulation', 'POZAJMICE', 'repayment')">
                 <span class="fa fa-bars fa-fw mr-3"></span>
@@ -60,7 +64,7 @@
                 <span class="menu-collapsed">Žiro - Račun</span>
             </a>
         </li>
-        <link-directive href="'#submenu2'" src="'entry'" title="'Postavke'" ico="'cogs'"></link-directive>
+        <link-directive href="'#submenu2'" tpl="'settings'" title="'Postavke'" ico="'cogs'"></link-directive>
         <li id='submenu2' class="collapse sidebar-submenu">
             <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('settings', 'Generalne postavke')">
                 <span class="fa fa-cog fa-fw mr-3"></span>

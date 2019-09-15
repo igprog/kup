@@ -5,5 +5,85 @@
   "debug": true,
   "showadminpage": true,
   "currency": "kn",
-  "manipulativeCostsPerc": 2
+  "manipulativeCostsPerc": 2,
+  "menu": [
+    {
+      "tpl": "dashboard",
+      "title": "Naslovna",
+      "ico": "home"
+    },
+    {
+      "tpl": null,
+      "title": "KORISNICI",
+      "ico": null
+    },
+    {
+      "tpl": "newuser",
+      "title": "Novi Korisnik",
+      "ico": "user-plus"
+    },
+    {
+      "tpl": "users",
+      "title": "Korisnici",
+      "ico": "users"
+    },
+    {
+      "tpl": "card",
+      "title": "Kartica Korisnika",
+      "ico": "home"
+    },
+    {
+      "tpl": null,
+      "title": "POZAJMICE",
+      "src": null,
+      "ico": null
+    },
+    {
+      "tpl": "loan",
+      "title": "Nova Pozajmica",
+      "src": "loan",
+      "ico": "hand-holding-usd"
+    },
+    {
+      "tpl": "repayment",
+      "title": "Otplata Pozajmice",
+      "ico": "money-bill-wave"
+    },
+    {
+      "tpl": null,
+      "title": "MJESEČNI PROMET",
+      "ico": null
+    },
+    {
+      "tpl": "monthlyfee",
+      "title": "Mjesečni Ulog",
+      "ico": "coins"
+    },
+    {
+      "tpl": "loans",
+      "title": "Pozajmice",
+      "ico": "list"
+    },
+    {
+      "tpl": "otherfee",
+      "title": "Ostali Promet",
+      "ico": "file-invoice-dollar"
+    },
+    {
+      "tpl": "suspension",
+      "title": "Obustave Na Plaći",
+      "ico": "hand-paper"
+    },
+    {
+      "tpl": "entry",
+      "title": "Temeljnica",
+      "ico": "file-alt"
+    },
+    {
+      "tpl": null,
+      "title": null,
+      "ico": null
+    }
+  ]
+
 }

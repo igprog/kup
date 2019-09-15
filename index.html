@@ -35,14 +35,16 @@
                 </li>
                 <li ng-if="d.isLogin" class="nav-item dropdown d-sm-block d-md-none">
                     <a class="nav-link dropdown-toggle" href="#" id="smallerscreenmenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Menu
+                        Izbornik
                     </a>
                     <div class="dropdown-menu" aria-labelledby="smallerscreenmenu">
-                        <a class="dropdown-item" href="#" ng-click="toggleTpl('dashboard', config.apptitle)">Naslovna</a>
+                        <a class="dropdown-item {{x.tpl==null?'bg-light':''}}" href="#" ng-click="toggleTpl(x.tpl, x.title)" ng-repeat="x in config.menu">{{x.title}}</a>
+
+                        <!--<a class="dropdown-item" href="#" ng-click="toggleTpl('dashboard', config.apptitle)">Naslovna</a>
                         <a class="dropdown-item" href="#" ng-click="toggleTpl('newuser', 'Novi Korisnik')">Novi Korisnik</a>
                         <a class="dropdown-item" href="#" ng-click="toggleTpl('users', 'Korisnici')">Korisnici</a>
                         <a class="dropdown-item" href="#" ng-click="toggleTpl('loan', 'Nova Pozajmica')">Nova Pozajmica</a>
-                        <a class="dropdown-item" href="#" ng-click="toggleTpl('account', 'Promet')">Promet</a>
+                        <a class="dropdown-item" href="#" ng-click="toggleTpl('account', 'Promet')">Promet</a>-->
                     </div>
                 </li>
             </ul>
