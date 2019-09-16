@@ -242,6 +242,7 @@
             buisinessUnitCode: null,
             year: f.year(),
             records: [],
+            statusDate: new Date(),
             pdf: null,
             loadingPdf: false
         }
@@ -273,7 +274,13 @@
         if (x.birthDate != null) {
             x.birthDate = f.setDate(x.birthDate);
         }
-        if(!validate(x)) { return false }
+        if (!validate(x)) { return false }
+
+        //x.statusHistory.push({
+        //    status: x.isActive,
+        //    statusDate: f.setDate($scope.d.statusDate)
+        //})
+
         f.post(service, 'Save', { x: x }).then((d) => {
             alert(d);
             $scope.d.user.accessDate = new Date($scope.d.user.accessDate);
@@ -286,6 +293,7 @@
             $scope.d.user = d;
             $scope.d.user.accessDate = new Date(d.accessDate);
             $scope.d.user.birthDate = new Date(d.birthDate);
+            $scope.d.user.terminationDate = new Date(d.terminationDate);
             $scope.g.currTpl = f.currTpl(tpl);
             $scope.g.currTplTitle = title;
         });

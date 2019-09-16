@@ -734,9 +734,13 @@ public class Account : System.Web.Services.WebService {
     public List<NewAccount> GetRecords(string userId, int? year) {
         db.Account();
         db.Loan();
-        string sql = string.Format("SELECT * FROM Account WHERE userId = '{0}' {1}"
-            , userId
-            , year > 0 ? string.Format("AND yr = '{0}' ORDER BY mo ASC", year) : "");
+        //string sql = string.Format("SELECT * FROM Account WHERE userId = '{0}' {1}"
+        //    , userId
+        //    , year > 0 ? string.Format("AND yr = '{0}' ORDER BY mo ASC", year) : "");
+        string sql = string.Format("SELECT * FROM Account WHERE userId = '{0}' AND recordType <> '{1}' {2}"
+          , userId
+          , g.manipulativeCosts
+          , year > 0 ? string.Format("AND yr = '{0}' ORDER BY mo ASC", year) : "");
         List<NewAccount> xx = new List<NewAccount>();
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();

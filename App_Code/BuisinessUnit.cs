@@ -135,9 +135,8 @@ public class BuisinessUnit : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
-            if(string.IsNullOrEmpty(code))
-            {
-                x.code = code;
+            if(string.IsNullOrEmpty(code)) {
+                x.code = null;
                 x.id = null;
                 x.title = g.allUnitsTitle;
             }

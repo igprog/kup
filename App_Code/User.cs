@@ -40,10 +40,17 @@ public class User : System.Web.Services.WebService {
         public int isActive;
         public double monthlyFee;
         public double restToRepayment;
+        //public List<UserStatus> statusHistory;
+
         //public string activeLoanId;
 
         //TODO: list<Card>
         public List<Account.NewAccount> records;
+    }
+
+    public class UserStatus {
+        public int status;
+        public string statusDate;
     }
 
     [WebMethod]
@@ -61,6 +68,7 @@ public class User : System.Web.Services.WebService {
         x.isActive = 1;
         x.monthlyFee = s.Data().monthlyFee;
         x.restToRepayment = 0;
+        //x.statusHistory = new List<UserStatus>();
         //x.activeLoanId = null;
         x.records = new List<Account.NewAccount>();
         return JsonConvert.SerializeObject(x, Formatting.Indented);
@@ -184,6 +192,8 @@ public class User : System.Web.Services.WebService {
         x.monthlyFee = reader.GetValue(9) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(9));
         x.buisinessUnit.id = reader.GetValue(10) == DBNull.Value ? null : reader.GetString(10);
         x.buisinessUnit.title = reader.GetValue(11) == DBNull.Value ? null : reader.GetString(11);
+        //x.statusHistory = new List<UserStatus>();  // TODO GetUserStatusHistory
+
         return x;
     }
 

@@ -27,16 +27,18 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th colspan="4"></th>
+                    <th colspan="3"></th>
+                    <th colspan="2" class="text-center">Ulog</th>
                     <th colspan="2" class="text-center">Pozajmica</th>
                 </tr>
                 <tr>
                     <th>Datum</th>
                     <th>Mjesec</th>
                     <th>Opis</th>
-                    <th>Ulog ({{config.currency}})</th>
-                    <th>Duguje ({{config.currency}})</th>
-                    <th>Potražuje ({{config.currency}})</th>
+                    <th class="text-right">Duguje ({{config.currency}})</th>
+                    <th class="text-right">Potražuje ({{config.currency}})</th>
+                    <th class="text-right">Duguje ({{config.currency}})</th>
+                    <th class="text-right">Potražuje ({{config.currency}})</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,15 +46,24 @@
                     <td>{{x.recordDate}}</td>
                     <td>{{x.month}}</td>
                     <td>{{x.note}}</td>
-                    <td><span ng-if="x.recordType=='monthlyFee'">{{x.amount | number:2}}</span>
-                    </td>
-                    <td>
+                    <td class="text-right">TODO</td>
+                    <td class="text-right"><span ng-if="x.recordType=='monthlyFee'">{{x.amount | number:2}}</span></td>
+                    <td class="text-right">
                         <span ng-if="x.recordType=='repayment'">{{x.restToRepayment | number:2}}</span>
-                        <span ng-if="x.recordType=='withdraw'">{{x.amount | number:2}}</span>
+                        <span ng-if="x.recordType=='loan'">{{x.amount | number:2}}</span>
                     </td>
-                    <td><span ng-if="x.recordType=='repayment' || x.recordType=='manipulativeCosts'">{{x.amount | number:2}}</span></td>
+                    <td class="text-right"><span ng-if="x.recordType=='repayment' || x.recordType=='manipulativeCosts'">{{x.amount | number:2}}</span></td>
                 </tr>
             </tbody>
+            <tfoot ng-if="d.user.records.length>0" class="thead-light">
+                <tr class="text-right">
+                    <th colspan="3">Ukupno:</th>
+                    <th>TODO</th>
+                    <th>TODO</th>
+                    <th>TODO</th>
+                    <th>TODO</th>
+                </tr>
+            </tfoot>
         </table>
     </div>
     <pre ng-if="config.debug">{{d | json}}</pre>
