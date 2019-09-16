@@ -378,8 +378,8 @@ public class Account : System.Web.Services.WebService {
                 x.note = "Pozajmice";
             }
             if (x.recordType == g.monthlyFee) {
-                x.output = GetMonthlyFeeRequired(x.month, x.year);
-                x.input = 0;
+                //x.output = GetMonthlyFeeRequired(x.month, x.year);
+                //x.input = 0;
                 x.note = "Ulozi";
             }
             if (x.recordType == g.bankFee) {
@@ -557,13 +557,13 @@ public class Account : System.Web.Services.WebService {
                     x.total.outputAccumulation = GetMonthlyFeeRequiredAccu(i, year);
                 }
                 if (type == g.repayment) {
-                    x.total.note = string.Format("Promet pozajmica {0}/{1}", x.month, year);
+                    x.total.note = string.Format("Promet pozajmica {0}/{1}", g.Month(i), year);
                 } else if (type == g.monthlyFee) {
-                    x.total.note = string.Format("Promet uloga {0}/{1}", x.month, year);
+                    x.total.note = string.Format("Promet uloga {0}/{1}", g.Month(i), year);
                 }else if (type == g.manipulativeCosts) {
-                    x.total.note = string.Format("{0}% Manipulativni troškovni {1}/{2}", g.manipulativeCostsPerc(), x.month, year);
+                    x.total.note = string.Format("{0}% Manipulativni troškovni {1}/{2}", g.manipulativeCostsPerc(), g.Month(i), year);
                 } else if (type == g.giroaccount) {
-                    x.total.note = string.Format("Promet Žiro-Računa {0}/{1}", x.month, year);
+                    x.total.note = string.Format("Promet Žiro-Računa {0}/{1}", g.Month(i), year);
                     x.total.accountBalance = x.total.inputAccumulation - x.total.outputAccumulation;
                 } else {
                     x.total.note = data.Where(a => a.month.ToString() == i.ToString()).FirstOrDefault().note;

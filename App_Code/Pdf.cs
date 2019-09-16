@@ -770,10 +770,11 @@ Datum..................................."), GetFont(8))) { Border = PdfPCell.BOX
             logo.ScaleToFit(160f, 30f);
             logo.SpacingAfter = 15f;
             table.AddCell(new PdfPCell(logo) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 15, PaddingBottom = 10 });
+            table.AddCell(new PdfPCell(new Phrase(s.Data().printSettings.headerInfo, GetFont())) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 15, PaddingBottom = 10 });
         } else {
+            table.AddCell(new PdfPCell(new Phrase(s.Data().printSettings.headerInfo, GetFont(8))) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 15, PaddingBottom = 10, HorizontalAlignment = PdfPCell.ALIGN_LEFT });
             table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 15, PaddingBottom = 10 });
         }
-        table.AddCell(new PdfPCell(new Phrase(s.Data().printSettings.headerInfo, GetFont(8))) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 15, PaddingBottom = 10, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
         doc.Add(table);
         doc.Add(new Chunk(line));
     }
