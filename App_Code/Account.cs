@@ -40,6 +40,7 @@ public class Account : System.Web.Services.WebService {
         public double restToRepayment;
         public double totalObligation;
         public double repaid;
+        public double lastMonthObligation;
     }
 
     public class Total {
@@ -297,6 +298,21 @@ public class Account : System.Web.Services.WebService {
                 x = CheckLoan(x, user.id);
                 x = CheckMonthlyFee(x, user.id, g.monthlyFee);
                 x.totalObligation = x.monthlyFee + x.repayment;
+
+                // ***** Check last month obligation *****
+                NewAccount lastMonth = new NewAccount();
+                lastMonth = GetRecord(user.id, month == 1 ? 12 : month - 1, month == 1 ? year - 1 : year, null);
+                if(!string.IsNullOrEmpty(lastMonth.id)) {
+                    lastMonth = CheckLoan(lastMonth, user.id);
+                    lastMonth = CheckMonthlyFee(lastMonth, user.id, g.monthlyFee);
+                    x.lastMonthObligation = lastMonth.monthlyFee + lastMonth.repayment;
+                } else {
+                    x.lastMonthObligation = 0;
+                }
+                //****************************************
+
+
+
                 x.user = user;
                 xx.data.Add(x);
             }

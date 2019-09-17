@@ -21,32 +21,37 @@
             <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
         </div>
     </div>
-    <div ng-if="d.records.data.length>0" class="table-responsive">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Sadržaj</th>
-                    <th class="text-right">Konto</th>
-                    <th class="text-right">Duguje</th>
-                    <th class="text-right">Potražuje</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="x in d.records.data">
-                    <td>{{x.note}}</td>
-                    <td class="text-right">{{x.account}}</td>
-                    <td class="text-right"><span ng-if="x.output==0">-</span><span ng-if="x.output>0">{{x.output | number:2}}</span></td>
-                    <td class="text-right"><span ng-if="x.input==0">-</span><span ng-if="x.input>0">{{x.input | number:2}}</span></td>
-                </tr>
-            </tbody>
-            <tfoot class="thead-light">
-                <tr class="text-right">
-                    <th colspan="2">Ukupno:</th>
-                    <th>{{d.records.total.output | number:2}}</th>
-                    <th>{{d.records.total.input | number:2}}</th>
-                </tr>
-            </tfoot>
-        </table>
+    <div ng-if="d.records.data.length>0">
+        <div>
+            <strong>Temeljnica za knjiženje br. {{d.month}}</strong>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Sadržaj</th>
+                        <th class="text-right">Konto</th>
+                        <th class="text-right">Duguje</th>
+                        <th class="text-right">Potražuje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="x in d.records.data">
+                        <td>{{x.note}}</td>
+                        <td class="text-right">{{x.account}}</td>
+                        <td class="text-right"><span ng-if="x.output==0">-</span><span ng-if="x.output>0">{{x.output | number:2}}</span></td>
+                        <td class="text-right"><span ng-if="x.input==0">-</span><span ng-if="x.input>0">{{x.input | number:2}}</span></td>
+                    </tr>
+                </tbody>
+                <tfoot class="thead-light">
+                    <tr class="text-right">
+                        <th colspan="2">Ukupno:</th>
+                        <th>{{d.records.total.output | number:2}}</th>
+                        <th>{{d.records.total.input | number:2}}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
     </div>
     <pre ng-if="config.debug">{{d | json}}</pre>
 </div>
