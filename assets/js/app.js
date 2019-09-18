@@ -290,7 +290,8 @@
 
 
     $scope.saveUserStatus = (x) => {
-        if (!f.isValidDate(f.setDate(x.terminationDate))) {
+        x.terminationDate = f.setDate(x.terminationDate);
+        if (!f.isValidDate(x.terminationDate)) {
             alert('Neispravan datum!');
             return false;
         }

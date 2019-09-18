@@ -1,5 +1,5 @@
 ﻿{
-  "version": "1.2.3",
+  "version": "1.3.1",
   "appname": "KUP - Janaf",
   "apptitle": "Kasa Uzajamne Pomoći",
   "debug": true,
@@ -45,29 +45,34 @@
       "ico": "hand-holding-usd"
     },
     {
-      "tpl": "repayment",
-      "title": "Otplata Pozajmice",
-      "ico": "money-bill-wave"
-    },
-    {
-      "tpl": null,
-      "title": "MJESEČNI PROMET",
-      "ico": null
-    },
-    {
-      "tpl": "monthlyfee",
-      "title": "Mjesečni Ulog",
-      "ico": "coins"
-    },
-    {
       "tpl": "loans",
       "title": "Pozajmice",
       "ico": "list"
     },
     {
+      "tpl": null,
+      "title": "PROMET",
+      "ico": null
+    },
+    {
+      "tpl": "monthlyfee",
+      "title": "Uplata uloga",
+      "ico": "coins"
+    },
+    {
+      "tpl": "repayment",
+      "title": "Otplata Pozajmice",
+      "ico": "money-bill-wave"
+    },
+    {
       "tpl": "otherfee",
-      "title": "Ostali Promet",
+      "title": "Ostali Troškovi",
       "ico": "file-invoice-dollar"
+    },
+    {
+      "tpl": null,
+      "title": null,
+      "ico": null
     },
     {
       "tpl": "suspension",
@@ -78,11 +83,6 @@
       "tpl": "entry",
       "title": "Temeljnica",
       "ico": "file-alt"
-    },
-    {
-      "tpl": null,
-      "title": null,
-      "ico": null
     }
   ]
 

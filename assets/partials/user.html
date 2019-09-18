@@ -53,7 +53,7 @@
                             <div class="input-group">
                                 <input ng-model="d.user.monthlyFee" type="text" class="form-control" name="monthlyPayment" allow-only-numbers>
                                 <div class="input-group-append">
-                                    <span class="input-group-text">kn</span>
+                                    <span class="input-group-text">{{config.currency}}</span>
                                 </div>
                             </div>
                         </div>
@@ -65,9 +65,9 @@
             </div>
         </div>
         <div class="col-sm-6">
-            <div class="card">
+            <div ng-if="d.user.id!==null" class="card">
                 <div class="card-body">
-                    <div>Ukupno uplaćeno uloga: {{d.user.totalMebershipFees | number:2}} {{config.currency}} <label ng-if="d.user.totalMebershipFeesRequired>0" class="text-danger">(Dug: {{d.user.totalMebershipFeesRequired | number:2}} {{config.currency}})</label></div>
+                    <div>Ukupno uplaćeno uloga: {{d.user.totalMebershipFees | number:2}} {{config.currency}} <label ng-if="d.user.totalMebershipFeesRequired > d.user.totalMebershipFees" class="text-danger">(Dug: {{d.user.totalMebershipFeesRequired | number:2}} {{config.currency}})</label></div>
                     <div>Ukupno neotplaćeno pozajmica: <label class="{{d.user.restToRepayment>0?'text-danger':''}}">{{d.user.restToRepayment | number:2}} {{config.currency}}</label></div>
                     <div class="row">
                         <div class="col-sm-6 pt-2">

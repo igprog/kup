@@ -570,7 +570,7 @@ public class Account : System.Web.Services.WebService {
             if (x.total.input > 0 || x.total.output > 0) {
                 if (type == g.monthlyFee.ToString()) {
                     x.total.output = GetMonthlyFeeRequired(null, i, year);
-                    x.total.outputAccumulation = GetMonthlyFeeRequiredAccu(i, year);
+                    x.total.outputAccumulation = GetMonthlyFeeRequiredAccu(null, i, year);
                 }
                 if (type == g.repayment) {
                     x.total.note = string.Format("Promet pozajmica {0}/{1}", g.Month(i), year);
@@ -595,7 +595,7 @@ public class Account : System.Web.Services.WebService {
         double x = 0;
         int month_ = month == null ? 1: Convert.ToInt32(month);
         string sql = string.Format(@"SELECT SUM(CONVERT(DECIMAL, u.monthlyFee))
-                                    FROM Users u WHERE CONVERT(DATETIME, u.accessDate) <= CONVERT(DATETIME, '{0}') AND u.isActive = 1 {1}"
+                                    FROM Users u WHERE CONVERT(DATETIME, u.accessDate) <= CONVERT(DATETIME, '{0}') {1}"
                                 , g.SetDate(g.GetLastDayInMonth(year, month_), month_, year)
                                 , !string.IsNullOrEmpty(userId) ? string.Format("AND u.id = '{0}'", userId) : "");
 
@@ -613,11 +613,12 @@ public class Account : System.Web.Services.WebService {
         return x;
     }
 
-    private double GetMonthlyFeeRequiredAccu(int month, int year) {
+    public double GetMonthlyFeeRequiredAccu(string userId, int month, int year) {
         double x = 0;
         string sql = string.Format(@"SELECT SUM(CONVERT(DECIMAL,(DATEDIFF(month, CONVERT(DATETIME, u.accessDate), CONVERT(DATETIME, '{0}')) * u.monthlyFee)))
-                                    FROM Users u WHERE CONVERT(DATETIME, u.accessDate) <= CONVERT(DATETIME, '{0}') AND u.isActive = 1"
-                                , g.SetDate(g.GetLastDayInMonth(year, month), month, year));
+                                    FROM Users u WHERE CONVERT(DATETIME, u.accessDate) <= CONVERT(DATETIME, '{0}') {1}"
+                                , g.SetDate(g.GetLastDayInMonth(year, month), month, year)
+                                , !string.IsNullOrEmpty(userId) ? string.Format("AND u.id = '{0}'", userId) : "");
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -811,19 +812,26 @@ public class Account : System.Web.Services.WebService {
                     SELECT a.userId, a.amount, u.monthlyFee FROM Account a
                     LEFT OUTER JOIN Users u
                     ON a.userId = u.id
-                    WHERE a.userId = '{0}' AND mo = '{1}' AND yr = '{2}' {3}"
-                        , userId
-                        , x.month
-                        , x.year
-                        , !string.IsNullOrEmpty(recordType) ? string.Format("AND recordType = '{0}'", recordType) : "");
+                    WHERE a.userId = '{0}' AND a.mo = '{1}' AND a.yr = '{2}' AND a.recordType = '{3}' OR a.recordType = '{4}'"
+                       , userId
+                       , x.month
+                       , x.year
+                       , g.monthlyFee
+                       , g.terminationWithdraw);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
                     while (reader.Read()) {
                         x.user.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
-                        x.monthlyFee = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
-                        x.user.monthlyFee = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
+                        if(recordType == g.monthlyFee) {
+                            x.monthlyFee = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
+                            x.user.monthlyFee = x.monthlyFee;
+                        }
+                        if (recordType == g.terminationWithdraw) {
+                            x.amount = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
+                        }
+                        
                     }
                 }
             }

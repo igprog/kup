@@ -115,9 +115,11 @@ public class User : System.Web.Services.WebService {
             string sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Users WITH (updlock,serializable) WHERE id = '{0}')
                                                 BEGIN
-                                                   UPDATE Users SET terminationDate = '{1}', isActive = '{2}' WHERE id = '{0}'
+                                                   UPDATE Users SET terminationDate = '{1}', isActive = '{2}' WHERE id = '{0}'                                         
+                                                   INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, note)
+                                                   VALUES ('{8}', '{0}', '{3}', '{2}', '{4}', '{5}', '{6}', '{7}')
                                                 END
-                                        COMMIT TRAN", x.id, x.terminationDate, x.isActive);
+                                        COMMIT TRAN", x.id, x.terminationDate, x.isActive, x.terminationWithdraw, g.GetMonth(x.terminationDate), g.GetYear(x.terminationDate), g.terminationWithdraw, "Isplata uloga", Guid.NewGuid().ToString());
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -160,8 +162,8 @@ public class User : System.Web.Services.WebService {
             x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment);
             x.totalMebershipFees = GetAmount(id, g.monthlyFee);
             DateTime now = DateTime.UtcNow;
-            x.totalMebershipFeesRequired = a.GetMonthlyFeeRequired(x.id, now.Month, now.Year);  //TODO: provjeriti dali to treba???
-            x.terminationWithdraw = x.totalMebershipFees - x.restToRepayment - x.totalMebershipFeesRequired; 
+            x.totalMebershipFeesRequired = a.GetMonthlyFeeRequiredAccu(x.id, now.Month, now.Year);  //TODO: provjeriti dali to treba???
+            x.terminationWithdraw = x.totalMebershipFees - x.restToRepayment - (x.totalMebershipFeesRequired - x.totalMebershipFees); 
             //x.activeLoanId = GetActiveLoanId(id);
             if (year != null) {
                 x.records = a.GetRecords(x.id, year);
