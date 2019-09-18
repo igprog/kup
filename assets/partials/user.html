@@ -72,7 +72,7 @@
                     <div class="row">
                         <div class="col-sm-6 pt-2">
                             <label for="isActive">Status Korisnika:</label>
-                            <select ng-model="d.user.isActive" class="form-control bg-{{d.user.isActive==1?'success':'danger'}}" name="isActive">
+                            <select ng-model="d.user.isActive" class="form-control bg-{{d.user.isActive==1?'success':'danger'}}" name="isActive" ng-change="changeUserStatus()">
                                 <option ng-value="1" ng-selected="d.user.isActive==1?true:false">Aktivan</option>
                                 <option ng-value="0" ng-selected="d.user.isActive==0?true:false">Neaktivan</option>
                             </select>

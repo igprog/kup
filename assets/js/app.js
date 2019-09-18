@@ -212,7 +212,8 @@
 }])
 
 .controller('userCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
-    var service = 'User'
+    var service = 'User';
+    var statusChange = false;
     var init = () => {
         f.post('User', 'Init', {}).then((d) => {
             $scope.d.user = d;
@@ -288,8 +289,13 @@
         });
     }
 
+    $scope.changeUserStatus = () => {
+        statusChange = !statusChange;
+    }
 
     $scope.saveUserStatus = (x) => {
+        debugger;
+        if (!statusChange) { return false;}
         x.terminationDate = f.setDate(x.terminationDate);
         if (!f.isValidDate(x.terminationDate)) {
             alert('Neispravan datum!');
@@ -303,8 +309,6 @@
             alert(d);
         });
     }
-
-
 
     $scope.get = (tpl, title, id, year) => {
         f.post(service, 'Get', { id: id, year: year }).then((d) => {

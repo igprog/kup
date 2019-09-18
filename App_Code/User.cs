@@ -116,10 +116,8 @@ public class User : System.Web.Services.WebService {
                                             IF EXISTS (SELECT * from Users WITH (updlock,serializable) WHERE id = '{0}')
                                                 BEGIN
                                                    UPDATE Users SET terminationDate = '{1}', isActive = '{2}' WHERE id = '{0}'                                         
-                                                   INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, note)
-                                                   VALUES ('{8}', '{0}', '{3}', '{2}', '{4}', '{5}', '{6}', '{7}')
                                                 END
-                                        COMMIT TRAN", x.id, x.terminationDate, x.isActive, x.terminationWithdraw, g.GetMonth(x.terminationDate), g.GetYear(x.terminationDate), g.terminationWithdraw, "Isplata uloga", Guid.NewGuid().ToString());
+                                        COMMIT TRAN", x.id, x.terminationDate, x.isActive);
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -127,9 +125,26 @@ public class User : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
+            if(x.isActive == 0) {
+                SaveTerminationWithdraw(x);
+            }
             return JsonConvert.SerializeObject("Spremljeno", Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+        }
+    }
+
+    private void SaveTerminationWithdraw(NewUser x) {
+        string sql = string.Format(@"BEGIN TRAN                                    
+                                        INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, note)
+                                        VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')
+                                    COMMIT TRAN", Guid.NewGuid().ToString(), x.id, x.terminationWithdraw, x.terminationDate, g.GetMonth(x.terminationDate), g.GetYear(x.terminationDate), g.terminationWithdraw, "Isplata uloga");
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
         }
     }
 
