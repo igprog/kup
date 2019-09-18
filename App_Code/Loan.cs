@@ -29,7 +29,7 @@ public class Loan : System.Web.Services.WebService {
         public string loanDate;
         public double repayment;
         public double manipulativeCosts;
-        public double actualLoan;  // pozajmica - manipulativni troskovi
+        //public double actualLoan;  // pozajmica - manipulativni troskovi
         public double withdraw;  // za isplatu (pozajmica - neotplacena pozajmica)
         public double dedline;
         public double restToRepayment;  //TODO
@@ -68,7 +68,7 @@ public class Loan : System.Web.Services.WebService {
         x.loanDate = null; // g.Date(DateTime.Now);
         x.repayment = 0;
         x.manipulativeCosts = 0;
-        x.actualLoan = 0;
+        //x.actualLoan = 0;
         x.withdraw = 0;
         x.dedline = s.Data().defaultDedline;
         x.restToRepayment = 0;
@@ -159,7 +159,7 @@ public class Loan : System.Web.Services.WebService {
             xx.total.loan = xx.data.Sum(a => a.loan);
             xx.total.repayment = xx.data.Sum(a => a.repayment);
             xx.total.manipulativeCosts = xx.data.Sum(a => a.manipulativeCosts);
-            xx.total.actualLoan = xx.data.Sum(a => a.actualLoan);
+            //xx.total.actualLoan = xx.data.Sum(a => a.actualLoan);
             xx.total.withdraw = xx.data.Sum(a => a.withdraw);
             xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
 
@@ -198,7 +198,7 @@ public class Loan : System.Web.Services.WebService {
         x.loanDate = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
         x.repayment = reader.GetValue(4) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(4));
         x.manipulativeCosts = reader.GetValue(5) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(5));
-        x.actualLoan = x.loan - x.manipulativeCosts;
+        //x.actualLoan = x.loan - x.manipulativeCosts;
         x.withdraw = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
         //TODO:  x.restToRepayment;
         x.dedline = reader.GetValue(7) == DBNull.Value ? s.Data().defaultDedline : Convert.ToDouble(reader.GetString(7));
@@ -239,7 +239,7 @@ public class Loan : System.Web.Services.WebService {
             x.total.loan = aa.Sum(a => a.loan);
             x.total.repayment = aa.Sum(a => a.repayment);
             x.total.manipulativeCosts = aa.Sum(a => a.manipulativeCosts);
-            x.total.actualLoan = aa.Sum(a => a.actualLoan);
+            //x.total.actualLoan = aa.Sum(a => a.actualLoan);
             x.total.withdraw = aa.Sum(a => a.withdraw);
             x.total.restToRepayment = aa.Sum(a => a.restToRepayment);
             xx.Add(x);

@@ -40,6 +40,9 @@ public class User : System.Web.Services.WebService {
         public int isActive;
         public double monthlyFee;
         public double restToRepayment;
+        public double totalMebershipFees;
+        public double totalMebershipFeesRequired;
+        public double terminationWithdraw;
         //public List<UserStatus> statusHistory;
 
         //public string activeLoanId;
@@ -68,6 +71,9 @@ public class User : System.Web.Services.WebService {
         x.isActive = 1;
         x.monthlyFee = s.Data().monthlyFee;
         x.restToRepayment = 0;
+        x.totalMebershipFees = 0;
+        x.totalMebershipFeesRequired = 0;
+        x.terminationWithdraw = 0;
         //x.statusHistory = new List<UserStatus>();
         //x.activeLoanId = null;
         x.records = new List<Account.NewAccount>();
@@ -89,6 +95,29 @@ public class User : System.Web.Services.WebService {
                                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
                                                 END
                                         COMMIT TRAN", x.id, x.buisinessUnit.code, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+            }
+            return JsonConvert.SerializeObject("Spremljeno", Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+        }
+    }
+
+    [WebMethod]
+    public string SaveUserStatus(NewUser x) {
+        try {
+            db.Users();
+            string sql = string.Format(@"BEGIN TRAN
+                                            IF EXISTS (SELECT * from Users WITH (updlock,serializable) WHERE id = '{0}')
+                                                BEGIN
+                                                   UPDATE Users SET terminationDate = '{1}', isActive = '{2}' WHERE id = '{0}'
+                                                END
+                                        COMMIT TRAN", x.id, x.terminationDate, x.isActive);
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -128,7 +157,11 @@ public class User : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
-            x.restToRepayment = GetLoanAmount(id) - GetRepayedAmount(id);
+            x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment);
+            x.totalMebershipFees = GetAmount(id, g.monthlyFee);
+            DateTime now = DateTime.UtcNow;
+            x.totalMebershipFeesRequired = a.GetMonthlyFeeRequired(x.id, now.Month, now.Year);  //TODO: provjeriti dali to treba???
+            x.terminationWithdraw = x.totalMebershipFees - x.restToRepayment - x.totalMebershipFeesRequired; 
             //x.activeLoanId = GetActiveLoanId(id);
             if (year != null) {
                 x.records = a.GetRecords(x.id, year);
@@ -193,7 +226,6 @@ public class User : System.Web.Services.WebService {
         x.buisinessUnit.id = reader.GetValue(10) == DBNull.Value ? null : reader.GetString(10);
         x.buisinessUnit.title = reader.GetValue(11) == DBNull.Value ? null : reader.GetString(11);
         //x.statusHistory = new List<UserStatus>();  // TODO GetUserStatusHistory
-
         return x;
     }
 
@@ -241,10 +273,10 @@ public class User : System.Web.Services.WebService {
         return xx;
     }
 
-    public double GetRepayedAmount(string id) {
+     public double GetAmount(string id, string type) {
         db.Account();
         double x = 0;
-        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, amount)) FROM Account WHERE userId = '{0}' and recordType = '{1}'", id, "repayment");
+        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, amount)) FROM Account WHERE userId = '{0}' and recordType = '{1}'", id, type);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -258,6 +290,24 @@ public class User : System.Web.Services.WebService {
         }
         return x;
     }
+
+    //public double GetRepayedAmount(string id) {
+    //    db.Account();
+    //    double x = 0;
+    //    string sql = string.Format(@"SELECT SUM(CONVERT(decimal, amount)) FROM Account WHERE userId = '{0}' and recordType = '{1}'", id, g.repayment);
+    //    using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+    //        connection.Open();
+    //        using (SqlCommand command = new SqlCommand(sql, connection)) {
+    //            using (SqlDataReader reader = command.ExecuteReader()) {
+    //                while (reader.Read()) {
+    //                    x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+    //                }
+    //            }
+    //        }
+    //        connection.Close();
+    //    }
+    //    return x;
+    //}
 
     public double GetLoanAmount(string id) {
         db.Loan();

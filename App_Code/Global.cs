@@ -25,6 +25,7 @@ namespace Igprog {
         public string bankFee = "bankFee";
         public string interest = "interest";
         public string otherFee = "otherFee";
+        public string terminationWithdraw = "terminationWithdraw";
         #endregion RecordType
         public string giroaccount = "giroaccount";
         public string allUnitsTitle = "JANAF ukupno";

@@ -288,6 +288,23 @@
         });
     }
 
+
+    $scope.saveUserStatus = (x) => {
+        if (!f.isValidDate(f.setDate(x.terminationDate))) {
+            alert('Neispravan datum!');
+            return false;
+        }
+        if (x.terminationWithdraw < 0) {
+            alert('Dug nije podmiren. Iznos duga: ' + x.terminationWithdraw + ' ' + $scope.config.currency);
+            return false;
+        }
+        f.post(service, 'SaveUserStatus', { x: x }).then((d) => {
+            alert(d);
+        });
+    }
+
+
+
     $scope.get = (tpl, title, id, year) => {
         f.post(service, 'Get', { id: id, year: year }).then((d) => {
             $scope.d.user = d;
@@ -419,8 +436,8 @@
         if (x.loan > 0) {
             $scope.d.loan.manipulativeCosts = (x.loan * x.manipulativeCostsCoeff).toFixed(2);
             $scope.d.loan.repayment = (x.loan / x.dedline).toFixed(2);
-            $scope.d.loan.actualLoan = x.loan - $scope.d.loan.manipulativeCosts;
-            $scope.d.loan.withdraw = $scope.d.loan.actualLoan - $scope.d.loan.user.restToRepayment;
+            //$scope.d.loan.actualLoan = x.loan - $scope.d.loan.manipulativeCosts;
+            $scope.d.loan.withdraw = $scope.d.loan.loan - $scope.d.loan.user.restToRepayment;
             //$scope.d.loan.user.activeLoanId = $scope.d.user.activeLoanId;
         }
     }

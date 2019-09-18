@@ -34,7 +34,7 @@
                 </div>
                 <hr />
                 <div class="form-group">
-                    <label for="loan">Iznos pozajmice:</label>
+                    <label for="loan">Pozajmica:</label>
                     <input ng-model="d.loan.loan" type="text" class="form-control" name="loan" ng-change="calculate(d.loan)" allow-only-numbers>
                 </div>
                 <div class="form-group">
@@ -49,10 +49,10 @@
                     <label for="manipulativeCosts">Manipulativni troškovi ({{d.loan.manipulativeCostsCoeff * 100}}%):</label>
                     <input ng-model="d.loan.manipulativeCosts" type="text" class="form-control" name="manipulativeCosts" ng-change="calculate(d.loan)" allow-only-numbers>
                 </div>
-                <div class="form-group">
+                <!--<div class="form-group">
                     <label for="actualLoan">Pozajmica:</label>
                     <input ng-model="d.loan.actualLoan" type="text" class="form-control" name="actualLoan" ng-change="calculate(d.loan)" allow-only-numbers>
-                </div>
+                </div>-->
                 <div class="form-group">
                     <label for="withdraw">Za isplatu:</label>
                     <input ng-model="d.loan.withdraw" type="text" class="form-control" name="withdraw" ng-change="calculate(d.loan)" allow-only-numbers>

@@ -569,7 +569,7 @@ public class Account : System.Web.Services.WebService {
 
             if (x.total.input > 0 || x.total.output > 0) {
                 if (type == g.monthlyFee.ToString()) {
-                    x.total.output = GetMonthlyFeeRequired(i, year);
+                    x.total.output = GetMonthlyFeeRequired(null, i, year);
                     x.total.outputAccumulation = GetMonthlyFeeRequiredAccu(i, year);
                 }
                 if (type == g.repayment) {
@@ -591,12 +591,13 @@ public class Account : System.Web.Services.WebService {
         return xx;
     }
 
-    private double GetMonthlyFeeRequired(int? month, int year) {
+    public double GetMonthlyFeeRequired(string userId, int? month, int year) {
         double x = 0;
         int month_ = month == null ? 1: Convert.ToInt32(month);
         string sql = string.Format(@"SELECT SUM(CONVERT(DECIMAL, u.monthlyFee))
-                                    FROM Users u WHERE CONVERT(DATETIME, u.accessDate) <= CONVERT(DATETIME, '{0}') AND u.isActive = 1"
-                                , g.SetDate(g.GetLastDayInMonth(year, month_), month_, year));
+                                    FROM Users u WHERE CONVERT(DATETIME, u.accessDate) <= CONVERT(DATETIME, '{0}') AND u.isActive = 1 {1}"
+                                , g.SetDate(g.GetLastDayInMonth(year, month_), month_, year)
+                                , !string.IsNullOrEmpty(userId) ? string.Format("AND u.id = '{0}'", userId) : "");
 
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
@@ -635,11 +636,12 @@ public class Account : System.Web.Services.WebService {
         double x = 0;
         string sql = string.Format(@"SELECT SUM(CONVERT(DECIMAL, a.amount)) FROM Account a WHERE CONVERT(DATETIME, CONCAT(a.yr, '-', a.mo, '-01')) <= '{0}' {1}"
          , g.ReffDate(1, year)
-         , type != g.giroaccount ? string.Format("AND a.recordType = '{0}'", type) : string.Format("AND (a.recordType = '{0}' OR a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}')"
-                                                                                             , g.repayment
-                                                                                             , g.monthlyFee
-                                                                                             , g.manipulativeCosts
-                                                                                             , g.interest));
+         , type != g.giroaccount ? string.Format("AND a.recordType = '{0}'", type)
+                                 : string.Format("AND (a.recordType = '{0}' OR a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}')"
+                                                , g.repayment
+                                                , g.monthlyFee
+                                                , g.manipulativeCosts
+                                                , g.interest));
 
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();

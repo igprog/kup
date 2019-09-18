@@ -17,63 +17,85 @@
     </div>
     <div class="row">
         <div class="col-sm-6">
-            <form>
-                <div class="form-group">
-                    <label for="buissinesUnitCode">Poslovna jedinica:</label>
-                    <select ng-model="d.user.buisinessUnit.code" class="form-control" name="buissinesUnitCode">
-                        <option ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.code}} - {{x.title}}</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="id">Matični broj:</label>
-                    <input ng-model="d.user.id" type="text" class="form-control" name="id">
-                </div>
-                <div class="form-group">
-                    <label for="lastName">Prezime:</label>
-                    <input ng-model="d.user.lastName" type="text" class="form-control" name="lastName">
-                </div>
-                <div class="form-group">
-                    <label for="firstName">Ime:</label>
-                    <input ng-model="d.user.firstName" type="text" class="form-control" name="firstName">
-                </div>
-                <div class="form-group">
-                    <label for="pin">OIB:</label>
-                    <input ng-model="d.user.pin" type="text" class="form-control" name="pin" allow-only-numbers>
-                </div>
-                <div class="form-group">
-                    <label for="birthDate">Datum rođenja:</label>
-                    <input ng-model="d.user.birthDate" type="date" class="form-control" name="birthDate" style="width:180px" />
-                    <!--<date-directive id="'birthDate'" fromyear="'1950'" date="d.user.birthDate"></date-directive>-->
-                </div>
-                <hr />
-                <div class="form-group">
-                    <label for="monthlyPayment">Mjesečni ulog:</label>
-                    <div class="input-group">
-                        <input ng-model="d.user.monthlyFee" type="text" class="form-control" name="monthlyPayment" allow-only-numbers>
-                        <div class="input-group-append">
-                            <span class="input-group-text">kn</span>
+            <div class="card">
+                <div class="card-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="buissinesUnitCode">Poslovna jedinica:</label>
+                            <select ng-model="d.user.buisinessUnit.code" class="form-control" name="buissinesUnitCode">
+                                <option ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.code}} - {{x.title}}</option>
+                            </select>
                         </div>
-                    </div>
+                        <div class="form-group">
+                            <label for="id">Matični broj:</label>
+                            <input ng-model="d.user.id" type="text" class="form-control" name="id">
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Prezime:</label>
+                            <input ng-model="d.user.lastName" type="text" class="form-control" name="lastName">
+                        </div>
+                        <div class="form-group">
+                            <label for="firstName">Ime:</label>
+                            <input ng-model="d.user.firstName" type="text" class="form-control" name="firstName">
+                        </div>
+                        <div class="form-group">
+                            <label for="pin">OIB:</label>
+                            <input ng-model="d.user.pin" type="text" class="form-control" name="pin" allow-only-numbers>
+                        </div>
+                        <div class="form-group">
+                            <label for="birthDate">Datum rođenja:</label>
+                            <input ng-model="d.user.birthDate" type="date" class="form-control" name="birthDate" style="width:180px" />
+                            <!--<date-directive id="'birthDate'" fromyear="'1950'" date="d.user.birthDate"></date-directive>-->
+                        </div>
+                        <hr />
+                        <div class="form-group">
+                            <label for="monthlyPayment">Mjesečni ulog:</label>
+                            <div class="input-group">
+                                <input ng-model="d.user.monthlyFee" type="text" class="form-control" name="monthlyPayment" allow-only-numbers>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">kn</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right mt-3">
+                            <button type="submit" class="btn btn-outline-primary" ng-click="save(d.user)"><i class="fas fa-save"></i> Spremi</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="card">
-                    <div class="card-body row">
-                        <div class="col-sm-6">
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <div>Ukupno uplaćeno uloga: {{d.user.totalMebershipFees | number:2}} {{config.currency}} <label ng-if="d.user.totalMebershipFeesRequired>0" class="text-danger">(Dug: {{d.user.totalMebershipFeesRequired | number:2}} {{config.currency}})</label></div>
+                    <div>Ukupno neotplaćeno pozajmica: <label class="{{d.user.restToRepayment>0?'text-danger':''}}">{{d.user.restToRepayment | number:2}} {{config.currency}}</label></div>
+                    <div class="row">
+                        <div class="col-sm-6 pt-2">
                             <label for="isActive">Status Korisnika:</label>
                             <select ng-model="d.user.isActive" class="form-control bg-{{d.user.isActive==1?'success':'danger'}}" name="isActive">
                                 <option ng-value="1" ng-selected="d.user.isActive==1?true:false">Aktivan</option>
                                 <option ng-value="0" ng-selected="d.user.isActive==0?true:false">Neaktivan</option>
                             </select>
                         </div>
-                        <div ng-if="d.user.isActive==0" class="col-sm-6">
+                        <div ng-if="d.user.isActive==0" class="col-sm-6 pt-2">
                             <label for="terminationDate">Datum:</label>
                             <input ng-model="d.user.terminationDate" type="date" class="form-control" name="terminationDate" onkeydown="return false" style="width:180px" />
                         </div>
+                        <div ng-if="d.user.isActive==0" class="col-sm-12 pt-2">
+                            <label for="terminationWithdraw">Isplata kod isčlanjenja <em>(uplaćeni ulog - neotplaćena pozajmica)</em>:</label>
+                            <div class="input-group">
+                                <input ng-model="d.user.terminationWithdraw" type="text" class="form-control" name="terminationWithdraw" readonly allow-only-numbers>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">{{config.currency}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right mt-3">
+                        <button type="submit" class="btn btn-outline-primary" ng-click="saveUserStatus(d.user)"><i class="fas fa-save"></i> Spremi</button>
                     </div>
                 </div>
-                <div class="text-right mt-3">
-                    <button type="submit" class="btn btn-outline-primary" ng-click="save(d.user)"><i class="fas fa-save"></i> Spremi</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
     <pre ng-if="config.debug">{{d | json}}</pre>
