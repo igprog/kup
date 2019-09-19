@@ -212,22 +212,22 @@ public class Loan : System.Web.Services.WebService {
         return x;
     }
 
-    public NewLoan GetRecord(string userId, int month, int year) {
-        string sql = string.Format("SELECT * FROM Loan WHERE userId = '{0}' AND mo = '{1}' AND yr = '{2}'", userId, month, year);
-        NewLoan x = new NewLoan();
-        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-            connection.Open();
-            using (SqlCommand command = new SqlCommand(sql, connection)) {
-                using (SqlDataReader reader = command.ExecuteReader()) {
-                    while (reader.Read()) {
-                        x = ReadData(reader);
-                    }
-                }
-            }
-            connection.Close();
-        }
-        return x;
-    }
+    //public NewLoan GetRecord(string userId, int month, int year) {
+    //    string sql = string.Format("SELECT * FROM Loan WHERE userId = '{0}' AND mo = '{1}' AND yr = '{2}'", userId, month, year);
+    //    NewLoan x = new NewLoan();
+    //    using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+    //        connection.Open();
+    //        using (SqlCommand command = new SqlCommand(sql, connection)) {
+    //            using (SqlDataReader reader = command.ExecuteReader()) {
+    //                while (reader.Read()) {
+    //                    x = ReadData(reader);
+    //                }
+    //            }
+    //        }
+    //        connection.Close();
+    //    }
+    //    return x;
+    //}
 
     private List<MonthlyTotal> GetMonthlyTotal(List<NewLoan> data) {
         List<MonthlyTotal> xx = new List<MonthlyTotal>();
@@ -245,6 +245,24 @@ public class Loan : System.Web.Services.WebService {
             xx.Add(x);
         }
         return xx;
+    }
+
+    public double GetLoansTotal(int month, int year) {
+        string sql = string.Format("SELECT SUM(CONVERT(decimal, loan)) FROM Loan WHERE {0}"
+                                , string.Format("CONVERT(datetime, loanDate) >= CONVERT(datetime, '{0}') AND CONVERT(datetime, loanDate) <= CONVERT(datetime, '{1}')", g.SetDate(1, month, year), g.SetDate(g.GetLastDayInMonth(year, month), month, year)));
+        double x = 0;
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
     }
 
     private void UpdateActiveLoan(NewLoan x) {

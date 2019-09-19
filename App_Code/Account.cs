@@ -237,7 +237,6 @@ public class Account : System.Web.Services.WebService {
                     x.recordType = null;
                     x.loanId = null;
                     x.note = null;
-
                     x.monthlyFee = 0;
                     x.loan = 0;
                     x.loanDate = null;
@@ -284,7 +283,6 @@ public class Account : System.Web.Services.WebService {
                     x.recordType = null;
                     x.loanId = null;
                     x.note = null;
-
                     x.monthlyFee = 0;
                     x.loan = 0;
                     x.loanDate = null;
@@ -310,8 +308,6 @@ public class Account : System.Web.Services.WebService {
                     x.lastMonthObligation = 0;
                 }
                 //****************************************
-
-
 
                 x.user = user;
                 xx.data.Add(x);
@@ -368,7 +364,7 @@ public class Account : System.Web.Services.WebService {
                     }
                 }
                 connection.Close();
-                xx.data = PrepareEntryData(xx.data);
+                xx.data = PrepareEntryData(xx.data, year, month);
                 xx.total = new Recapitulation();
                 xx.total.input = xx.data.Sum(a => a.input);
                 xx.total.output = xx.data.Sum(a => a.output);
@@ -379,21 +375,27 @@ public class Account : System.Web.Services.WebService {
         }
     }
 
-    private List<Recapitulation> PrepareEntryData(List<Recapitulation> xx) {
+    private List<Recapitulation> PrepareEntryData(List<Recapitulation> xx, int year, int month) {
         List<Recapitulation> xxx = new List<Recapitulation>();
         Recapitulation r = new Recapitulation();
         r.note = "Žiro račun";
-        r.output = xx.Where(a => a.recordType == g.bankFee || a.recordType == g.otherFee || a.recordType == g.terminationWithdraw).Sum(a => a.input);  // TODO
-        r.input = xx.Where(a => a.recordType == g.monthlyFee || a.recordType == g.repayment || a.recordType == g.interest).Sum(a => a.input);   // TODO
+        r.output = xx.Where(a => a.recordType == g.monthlyFee).Sum(a => a.input) + xx.Where(a => a.recordType == g.repayment).Sum(a => a.input);
+        r.input = xx.Where(a => a.recordType == g.withdraw).Sum(a => a.input) + xx.Where(a => a.recordType == g.bankFee).Sum(a => a.input) + xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input);
+        //r.output = xx.Where(a => a.recordType == g.bankFee || a.recordType == g.otherFee || a.recordType == g.terminationWithdraw).Sum(a => a.input);  // TODO
+        //r.input = xx.Where(a => a.recordType == g.monthlyFee || a.recordType == g.repayment || a.recordType == g.interest).Sum(a => a.input);   // TODO
         r.account = GetAccountNo(g.giroaccount);
         xxx.Add(r);
+        Loan l = new Loan();
         foreach (Recapitulation x in xx) {
             x.account = GetAccountNo(x.recordType);
             if (x.recordType == g.repayment) {
-                x.output = xx.Where(a => a.recordType == g.withdraw).Sum(a => a.input);
+                x.output = l.GetLoansTotal(month, year);
+               // x.output = xx.Where(a => a.recordType == g.withdraw).Sum(a => a.input);  // TODO: sve odobrene pozajmice
                 x.note = "Pozajmice";
             }
             if (x.recordType == g.monthlyFee) {
+                x.output = xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input);
+                x.input = xx.Where(a => a.recordType == g.monthlyFee).Sum(a => a.input);
                 //x.output = GetMonthlyFeeRequired(x.month, x.year);
                 //x.input = 0;
                 x.note = "Ulozi";
@@ -403,19 +405,19 @@ public class Account : System.Web.Services.WebService {
                 x.input = 0;
                 x.note = "Troškovi održavanja računa";
             }
-            if (x.recordType == g.otherFee) {
-                x.output = x.input;
-                x.input = 0;
-                x.note = "Ostali troškovi";
-            }
+            //if (x.recordType == g.otherFee) {
+            //    x.output = x.input;
+            //    x.input = 0;
+            //    x.note = "Ostali troškovi";
+            //}
             if (x.recordType == g.manipulativeCosts) {
                 x.note = string.Format("Manipulativni troškovni {0}%", g.manipulativeCostsPerc());
             }
-            if(x.recordType == g.terminationWithdraw) {
-                x.output = x.input;
-                x.note = "Isplata uloga";
-            }
-            if(x.recordType != g.withdraw) {
+            //if(x.recordType == g.terminationWithdraw) {
+            //    x.output = x.input;
+            //    x.note = "Isplata uloga";
+            //}
+            if(x.recordType != g.withdraw && x.recordType != g.otherFee && x.recordType != g.terminationWithdraw) {
                 xxx.Add(x);
             }
         }
