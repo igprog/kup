@@ -707,7 +707,7 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
                 cell2.Border = 0;
                 table.AddCell(cell2);
                 if (records.type == g.giroaccount) {
-                    PdfPCell cell3 = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.accountBalance), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                    PdfPCell cell3 = new PdfPCell(new Phrase(x.total.accountBalance > 0 ? string.Format("{0:N}", x.total.accountBalance) : "", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                     cell3.Border = 0;
                     table.AddCell(cell3);
                 }
