@@ -294,7 +294,6 @@
     }
 
     $scope.saveUserStatus = (x) => {
-        debugger;
         if (!statusChange) { return false;}
         x.terminationDate = f.setDate(x.terminationDate);
         if (!f.isValidDate(x.terminationDate)) {
@@ -618,6 +617,26 @@
         x.month = d.month;
         x.year = d.year;
         f.post('Account', 'SaveMonthlyFee', { x: x }).then((d) => {
+            //TODO:
+            //$scope.d.user.records[idx].repaid = d.repaid;
+            //$scope.d.user.records[idx].restToRepayment = d.restToRepayment;
+        });
+    }
+
+    $scope.add = (x, idx) => {
+        x.userPayment.push({
+            id: null,
+            userId: x.user.id,
+            recordDate: f.setDate(new Date()),
+            amount: null,
+            note: null
+        });
+    }
+
+    $scope.saveUserPayment = (x, y, d, idx) => {
+        y.month = d.month;
+        y.year = d.year;
+        f.post('Account', 'SaveUserPayment', {userId: x.user.id, y: y }).then((d) => {
             //TODO:
             //$scope.d.user.records[idx].repaid = d.repaid;
             //$scope.d.user.records[idx].restToRepayment = d.restToRepayment;

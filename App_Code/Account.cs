@@ -41,6 +41,7 @@ public class Account : System.Web.Services.WebService {
         public double totalObligation;
         public double repaid;
         public double lastMonthObligation;
+        public List<UserPayment> userPayment;
     }
 
     public class Total {
@@ -92,6 +93,16 @@ public class Account : System.Web.Services.WebService {
         public Recapitulation total;
     }
 
+    public class UserPayment {
+        public string id;
+        public string userId;
+        public string recordDate;
+        public double amount;
+        public string month;
+        public int year;
+        public string note;
+    }
+
     // ***** Konto *****
     public class AccountNo {
         public string giroAccount;
@@ -105,7 +116,7 @@ public class Account : System.Web.Services.WebService {
     [WebMethod]
     public string Init() {
         NewAccount x = new NewAccount();
-        x.id = Guid.NewGuid().ToString();
+        x.id = null; Guid.NewGuid().ToString();
         x.user = new User.NewUser();
         x.amount = 0;
         x.recordDate = g.Date(DateTime.Now);
@@ -130,6 +141,25 @@ public class Account : System.Web.Services.WebService {
         try {
             x.recordType = g.monthlyFee;
             x.amount = x.monthlyFee;
+            return JsonConvert.SerializeObject(Save(x), Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+        }
+    }
+
+    [WebMethod]
+    public string SaveUserPayment(string userId, UserPayment y) {
+        try {
+            NewAccount x = new NewAccount();
+            x.user = new User.NewUser();
+            x.user.id = userId;
+            x.recordType = g.userPayment;
+            x.amount = y.amount;
+            x.id = y.id;
+            x.recordDate = y.recordDate;
+            x.month = y.month;
+            x.year = y.year;
+            x.note = y.note;
             return JsonConvert.SerializeObject(Save(x), Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
@@ -202,6 +232,7 @@ public class Account : System.Web.Services.WebService {
                     //x = CheckLoan(x, user.id, month, year);  //TODO
                 }
                 x = CheckMonthlyFee(x, user.id, g.monthlyFee);
+                x.userPayment = GetUserPayment(x, user.id);
                 x.user = user;
                 xx.data.Add(x);
             }
@@ -741,7 +772,7 @@ public class Account : System.Web.Services.WebService {
                                                    INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
                                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
                                                 END
-                                        COMMIT TRAN", x.id, x.user.id, x.amount, x.recordDate, x.month, x.year, x.recordType, x.loanId, x.note);
+                                        COMMIT TRAN", string.IsNullOrEmpty(x.id) ? Guid.NewGuid().ToString() : x.id, x.user.id, x.amount, x.recordDate, x.month, x.year, x.recordType, x.loanId, x.note);
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -863,7 +894,7 @@ public class Account : System.Web.Services.WebService {
                     SELECT a.userId, a.amount, u.monthlyFee FROM Account a
                     LEFT OUTER JOIN Users u
                     ON a.userId = u.id
-                    WHERE a.userId = '{0}' AND a.mo = '{1}' AND a.yr = '{2}' AND a.recordType = '{3}' OR a.recordType = '{4}'"
+                    WHERE a.userId = '{0}' AND a.mo = '{1}' AND a.yr = '{2}' AND (a.recordType = '{3}' OR a.recordType = '{4}')"
                        , userId
                        , x.month
                        , x.year
@@ -889,6 +920,34 @@ public class Account : System.Web.Services.WebService {
             connection.Close();
         }
         return x;
+    }
+
+    public List<UserPayment> GetUserPayment(NewAccount x, string userId) {
+        string sql = string.Format(@"
+                    SELECT a.id, a.recordDate, a.amount, a.note FROM Account a
+                    WHERE a.userId = '{0}' AND a.mo = '{1}' AND a.yr = '{2}' AND a.recordType = '{3}'"
+                       , userId
+                       , x.month
+                       , x.year
+                       , g.userPayment);
+        List<UserPayment> xx = new List<UserPayment>();
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        UserPayment up = new UserPayment();
+                        up.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
+                        up.recordDate = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
+                        up.amount = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
+                        up.note = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
+                        xx.Add(up);
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return xx;
     }
 
     public double Repaid(NewAccount x) {
