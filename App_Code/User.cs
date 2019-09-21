@@ -49,6 +49,7 @@ public class User : System.Web.Services.WebService {
 
         //TODO: list<Card>
         public List<Account.NewAccount> records;
+        public Account.Total total;
     }
 
     public class UserStatus {
@@ -77,6 +78,7 @@ public class User : System.Web.Services.WebService {
         //x.statusHistory = new List<UserStatus>();
         //x.activeLoanId = null;
         x.records = new List<Account.NewAccount>();
+        x.total = new Account.Total();
         return JsonConvert.SerializeObject(x, Formatting.Indented);
     }
 
@@ -149,9 +151,9 @@ public class User : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    public string Load(string buisinessUnitCode) {
+    public string Load(string buisinessUnitCode, string search) {
         try {
-            return JsonConvert.SerializeObject(GetUsers(buisinessUnitCode), Formatting.Indented);
+            return JsonConvert.SerializeObject(GetUsers(buisinessUnitCode, search), Formatting.Indented);
         }catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
         }
@@ -182,7 +184,17 @@ public class User : System.Web.Services.WebService {
             //x.activeLoanId = GetActiveLoanId(id);
             if (year != null) {
                 x.records = a.GetRecords(x.id, year);
+                x.total = new Account.Total();
+                x.total.monthlyFee = x.records.Where(r => r.recordType == g.monthlyFee).Sum(r => r.amount);
+                x.total.userPayment = x.records.Where(r => r.recordType == g.userPayment).Sum(r => r.amount);
+                x.total.userPaymentWithMonthlyFee = x.total.monthlyFee + x.total.userPayment;
+                x.total.userPaymentWithMonthlyFeeTotal = a.GetMonthlyFeeStartBalance(id, year) + x.total.userPaymentWithMonthlyFee;
+                x.total.repayment = x.records.Where(r => r.recordType == g.repayment).Sum(r => r.amount);
+                x.total.terminationWithdraw = x.records.Where(r => r.recordType == g.terminationWithdraw).Sum(r => r.amount);
+                x.total.loan = 999;  // TODO GetLoanByYear
             }
+            //TODO: Totals:
+
             return JsonConvert.SerializeObject(x, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
@@ -246,11 +258,15 @@ public class User : System.Web.Services.WebService {
         return x;
     }
 
-    public List<NewUser> GetUsers(string buisinessUnitCode) {
+    public List<NewUser> GetUsers(string buisinessUnitCode, string search) {
         db.Users();
-        string sql = string.Format(@"{0} {1}"
-                        , sqlString 
-                        , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("WHERE u.buisinessUnitCode = '{0}'", buisinessUnitCode): "");
+        string sql = string.Format(@"{0} {1} {2} {3}"
+                        , sqlString
+                        , !string.IsNullOrEmpty(buisinessUnitCode) || !string.IsNullOrEmpty(search) ? "WHERE" : ""
+                        , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("u.buisinessUnitCode = '{0}'", buisinessUnitCode): ""
+                        , !string.IsNullOrEmpty(search) ? string.Format("{0} u.firstName LIKE '%{1}%' OR u.lastName LIKE '%{1}%'"
+                                                                        , !string.IsNullOrEmpty(buisinessUnitCode) && !string.IsNullOrEmpty(search) ? "AND" : ""                                             
+                                                                        , search) : "");
         List<NewUser> xx = new List<NewUser>();
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
@@ -267,13 +283,18 @@ public class User : System.Web.Services.WebService {
         return xx;
     }
 
-    public List<NewUser> GetLoanUsers(string buisinessUnitCode) {
+    public List<NewUser> GetLoanUsers(string buisinessUnitCode, string search) {
         db.Users();
         string sql = string.Format(@"{0}
                         LEFT OUTER JOIN Loan l on u.id = l.userId
-                        {1}"
-                        , sqlString 
-                        , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("WHERE u.buisinessUnitCode = '{0}' AND l.isRepaid = 0", buisinessUnitCode): "");
+                        {1} {2} {3} {4} l.isRepaid = 0"
+                        , sqlString
+                        , !string.IsNullOrEmpty(buisinessUnitCode) || !string.IsNullOrEmpty(search) ? "WHERE" : ""
+                        , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("u.buisinessUnitCode = '{0}'", buisinessUnitCode) : ""
+                        , !string.IsNullOrEmpty(search) ? string.Format("{0} (u.firstName LIKE '%{1}%' OR u.lastName LIKE '%{1}%')"
+                                                                      , !string.IsNullOrEmpty(buisinessUnitCode) && !string.IsNullOrEmpty(search) ? "AND" : ""
+                                                                      , search) : ""
+                        , string.IsNullOrEmpty(buisinessUnitCode) && string.IsNullOrEmpty(search) ? "WHERE" : "AND" );
         List<NewUser> xx = new List<NewUser>();
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();

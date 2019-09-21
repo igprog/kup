@@ -63,6 +63,10 @@ namespace Igprog {
             return Convert.ToInt32(DateTime.DaysInMonth(year, month));
         }
 
+        public string LastDayInMonth(int year, int month) {
+            return SetDayMonthDate(GetLastDayInMonth(year, month), month);
+        }
+
         public void CreateFolder(string path) {
             if (!Directory.Exists(path)) {
                 Directory.CreateDirectory(path);

@@ -23,48 +23,60 @@
             <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
         </div>
     </div>
-    <div ng-if="d.user.records.length>0" class="table-responsive">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th colspan="3"></th>
-                    <th colspan="2" class="text-center">Ulog</th>
-                    <th colspan="2" class="text-center">Pozajmica</th>
-                </tr>
-                <tr>
-                    <th>Datum</th>
-                    <th>Mjesec</th>
-                    <th>Opis</th>
-                    <th class="text-right">Duguje ({{config.currency}})</th>
-                    <th class="text-right">Potražuje ({{config.currency}})</th>
-                    <th class="text-right">Duguje ({{config.currency}})</th>
-                    <th class="text-right">Potražuje ({{config.currency}})</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="x in d.user.records track by $index">
-                    <td>{{x.recordDate}}</td>
-                    <td>{{x.month}}</td>
-                    <td>{{x.note}}</td>
-                    <td class="text-right"><span ng-if="x.recordType=='terminationWithdraw'">{{x.amount | number:2}}</span></td>
-                    <td class="text-right"><span ng-if="x.recordType=='monthlyFee'">{{x.amount | number:2}}</span></td>
-                    <td class="text-right">
-                        <span ng-if="x.recordType=='repayment'">{{x.restToRepayment | number:2}}</span>
-                        <span ng-if="x.recordType=='withdraw'">{{x.amount | number:2}}</span>
-                    </td>
-                    <td class="text-right"><span ng-if="x.recordType=='repayment' || x.recordType=='manipulativeCosts'">{{x.amount | number:2}}</span></td>
-                </tr>
-            </tbody>
-            <tfoot ng-if="d.user.records.length>0" class="thead-light">
-                <tr class="text-right">
-                    <th colspan="3">Ukupno:</th>
-                    <th>TODO</th>
-                    <th>TODO</th>
-                    <th>TODO</th>
-                    <th>TODO</th>
-                </tr>
-            </tfoot>
-        </table>
+    <div ng-if="d.user.records.length>0">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th colspan="3"></th>
+                        <th colspan="2" class="text-center">Ulog</th>
+                        <th colspan="2" class="text-center">Pozajmica</th>
+                    </tr>
+                    <tr class="thead-light">
+                        <th>Datum</th>
+                        <th>Mjesec</th>
+                        <th>Opis</th>
+                        <th class="text-right">Duguje ({{config.currency}})</th>
+                        <th class="text-right">Potražuje ({{config.currency}})</th>
+                        <th class="text-right">Duguje ({{config.currency}})</th>
+                        <th class="text-right">Potražuje ({{config.currency}})</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{d.user.records[0].lastDayInMonth}}</td>
+                        <td>{{d.user.records[0].month}}</td>
+                        <td>{{d.user.records[0].note}}</td>
+                        <td class="text-right"></td>
+                        <td class="text-right">{{d.user.records[0].monthlyFeeStartBalance | number:2}}</td>
+                        <td class="text-right">{{d.user.records[0].loanStartBalance | number:2}}</td>
+                        <td class="text-right"></td>
+                    </tr>
+                    <tr ng-if="x.lastDayInMonth!=='01.01'" ng-repeat="x in d.user.records track by $index">
+                        <td>{{x.lastDayInMonth}}</td>
+                        <td>{{x.month}}</td>
+                        <td>{{x.note}}</td>
+                        <td class="text-right"><span ng-if="x.recordType=='terminationWithdraw'">{{x.amount | number:2}}</span></td>
+                        <td class="text-right"><span ng-if="x.recordType=='monthlyFee'||x.recordType=='userPayment'">{{x.amount | number:2}}</span></td>
+                        <td class="text-right">
+                            <span ng-if="x.recordType=='repayment'">{{x.restToRepayment | number:2}}</span>
+                            <span ng-if="x.recordType=='withdraw'">{{x.amount | number:2}}</span>
+                        </td>
+                        <td class="text-right"><span ng-if="x.recordType=='repayment' || x.recordType=='manipulativeCosts'">{{x.amount | number:2}}</span></td>
+                    </tr>
+                </tbody>
+                <tfoot ng-if="d.user.records.length>0" class="thead-light">
+                    <tr class="text-right">
+                        <th colspan="3">Ukupno:</th>
+                        <th>{{d.user.total.terminationWithdraw | number:2}}</th>
+                        <th>{{d.user.total.userPaymentWithMonthlyFeeTotal | number:2}}</th>
+                        <th>TODO</th>
+                        <th>{{d.user.total.repayment | number:2}}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
     </div>
+  
     <pre ng-if="config.debug">{{d | json}}</pre>
 </div>

@@ -27,37 +27,51 @@
             <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
         </div>
     </div>
-    <div ng-if="d.records.data.length>0" class="table-responsive">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Mat. br.</th>
-                    <th>Prezime i ime</th>
-                    <th class="text-right">Ugovorena rata ({{config.currency}})</th>
-                    <th class="text-right">Uplaćeno ({{config.currency}})</th>
-                    <th class="text-right">Ostatak za otplatu ({{config.currency}})</th>
-                    <th>Napomena</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="x in d.records.data track by $index">
-                    <td>{{x.user.id}}</td>
-                    <td>{{x.user.lastName}} {{x.user.firstName}}</td>
-                    <td class="text-right">{{x.repayment | number:2}}<button class="btn btn-outline-primary ml-2" ng-click="setRepayment(x, $index)"><i class="fa fa-arrow-circle-right"></i></button></td>
-                    <td class="text-right"><input ng-model="x.amount" class="form-control text-right" allow-only-numbers/></td>
-                    <td class="text-right">{{x.restToRepayment | number:2}}</td>
-                    <td><input ng-model="x.note" class="form-control" /></td>
-                    <td><button class="btn btn-outline-primary" ng-click="save(x, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button></td>
-            </tbody>
-            <tfoot ng-if="d.records.data.length>0" class="thead-light">
-                <tr class="text-right">
-                    <th colspan="3">Ukupno:</th>
-                    <th>{{d.records.total.repayment | number:2}}</th>
-                    <th colspan="3"></th>
-                </tr>
-            </tfoot>
-        </table>
+    <div>
+        <div class="row">
+            <div class="col-sm-4">
+                <form>
+                    <div class="input-group mb-3">
+                        <input ng-model="d.search" type="text" class="form-control" placeholder="Pretraži...">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-primary" type="submit" ng-click="getMonthlyRecords(d)"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div ng-if="d.records.data.length>0" class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Mat. br.</th>
+                        <th>Prezime i ime</th>
+                        <th class="text-right">Ugovorena rata ({{config.currency}})</th>
+                        <th class="text-right">Uplaćeno ({{config.currency}})</th>
+                        <th class="text-right">Ostatak za otplatu ({{config.currency}})</th>
+                        <th>Napomena</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="x in d.records.data track by $index">
+                        <td>{{x.user.id}}</td>
+                        <td>{{x.user.lastName}} {{x.user.firstName}}</td>
+                        <td class="text-right">{{x.repayment | number:2}}<button class="btn btn-outline-primary ml-2" ng-click="setRepayment(x, $index)"><i class="fa fa-arrow-circle-right"></i></button></td>
+                        <td class="text-right"><input ng-model="x.amount" class="form-control text-right" allow-only-numbers /></td>
+                        <td class="text-right">{{x.restToRepayment | number:2}}</td>
+                        <td><input ng-model="x.note" class="form-control" /></td>
+                        <td><button class="btn btn-outline-primary" ng-click="save(x, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button></td>
+                </tbody>
+                <tfoot ng-if="d.records.data.length>0" class="thead-light">
+                    <tr class="text-right">
+                        <th colspan="3">Ukupno:</th>
+                        <th>{{d.records.total.repayment | number:2}}</th>
+                        <th colspan="3"></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
     </div>
     <pre ng-if="config.debug">{{d | json}}</pre>
 </div>

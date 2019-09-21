@@ -223,17 +223,17 @@
         });
     }
 
-    var load = (bu) => {
-        if (f.defined(bu)) {
-            f.post(service, 'Load', { buisinessUnitCode: bu }).then((d) => {
+    var load = (x) => {
+        if (f.defined(x.buisinessUnitCode)) {
+            f.post(service, 'Load', { buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
                 $scope.d.users = d;
                 $scope.d.year = f.year();
             });
         }
     }
 
-    $scope.load = (bu) => {
-        load(bu);
+    $scope.load = (d) => {
+        load(d);
     }
    
     if ($scope.g.currTpl == './assets/partials/newuser.html') {
@@ -241,6 +241,7 @@
             user: {},
             users: [],
             buisinessUnitCode: null,
+            search: null,
             year: f.year(),
             records: [],
             statusDate: new Date(),
@@ -251,9 +252,10 @@
         init();
     } else {
         $scope.d.buisinessUnitCode = null;
+        $scope.d.search = null;
         $scope.d.pdf = null;
         $scope.d.loadingPdf = false;
-        load(null);
+        load($scope.d);
     }
 
     var validate = (x) => {
@@ -554,13 +556,14 @@
             month: $scope.g.month,
             year: $scope.g.year,
             buisinessUnitCode: null,
+            search: null,
             pdf: null,
             loadingPdf: false
         }
         $scope.d = data;
 
         var getMonthlyRecords = (x) => {
-            f.post(service, 'GetMonthlyRecords', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
+            f.post(service, 'GetMonthlyRecords', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
                 $scope.d.records = d;
             });
         }
@@ -594,13 +597,14 @@
         month: $scope.g.month,
         year: $scope.g.year,
         buisinessUnitCode: null,
+        search: null,
         pdf: null,
         loadingPdf: false
     }
     $scope.d = data;
 
     var getMonthlyRecords = (x) => {
-        f.post(service, 'GetMonthlyFee', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
+        f.post(service, 'GetMonthlyFee', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
             $scope.d.records = d;
         });
     }
@@ -662,63 +666,64 @@
 }])
 
 .controller('repaymentCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
-        var service = 'Account';
-        var data = {
-            records: {},
-            month: $scope.g.month,
-            year: $scope.g.year,
-            buisinessUnitCode: null,
-            pdf: null,
-            loadingPdf: false
-        }
-        $scope.d = data;
+    var service = 'Account';
+    var data = {
+        records: {},
+        month: $scope.g.month,
+        year: $scope.g.year,
+        buisinessUnitCode: null,
+        search: null,
+        pdf: null,
+        loadingPdf: false
+    }
+    $scope.d = data;
 
-        var getMonthlyRecords = (x) => {
-            f.post(service, 'GetLoanUsers', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
-                $scope.d.records = d;
-            });
-        }
+    var getMonthlyRecords = (x) => {
+        f.post(service, 'GetLoanUsers', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
+            $scope.d.records = d;
+        });
+    }
 
-        $scope.getMonthlyRecords = (x) => {
-            return getMonthlyRecords(x);
-        }
+    $scope.getMonthlyRecords = (x) => {
+        return getMonthlyRecords(x);
+    }
 
-        $scope.setRepayment = (x, idx) => {
-            $scope.d.records.data[idx].amount = x.repayment;
-        }
+    $scope.setRepayment = (x, idx) => {
+        $scope.d.records.data[idx].amount = x.repayment;
+    }
 
-        $scope.save = (x, d, idx) => {
-            x.month = d.month;
-            x.year = d.year;
-            if (x.amount > x.restToRepayment) {
-                alert('Rata je veća od duga!');
-                return false;
-            }
-            f.post('Account', 'SaveRepayment', { x: x }).then((d) => {
-                //TODO:
-                $scope.d.records.data[idx].repaid = d.repaid;
-                $scope.d.records.data[idx].amount = d.amount;
-                $scope.d.records.data[idx].restToRepayment = d.restToRepayment;
-            });
+    $scope.save = (x, d, idx) => {
+        x.month = d.month;
+        x.year = d.year;
+        if (x.amount > x.restToRepayment) {
+            alert('Rata je veća od duga!');
+            return false;
         }
+        f.post('Account', 'SaveRepayment', { x: x }).then((d) => {
+            //TODO:
+            $scope.d.records.data[idx].repaid = d.repaid;
+            $scope.d.records.data[idx].amount = d.amount;
+            $scope.d.records.data[idx].restToRepayment = d.restToRepayment;
+        });
+    }
 
-        $scope.print = (x) => {
-            if (f.defined(x.records.data.length)) {
-                if (x.records.data.length == 0) { return false; }
-            }
-            $scope.d.pdf = null;
-            $scope.d.loadingPdf = true;
-            f.post('Pdf', 'Repayment', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, records: x.records }).then((d) => {
-                $scope.d.pdf = f.pdfTempPath(d);
-                $scope.d.loadingPdf = false;
-            });
+    $scope.print = (x) => {
+        if (f.defined(x.records.data.length)) {
+            if (x.records.data.length == 0) { return false; }
         }
+        $scope.d.pdf = null;
+        $scope.d.loadingPdf = true;
+        f.post('Pdf', 'Repayment', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, records: x.records }).then((d) => {
+            $scope.d.pdf = f.pdfTempPath(d);
+            $scope.d.loadingPdf = false;
+        });
+    }
 
-        $scope.removePdfLink = () => {
-            $scope.d.pdf = null;
-        }
+    $scope.removePdfLink = () => {
+        $scope.d.pdf = null;
+    }
 
-    }])
+}])
 
 .controller('entryCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Account';

@@ -3,39 +3,52 @@
         <div class="col-sm-4">
             <div class="form-group">
                 <label for="buissinesUnitCode">Poslovna jedinica:</label>
-                <select ng-model="d.buisinessUnitCode" class="form-control" name="buissinesUnitCode" ng-click="load(d.buisinessUnitCode)">
-                    <option ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.code}} - {{x.title}}</option>
+                <select ng-model="d.buisinessUnitCode" class="form-control" name="buissinesUnitCode" ng-click="load(d)">
+                    <option ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.title}}</option>
                 </select>
             </div>
         </div>
     </div>
-    <div ng-if="d.users" class="table-responsive">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Mat. br.</th>
-                    <th>Prezime</th>
-                    <th>Ime</th>
-                    <th>OIB</th>
-                    <th>Posl. jedinice</th>
-                    <th colspan="2"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="x in d.users" class="{{x.isActive==0?'text-danger':''}}">
-                    <td>{{x.id}}</td>
-                    <td>{{x.lastName}}</td>
-                    <td>{{x.firstName}}</td>
-                    <td>{{x.pin}}</td>
-                    <td>{{x.buisinessUnit.code}} - {{x.buisinessUnit.title}}</td>
-                    <td>
-                        <button class="btn btn-outline-primary" title="Korisnički Profil" ng-click="get('user', 'Korisnički Profil', x.id, null)"><i class="fas fa-user"></i></button>
-                        <button class="btn btn-outline-danger" title="Kartica Korisnika" ng-click="get('card', 'Kartica Korisnika', x.id, d.year)"><i class="fas fa-id-card"></i></button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div>
+        <div class="row">
+            <div class="col-sm-4">
+                <form>
+                    <div class="input-group mb-3">
+                        <input ng-model="d.search" type="text" class="form-control" placeholder="Pretraži...">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-primary" type="submit" ng-click="load(d)"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div ng-if="d.users.length>0" class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Mat. br.</th>
+                        <th>Prezime</th>
+                        <th>Ime</th>
+                        <th>OIB</th>
+                        <th>Posl. jedinice</th>
+                        <th colspan="2"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="x in d.users" class="{{x.isActive==0?'text-danger':''}}">
+                        <td>{{x.id}}</td>
+                        <td>{{x.lastName}}</td>
+                        <td>{{x.firstName}}</td>
+                        <td>{{x.pin}}</td>
+                        <td>{{x.buisinessUnit.code}} - {{x.buisinessUnit.title}}</td>
+                        <td>
+                            <button class="btn btn-outline-primary" title="Korisnički Profil" ng-click="get('user', 'Korisnički Profil', x.id, null)"><i class="fas fa-user"></i></button>
+                            <button class="btn btn-outline-danger" title="Kartica Korisnika" ng-click="get('card', 'Kartica Korisnika', x.id, d.year)"><i class="fas fa-id-card"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-   
     <pre ng-if="config.debug">{{d | json}}</pre>
 </div>

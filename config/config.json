@@ -1,5 +1,5 @@
 ﻿{
-  "version": "1.3.6",
+  "version": "1.3.7",
   "appname": "KUP - Janaf",
   "apptitle": "Kasa Uzajamne Pomoći",
   "debug": true,
@@ -30,7 +30,7 @@
     {
       "tpl": "card",
       "title": "Kartica Korisnika",
-      "ico": "home"
+      "ico": "id-card"
     },
     {
       "tpl": null,

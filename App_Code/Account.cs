@@ -42,12 +42,21 @@ public class Account : System.Web.Services.WebService {
         public double repaid;
         public double lastMonthObligation;
         public List<UserPayment> userPayment;
+        public double userPaymentTotal;
+        public string lastDayInMonth;
+        public double monthlyFeeStartBalance;
+        public double loanStartBalance;
     }
 
     public class Total {
         public double monthlyFee;
+        public double userPayment;
+        public double userPaymentWithMonthlyFee;
+        public double userPaymentWithMonthlyFeeTotal;
         public double repayment;
         public double totalObligation;
+        public double terminationWithdraw;
+        public double loan;
     }
 
     public class Accounts {
@@ -211,10 +220,10 @@ public class Account : System.Web.Services.WebService {
 
 
     [WebMethod]
-    public string GetMonthlyFee(int month, int year, string buisinessUnitCode) {
+    public string GetMonthlyFee(int month, int year, string buisinessUnitCode, string search) {
         try {
             User u = new User();
-            List<User.NewUser> users = u.GetUsers(buisinessUnitCode);
+            List<User.NewUser> users = u.GetUsers(buisinessUnitCode, search);
             db.Account();
             Accounts xx = new Accounts();
             xx.data = new List<NewAccount>();
@@ -228,7 +237,7 @@ public class Account : System.Web.Services.WebService {
                     x.recordDate = g.Date(DateTime.Now);
                     x.recordType = null;
                     x.loanId = null;
-                    x.note = null;
+                    x.note = string.Format("OD {0}", g.Month(month));
                     //x = CheckLoan(x, user.id, month, year);  //TODO
                 }
                 x = CheckMonthlyFee(x, user.id, g.monthlyFee);
@@ -248,10 +257,10 @@ public class Account : System.Web.Services.WebService {
 
 
     [WebMethod]
-    public string GetLoanUsers(int month, int year, string buisinessUnitCode) {
+    public string GetLoanUsers(int month, int year, string buisinessUnitCode, string search) {
         try {
             User u = new User();
-            List<User.NewUser> users = u.GetLoanUsers(buisinessUnitCode);
+            List<User.NewUser> users = u.GetLoanUsers(buisinessUnitCode, search);
             db.Account();
             Accounts xx = new Accounts();
             xx.data = new List<NewAccount>();
@@ -267,7 +276,7 @@ public class Account : System.Web.Services.WebService {
                     x.year = year;
                     x.recordType = null;
                     x.loanId = null;
-                    x.note = null;
+                    x.note = string.Format("OD {0}", g.Month(month));
                     x.monthlyFee = 0;
                     x.loan = 0;
                     x.loanDate = null;
@@ -294,10 +303,10 @@ public class Account : System.Web.Services.WebService {
 
 
     [WebMethod]
-    public string GetMonthlyRecords(int month, int year, string buisinessUnitCode) {
+    public string GetMonthlyRecords(int month, int year, string buisinessUnitCode, string search) {
         try {
             User u = new User();
-            List<User.NewUser> users = u.GetUsers(buisinessUnitCode);
+            List<User.NewUser> users = u.GetUsers(buisinessUnitCode, search);
             db.Account();
             Accounts xx = new Accounts();
             xx.data = new List<NewAccount>();
@@ -798,6 +807,7 @@ public class Account : System.Web.Services.WebService {
         x.recordType = reader.GetValue(6) == DBNull.Value ? null : reader.GetString(6);
         x.loanId = reader.GetValue(7) == DBNull.Value ? null : reader.GetString(7);
         x.note = reader.GetValue(8) == DBNull.Value ? null : reader.GetString(8);
+        x.lastDayInMonth = g.LastDayInMonth(x.year, Convert.ToInt32(x.month));
 
         //if(x.recordType == RecordType.loan.ToString()) {
         //    x.loan = x.amount;
@@ -806,7 +816,7 @@ public class Account : System.Web.Services.WebService {
         //    x.restToRepayment = x.loan - x.repaid;
         //    x.totalObligation = x.monthlyFee + x.repayment;
         //}
-       
+
 
         return x;
     }
@@ -835,23 +845,29 @@ public class Account : System.Web.Services.WebService {
     public List<NewAccount> GetRecords(string userId, int? year) {
         db.Account();
         db.Loan();
-        //string sql = string.Format("SELECT * FROM Account WHERE userId = '{0}' {1}"
-        //    , userId
-        //    , year > 0 ? string.Format("AND yr = '{0}' ORDER BY mo ASC", year) : "");
+        List<NewAccount> xx = new List<NewAccount>();
+        NewAccount x = new NewAccount();
+        x.lastDayInMonth = "01.01";
+        x.month = "PS";
+        x.note = "Početno stanje";
+        x.monthlyFeeStartBalance = GetMonthlyFeeStartBalance(userId, year);
+        x.loanStartBalance = GetLoanStartBalance(userId, year); 
+        xx.Add(x);
         string sql = string.Format("SELECT * FROM Account WHERE userId = '{0}' AND recordType <> '{1}' {2}"
           , userId
           , g.manipulativeCosts
           , year > 0 ? string.Format("AND yr = '{0}' ORDER BY mo ASC", year) : "");
-        List<NewAccount> xx = new List<NewAccount>();
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
                     while (reader.Read()) {
-                        NewAccount x = new NewAccount();
+                        x = new NewAccount();
                         x = ReadData(reader);
                         x = CheckLoan(x, userId);
                         x = CheckMonthlyFee(x, userId, g.monthlyFee);
+                        x.userPayment = GetUserPayment(x, userId);
+                        x.userPaymentTotal = x.userPayment.Sum(a => a.amount);
                         xx.Add(x);
                     }
                 }
@@ -913,7 +929,6 @@ public class Account : System.Web.Services.WebService {
                         if (recordType == g.terminationWithdraw) {
                             x.amount = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
                         }
-                        
                     }
                 }
             }
@@ -969,5 +984,47 @@ public class Account : System.Web.Services.WebService {
         }
         return repaid;
     }
+
+    public double GetMonthlyFeeStartBalance(string userId, int? year) {
+        double x = 0;
+        string sql = string.Format(@"
+                    SELECT SUM(CONVERT(decimal, a.amount)) FROM Account a
+                    WHERE a.userId = '{0}' AND (a.recordType = '{1}' OR a.recordType = '{2}') AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{3}-01-01' AS datetime))"
+                       , userId, g.monthlyFee, g.userPayment, year);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
+    }
+
+    public double GetLoanStartBalance(string userId, int? year) {
+        double x = 0;
+        string sql = string.Format(@"
+                    SELECT SUM(CONVERT(decimal, a.amount)) FROM Account a
+                    WHERE a.userId = '{0}' AND a.recordType = '{1}' AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{2}-01-01' AS datetime))"
+                       , userId, g.repayment, year);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
+    }
+
+
 
 }
