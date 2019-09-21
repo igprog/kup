@@ -79,8 +79,13 @@ namespace Igprog {
             }
         }
 
+        public string Format(double value) {
+            return string.Format("{0:N}", value);
+        }
+
         public string Currency(double value) {
-            return string.Format("{0:N} {1}", value, s.Data().currency);
+            return string.Format("{0} {1}", Format(value), s.Data().currency);
+            //return string.Format("{0:N} {1}", value, s.Data().currency);
         }
 
         public string manipulativeCostsPerc() {

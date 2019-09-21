@@ -58,6 +58,7 @@ public class Account : System.Web.Services.WebService {
         public double totalObligation;
         public double terminationWithdraw;
         public double activatedLoan;
+        public double loanToRepaid;
 
     }
 
@@ -1033,6 +1034,8 @@ public class Account : System.Web.Services.WebService {
 
     public double GetLoanStartBalance(string userId, int? year) {
         double x = 0;
+        double repayed = 0;
+        double loan = 0;
         string sql = string.Format(@"
                     SELECT SUM(CONVERT(decimal, a.amount)) FROM Account a
                     WHERE a.userId = '{0}' AND a.recordType = '{1}' AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{2}-01-01' AS datetime))"
@@ -1042,12 +1045,28 @@ public class Account : System.Web.Services.WebService {
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
                     while (reader.Read()) {
-                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                        repayed = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
                     }
                 }
             }
             connection.Close();
         }
+        sql = string.Format(@"
+                SELECT SUM(CONVERT(decimal, l.loan)) FROM Loan l
+                WHERE l.userId = '{0}' AND (CAST(l.loanDate AS datetime) < CAST('{1}-01-01' AS datetime))"
+                    , userId, year);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        loan = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        x = loan - repayed;
         return x;
     }
 

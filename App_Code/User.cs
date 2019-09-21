@@ -192,6 +192,7 @@ public class User : System.Web.Services.WebService {
                 x.total.repayment = x.records.Where(r => r.recordType == g.repayment).Sum(r => r.amount);
                 x.total.terminationWithdraw = x.records.Where(r => r.recordType == g.terminationWithdraw).Sum(r => r.amount);
                 x.total.activatedLoan = x.records.Where(r => r.recordType == g.withdraw).Sum(r => r.activatedLoan);
+                x.total.loanToRepaid = a.GetLoanStartBalance(id, year) + x.total.activatedLoan;
             }
             //TODO: Totals:
 
