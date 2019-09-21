@@ -46,6 +46,7 @@ public class Account : System.Web.Services.WebService {
         public string lastDayInMonth;
         public double monthlyFeeStartBalance;
         public double loanStartBalance;
+        public double activatedLoan;
     }
 
     public class Total {
@@ -56,7 +57,8 @@ public class Account : System.Web.Services.WebService {
         public double repayment;
         public double totalObligation;
         public double terminationWithdraw;
-        public double loan;
+        public double activatedLoan;
+
     }
 
     public class Accounts {
@@ -865,6 +867,7 @@ public class Account : System.Web.Services.WebService {
                         x = new NewAccount();
                         x = ReadData(reader);
                         x = CheckLoan(x, userId);
+                        x.activatedLoan = GetActivatedLoan(x, userId);
                         x = CheckMonthlyFee(x, userId, g.monthlyFee);
                         x.userPayment = GetUserPayment(x, userId);
                         x.userPaymentTotal = x.userPayment.Sum(a => a.amount);
@@ -903,6 +906,29 @@ public class Account : System.Web.Services.WebService {
             connection.Close();
         }
         return x;
+    }
+
+    public double GetActivatedLoan(NewAccount x, string userId) {
+        double loan = 0;
+        string sql = string.Format(@"
+                    SELECT l.loan FROM Loan l
+                    WHERE l.userId = '{0}' AND ((CAST(l.loanDate AS datetime) >= CAST('{1}-{2}-01' AS datetime)) AND (CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)))"
+                        , userId
+                        , x.year
+                        , g.Month(Convert.ToInt32(x.month))
+                        , g.GetLastDayInMonth(x.year, Convert.ToInt32(x.month)));
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        loan = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return loan;
     }
 
     public NewAccount CheckMonthlyFee(NewAccount x, string userId, string recordType) {
