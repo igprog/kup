@@ -8,6 +8,7 @@
     <script src="./assets/js/vendor/jquery.min.js"></script>
     <script src="./assets/js/vendor/bootstrap.min.js"></script>
     <script src="./assets/js/vendor/angular.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <!--*********** FontAwesome ***********-->
     <script src="./assets/js/vendor/fontawesome.min.js"></script>
     <script src="./assets/js/vendor/solid.min.js"></script>
@@ -115,7 +116,7 @@
             <div style="min-height:50px">
             </div>
             <div class="card">
-                <h4 class="card-header">{{g.currTplTitle}}</h4>
+                <h4 class="card-header">{{g.currTpl=='./assets/partials/dashboard.html'?config.apptitle:g.currTplTitle}}</h4>
                 <div class="card-body">
                     <ng-include src="g.currTpl"></ng-include>
                 </div>

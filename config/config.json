@@ -57,12 +57,18 @@
     {
       "tpl": "monthlyfee",
       "title": "Uplata uloga",
-      "ico": "coins"
+      "ico": "coins",
+      "dashboard": {
+        "class": "success"
+      }
     },
     {
       "tpl": "repayment",
       "title": "Otplata Pozajmice",
-      "ico": "money-bill-wave"
+      "ico": "money-bill-wave",
+      "dashboard": {
+        "class": "warning"
+      }
     },
     {
       "tpl": "otherfee",
@@ -77,12 +83,18 @@
     {
       "tpl": "suspension",
       "title": "Obustave Na Plaći",
-      "ico": "hand-paper"
+      "ico": "hand-paper",
+      "dashboard": {
+        "class": "danger"
+      }
     },
     {
       "tpl": "entry",
       "title": "Temeljnica",
-      "ico": "file-alt"
+      "ico": "file-alt",
+      "dashboard": {
+        "class": "info"
+      }
     }
   ]
 

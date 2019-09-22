@@ -59,6 +59,9 @@ public class Account : System.Web.Services.WebService {
         public double terminationWithdraw;
         public double activatedLoan;
         public double loanToRepaid;
+        public double bankFee;
+        public double otherFee;
+
 
     }
 
@@ -513,6 +516,69 @@ public class Account : System.Web.Services.WebService {
                 xxx.total.accountBalance = GetYearlyTotal(xxx.data, "accountBalance");
             }
             return JsonConvert.SerializeObject(xxx, Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+        }
+    }
+
+     [WebMethod]
+    public string LoadTotal() {
+        try {
+            db.Account();
+            string sql = string.Format("SELECT SUM(CONVERT(decimal, a.amount)) FROM Account a WHERE a.recordType = '{0}' OR a.recordType = '{1}'", g.monthlyFee, g.userPayment);
+            Total x = new Total();
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            x.userPaymentWithMonthlyFee = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                        }
+                    }
+                }
+                connection.Close();
+            }
+
+            sql = string.Format("SELECT SUM(CONVERT(decimal, a.amount)) FROM Account a WHERE a.recordType = '{0}'", g.bankFee);
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            x.bankFee = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                        }
+                    }
+                }
+                connection.Close();
+            }
+
+            sql = string.Format("SELECT SUM(CONVERT(decimal, a.amount)) FROM Account a WHERE a.recordType = '{0}'", g.otherFee);
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            x.otherFee = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                        }
+                    }
+                }
+                connection.Close();
+            }
+
+            sql = "SELECT SUM(CONVERT(decimal, loan)) FROM Loan";
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            x.activatedLoan = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                        }
+                    }
+                }
+                connection.Close();
+            }
+
+            return JsonConvert.SerializeObject(x, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
         }

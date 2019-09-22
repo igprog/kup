@@ -162,7 +162,8 @@
             years: f.years(2018),
             buisinessUnits: [],
             recordTypes: f.recordTypes(),
-            clearView: false
+            clearView: false,
+            total: null
         }
         f.post('BuisinessUnit', 'Load', {}).then((d) => {
             data.buisinessUnits = d;
@@ -208,6 +209,48 @@
             $scope.g.clearView = true;
         }
     }
+
+}])
+
+.controller('dashboardCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+
+    $scope.d = {
+        total: null
+    }
+
+    var currency = (x) => {
+        debugger;
+        //if (!f.defined(x)) { return false;}
+        return x.toFixed(2) + ' ' + $scope.config.currency;
+    }
+    google.charts.load("current", { packages: ["corechart"] });
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+        debugger;
+        if ($scope.d.total == null) { return false; }
+        if (!f.defined(google.visualization)) { return false;}
+        var data = google.visualization.arrayToDataTable([
+          ['Task', 'Hours per Day'],
+          ['Ulozi: ' + currency($scope.d.total.userPaymentWithMonthlyFee), $scope.d.total.userPaymentWithMonthlyFee],
+          ['Pozajmice: ' + currency($scope.d.total.activatedLoan), $scope.d.total.activatedLoan],
+          ['Troškovi održavanja računa: ' + currency($scope.d.total.bankFee), $scope.d.total.bankFee],
+          ['Ostali troškovi: ' + currency($scope.d.total.otherFee), $scope.d.total.otherFee]
+        ]);
+        var options = {
+            title: 'Promet',
+            is3D: true
+        };
+        var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+        chart.draw(data, options);
+    }
+
+    var loadTotal = () => {
+        f.post('Account', 'LoadTotal', {}).then((d) => {
+            $scope.d.total = d;
+            drawChart();
+        });
+    }
+    loadTotal();
 
 }])
 
@@ -962,7 +1005,7 @@
             id: '=',
             href: '=',
             tpl: '=',
-            title: '=',
+            desc: '=',
             ico: '=',
             type: '='
         },

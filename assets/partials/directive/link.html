@@ -1,9 +1,9 @@
 ﻿<li ng-if="tpl==null" class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
-    <small>{{title}}</small>
+    <small>{{desc}}</small>
 </li>
 <li ng-if="tpl!=null" href="{{href}}" data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
     <a class="d-flex w-100 justify-content-start align-items-center">
         <span class="fa fa-{{ico}} fa-fw mr-3"></span>
-        <span class="menu-collapsed">{{title}}</span>
+        <span class="menu-collapsed">{{desc}} <i ng-if="tpl=='null'" class="fa fa-angle-down"></i></span>
     </a>
 </li>
