@@ -7,7 +7,7 @@
                 <!--<date-directive id="'accessDate'" date="d.user.accessDate" todaybtn="true"></date-directive>-->
             </div>
         </div>
-        <div class="col-sm-6 text-right">
+        <div ng-if="d.showPdf" class="col-sm-6 text-right">
             <button ng-show="!d.pdf && !g.clearView" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d, 'NewUser')">
                 <loading-directive title="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf"></loading-directive>
             </button>

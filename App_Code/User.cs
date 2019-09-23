@@ -89,12 +89,12 @@ public class User : System.Web.Services.WebService {
             string sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Users WITH (updlock,serializable) WHERE id = '{0}')
                                                 BEGIN
-                                                   UPDATE Users SET buisinessUnitCode = '{1}', firstName = '{2}', lastName = '{3}', pin = '{4}', birthDate = '{5}', accessDate = '{6}', terminationDate = '{7}', isActive = '{8}', monthlyFee = '{9}' WHERE id = '{0}'
+                                                   UPDATE Users SET buisinessUnitCode = '{1}', firstName = N'{2}', lastName = N'{3}', pin = '{4}', birthDate = '{5}', accessDate = '{6}', terminationDate = '{7}', isActive = '{8}', monthlyFee = '{9}' WHERE id = '{0}'
                                                 END
                                             ELSE
                                                 BEGIN
                                                    INSERT INTO Users (id, buisinessUnitCode, firstName, lastName, pin, birthDate, accessDate, terminationDate, isActive, monthlyFee)
-                                                   VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
+                                                   VALUES ('{0}', '{1}', N'{2}', N'{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
                                                 END
                                         COMMIT TRAN", x.id, x.buisinessUnit.code, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
@@ -265,7 +265,7 @@ public class User : System.Web.Services.WebService {
                         , sqlString
                         , !string.IsNullOrEmpty(buisinessUnitCode) || !string.IsNullOrEmpty(search) ? "WHERE" : ""
                         , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("u.buisinessUnitCode = '{0}'", buisinessUnitCode): ""
-                        , !string.IsNullOrEmpty(search) ? string.Format("{0} u.firstName LIKE '%{1}%' OR u.lastName LIKE '%{1}%'"
+                        , !string.IsNullOrEmpty(search) ? string.Format("{0} u.id LIKE '%{1}%' OR u.firstName LIKE '%{1}%' OR u.lastName LIKE '%{1}%' OR u.pin LIKE '%{1}%'"
                                                                         , !string.IsNullOrEmpty(buisinessUnitCode) && !string.IsNullOrEmpty(search) ? "AND" : ""                                             
                                                                         , search) : "");
         List<NewUser> xx = new List<NewUser>();

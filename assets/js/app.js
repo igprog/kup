@@ -144,9 +144,9 @@
 
     var getConfig = () => {
         $http.get('./config/config.json').then((response) => {
-              $scope.config = response.data;
-              reloadPage();
-          });
+            $scope.config = response.data;
+            reloadPage();
+        });
     };
     getConfig();
 
@@ -219,8 +219,6 @@
     }
 
     var currency = (x) => {
-        debugger;
-        //if (!f.defined(x)) { return false;}
         return x.toFixed(2) + ' ' + $scope.config.currency;
     }
     google.charts.load("current", { packages: ["corechart"] });
@@ -230,14 +228,14 @@
         if ($scope.d.total == null) { return false; }
         if (!f.defined(google.visualization)) { return false;}
         var data = google.visualization.arrayToDataTable([
-          ['Task', 'Hours per Day'],
+          ['Task', ''],
           ['Ulozi: ' + currency($scope.d.total.userPaymentWithMonthlyFee), $scope.d.total.userPaymentWithMonthlyFee],
           ['Pozajmice: ' + currency($scope.d.total.activatedLoan), $scope.d.total.activatedLoan],
           ['Troškovi održavanja računa: ' + currency($scope.d.total.bankFee), $scope.d.total.bankFee],
           ['Ostali troškovi: ' + currency($scope.d.total.otherFee), $scope.d.total.otherFee]
         ]);
         var options = {
-            title: 'Promet',
+            title: '',
             is3D: true
         };
         var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
@@ -289,7 +287,8 @@
             records: [],
             statusDate: new Date(),
             pdf: null,
-            loadingPdf: false
+            loadingPdf: false,
+            showPdf: false
         }
         $scope.d = data;
         init();
@@ -298,6 +297,7 @@
         $scope.d.search = null;
         $scope.d.pdf = null;
         $scope.d.loadingPdf = false;
+        $scope.d.showPdf = true;
         load($scope.d);
     }
 
@@ -320,17 +320,12 @@
         if (x.birthDate != null) {
             x.birthDate = f.setDate(x.birthDate);
         }
-        if (!validate(x)) { return false }
-
-        //x.statusHistory.push({
-        //    status: x.isActive,
-        //    statusDate: f.setDate($scope.d.statusDate)
-        //})
-
+        if (!validate(x)) { return false; }
         f.post(service, 'Save', { x: x }).then((d) => {
             alert(d);
             $scope.d.user.accessDate = new Date($scope.d.user.accessDate);
             $scope.d.user.birthDate = new Date($scope.d.user.birthDate);
+            $scope.d.showPdf = true;
         });
     }
 
@@ -681,6 +676,10 @@
     }
 
     $scope.saveUserPayment = (x, y, d, idx) => {
+        if (y.amount <= 0) {
+            alert('Unesit iznos.');
+            return false;
+        }
         y.month = d.month;
         y.year = d.year;
         f.post('Account', 'SaveUserPayment', {userId: x.user.id, y: y }).then((d) => {
@@ -743,7 +742,6 @@
             return false;
         }
         f.post('Account', 'SaveRepayment', { x: x }).then((d) => {
-            //TODO:
             $scope.d.records.data[idx].repaid = d.repaid;
             $scope.d.records.data[idx].amount = d.amount;
             $scope.d.records.data[idx].restToRepayment = d.restToRepayment;

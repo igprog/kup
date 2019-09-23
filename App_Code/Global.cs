@@ -29,6 +29,7 @@ namespace Igprog {
         public string userPayment = "userPayment";
         #endregion RecordType
         public string giroaccount = "giroaccount";
+        public string loan = "loan";
         public string allUnitsTitle = "JANAF ukupno";
 
         public string ReffDate(int? month, int year) {
