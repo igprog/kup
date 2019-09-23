@@ -61,6 +61,7 @@ public class Account : System.Web.Services.WebService {
         public double loanToRepaid;
         public double bankFee;
         public double otherFee;
+        public double interest;
     }
 
     public class Accounts {
@@ -127,7 +128,7 @@ public class Account : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    public string Init() {
+    public string Init(string type) {
         NewAccount x = new NewAccount();
         x.id = null; Guid.NewGuid().ToString();
         x.user = new User.NewUser();
@@ -135,7 +136,7 @@ public class Account : System.Web.Services.WebService {
         x.recordDate = g.Date(DateTime.Now);
         x.month = "01";
         x.year = DateTime.Now.Year;
-        x.recordType = null;
+        x.recordType = type;
         x.loanId = null;
         x.note = null;
         x.monthlyFee = 0;
@@ -201,25 +202,35 @@ public class Account : System.Web.Services.WebService {
     [WebMethod]
     public string Load(int year, string type) {
         try {
-            db.Account();
-            string sql = string.Format(@"SELECT * FROM Account WHERE yr = '{0}' AND recordType = '{1}'", year, type);
-            List<NewAccount> xx = new List<NewAccount>();
+            return JsonConvert.SerializeObject(LoadData(year, type), Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+        }
+    }
+
+    public Accounts LoadData(int year, string type) {
+        db.Account();
+        string sql = string.Format(@"SELECT * FROM Account WHERE yr = '{0}' AND recordType = '{1}'", year, type);
+        Accounts xx = new Accounts();
+        xx.data = new List<NewAccount>();
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     using (SqlDataReader reader = command.ExecuteReader()) {
                         while (reader.Read()) {
                             NewAccount x = ReadData(reader);
-                            xx.Add(x);
+                            xx.data.Add(x);
                         }
                     }
                 }
                 connection.Close();
             }
-            return JsonConvert.SerializeObject(xx, Formatting.Indented);
-        } catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
-        }
+        xx.total = new Total();
+        xx.total.otherFee = xx.data.Where(a => a.recordType == g.otherFee).Sum(a => a.amount);
+        xx.total.bankFee = xx.data.Where(a => a.recordType == g.bankFee).Sum(a => a.amount);
+        xx.total.interest = xx.data.Where(a => a.recordType == g.interest).Sum(a => a.amount);
+
+        return xx;
     }
 
 
@@ -431,7 +442,7 @@ public class Account : System.Web.Services.WebService {
         xxx.Add(r);
         Loan l = new Loan();
         foreach (Recapitulation x in xx) {
-            x.account = GetAccountNo(x.recordType);
+            x.account = GetAccountNo(x.recordType == g.repayment ? g.loan : x.recordType);
             if (x.recordType == g.repayment) {
                 x.output = l.GetLoansTotal(month, year);
                // x.output = xx.Where(a => a.recordType == g.withdraw).Sum(a => a.input);  // TODO: sve odobrene pozajmice
@@ -773,7 +784,7 @@ public class Account : System.Web.Services.WebService {
                     //x.total.output = GetMonthlyFeeRequired(null, i, year);
                     //x.total.outputAccumulation = GetMonthlyFeeRequiredAccu(null, i, year);
                 }
-                if (type == g.repayment) {
+                if (type == g.loan) {
                     x.total.note = string.Format("Promet pozajmica {0}/{1}", g.Month(i), year);
                 } else if (type == g.monthlyFee) {
                     x.total.note = string.Format("Promet uloga {0}/{1}", g.Month(i), year);
@@ -782,7 +793,10 @@ public class Account : System.Web.Services.WebService {
                 } else if (type == g.giroaccount) {
                     x.total.note = string.Format("Promet Žiro-Računa {0}/{1}", g.Month(i), year);
                     x.total.accountBalance = x.total.outputAccumulation - x.total.inputAccumulation;
-                } else {
+                } else if (type == g.otherFee) {
+                    x.total.note = "Ostali troškovi";
+                }
+                else {
                     x.total.note = null; // data.Where(a => a.month.ToString() == i.ToString()).FirstOrDefault().note;
                 }
                 x.month = g.Month(i);

@@ -814,37 +814,52 @@
             date: new Date(),
             month: $scope.g.month,
             year: $scope.g.year,
-            recordTypes: $scope.g.recordTypes,
+            recordType: null,
             pdf: null,
             loadingPdf: false
         }
         $scope.d = data;
 
-        var init = () => {
-            f.post(service, 'Init', {}).then((d) => {
-                $scope.d.fee = d;
+        //var init = () => {
+        //    f.post(service, 'Init', {}).then((d) => {
+        //        $scope.d.fee = d;
+        //    });
+        //}
+        //init();
+
+        $scope.save = (x, d, idx) => {
+            debugger;
+            if (x.id === null) {
+                x.recordDate = f.setDate(x.recordDate);
+            }
+            f.post(service, 'SaveOtherFee', { x: x }).then((d) => {
+                debugger;
+                $scope.d.records.data[idx] = d;
+                load(x, x.recordType);
+
             });
         }
-        init();
 
-        $scope.save = (x) => {
-            x.fee.recordDate = f.setDate(x.date);
-            f.post(service, 'SaveOtherFee', { x: x.fee }).then((d) => {
+        var load = (x, type) => {
+            f.post(service, 'Load', { year: x.year, type: type }).then((d) => {
                 $scope.d.records = d;
+                angular.forEach(d.data, function (value, key) {
+                    $scope.d.records.data[key].recordDate = new Date(value.recordDate);
+                });
             });
         }
 
-        var load = (x) => {
-            f.post(service, 'OtherFee', { month: x.month, year: x.year }).then((d) => {
-                $scope.d.records = d;
+        $scope.load = (x, type) => {
+            return load(x, type);
+        }
+
+        $scope.add = (type) => {
+            f.post(service, 'Init', { type:type }).then((d) => {
+                debugger;
+                d.recordDate = new Date(d.recordDate);
+                $scope.d.records.data.push(d);
             });
         }
-
-        $scope.load = (x) => {
-            return load(x);
-        }
-
-
 
         $scope.print = (x) => {
             alert('TODO');
