@@ -29,6 +29,7 @@
                     <tr>
                         <th>br.</th>
                         <th>Datum</th>
+                        <th>Mjesec</th>
                         <th class="text-right">Iznos ({{config.currency}})</th>
                         <th>Opis</th>
                         <th></th>
@@ -38,13 +39,18 @@
                     <tr ng-repeat="x in d.records.data track by $index">
                         <td>{{$index + 1}}</td>
                         <td><input ng-model="x.recordDate" type="date" class="form-control" name="accessDate"></td>
+                        <td>
+                            <select ng-model="x.month" class="form-control mb-2 mr-sm-2">
+                                <option ng-value="y.id" ng-repeat="y in g.months" ng-selected="x.month===Number(y.id)?true:false">{{y.title}}</option>
+                            </select>
+                        </td>
                         <td><input ng-model="x.amount" class="form-control text-right" allow-only-numbers /></td>
                         <td><input ng-model="x.note" class="form-control" /></td>
                         <td><button class="btn btn-outline-primary" ng-click="save(x, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button></td>
                 </tbody>
                 <tfoot ng-if="d.records.data.length>0" class="thead-light">
                     <tr class="text-right">
-                        <th colspan="2">Ukupno:</th>
+                        <th colspan="3">Ukupno:</th>
                         <th>{{d.records.total.bankFee | number:2}}</th>
                         <th colspan="2"></th>
                     </tr>

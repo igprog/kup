@@ -461,8 +461,8 @@
     };
     $scope.d = data;
 
-    var loadUsers = (bu) => {
-        f.post('User', 'Load', { buisinessUnitCode: bu}).then((d) => {
+    var loadUsers = (bu, search) => {
+        f.post('User', 'Load', { buisinessUnitCode: bu, search: search }).then((d) => {
             $scope.d.users = d;
         });
     }
@@ -471,7 +471,7 @@
         f.post(service, 'Init', {}).then((d) => {
             $scope.d.loan = d;
             $scope.d.loan.loanDate = new Date();
-            loadUsers(null);
+            loadUsers(null, null);
         });
     }
     init();
@@ -481,7 +481,7 @@
             $scope.d.loan.manipulativeCosts = (x.loan * x.manipulativeCostsCoeff).toFixed(2);
             $scope.d.loan.repayment = (x.loan / x.dedline).toFixed(2);
             //$scope.d.loan.actualLoan = x.loan - $scope.d.loan.manipulativeCosts;
-            $scope.d.loan.withdraw = $scope.d.loan.loan - $scope.d.loan.user.restToRepayment;
+            $scope.d.loan.withdraw = $scope.d.loan.loan - $scope.d.loan.user.restToRepayment - $scope.d.loan.manipulativeCosts;
             //$scope.d.loan.user.activeLoanId = $scope.d.user.activeLoanId;
         }
     }
@@ -820,20 +820,11 @@
         }
         $scope.d = data;
 
-        //var init = () => {
-        //    f.post(service, 'Init', {}).then((d) => {
-        //        $scope.d.fee = d;
-        //    });
-        //}
-        //init();
-
         $scope.save = (x, d, idx) => {
-            debugger;
             if (x.id === null) {
                 x.recordDate = f.setDate(x.recordDate);
             }
             f.post(service, 'SaveOtherFee', { x: x }).then((d) => {
-                debugger;
                 $scope.d.records.data[idx] = d;
                 load(x, x.recordType);
 
@@ -845,6 +836,7 @@
                 $scope.d.records = d;
                 angular.forEach(d.data, function (value, key) {
                     $scope.d.records.data[key].recordDate = new Date(value.recordDate);
+                    $scope.d.records.data[key].month = parseInt(value.month);
                 });
             });
         }
@@ -855,7 +847,6 @@
 
         $scope.add = (type) => {
             f.post(service, 'Init', { type:type }).then((d) => {
-                debugger;
                 d.recordDate = new Date(d.recordDate);
                 $scope.d.records.data.push(d);
             });

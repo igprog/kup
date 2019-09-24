@@ -403,6 +403,7 @@ public class Account : System.Web.Services.WebService {
                                         GROUP BY a.recordType", year, month);
             EntryTotal xx = new EntryTotal();
             xx.data = new List<Recapitulation>();
+            EntryTotal et = new EntryTotal();
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -419,17 +420,96 @@ public class Account : System.Web.Services.WebService {
                     }
                 }
                 connection.Close();
-                xx.data = PrepareEntryData(xx.data, year, month);
-                xx.total = new Recapitulation();
-                xx.total.input = xx.data.Sum(a => a.input);
-                xx.total.output = xx.data.Sum(a => a.output);
+                //xx.data = PrepareEntryData(xx.data, year, month);
+                et.data = PrepareEntryData(xx.data, year, month);
+                et.total = new Recapitulation();
+                et.total.input = et.data.Sum(a => a.input);
+                et.total.output = et.data.Sum(a => a.output);
             }
-            return JsonConvert.SerializeObject(xx, Formatting.Indented);
+            return JsonConvert.SerializeObject(et, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
         }
     }
 
+     private List<Recapitulation> PrepareEntryData(List<Recapitulation> xx, int year, int month) {
+        List<Recapitulation> xxx = new List<Recapitulation>();
+        Recapitulation x = new Recapitulation();
+        x.note = "Žiro račun";
+        x.output = xx.Where(a => a.recordType == g.monthlyFee).Sum(a => a.input) + xx.Where(a => a.recordType == g.userPayment).Sum(a => a.input) + xx.Where(a => a.recordType == g.repayment).Sum(a => a.input);
+        x.input = xx.Where(a => a.recordType == g.withdraw).Sum(a => a.input) + xx.Where(a => a.recordType == g.bankFee).Sum(a => a.input) + xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input);
+        x.account = GetAccountNo(g.giroaccount);
+        xxx.Add(x);
+
+        x = new Recapitulation();
+        x.note = "Pozajmice";
+        Loan l = new Loan();
+        x.output = l.GetLoansTotal(month, year);
+        x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input);
+        x.account = GetAccountNo(g.loan);
+        xxx.Add(x);
+
+        x = new Recapitulation();
+        x.note = "Ulozi";
+        x.output = xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input);
+        x.input = xx.Where(a => a.recordType == g.monthlyFee).Sum(a => a.input);
+        x.account = GetAccountNo(g.monthlyFee);
+        xxx.Add(x);
+
+        x = new Recapitulation();
+        x.note = "Troškovi održavanja računa";
+        x.output = xx.Where(a => a.recordType == g.bankFee).Sum(a => a.input);
+        x.input = 0;
+        x.account = GetAccountNo(g.monthlyFee);
+        xxx.Add(x);
+
+        x = new Recapitulation();
+        x.note = string.Format("Manipulativni troškovni {0}%", g.manipulativeCostsPerc());
+        x.output = 0;
+        x.input = xx.Where(a => a.recordType == g.manipulativeCosts).Sum(a => a.input);
+        x.account = GetAccountNo(g.manipulativeCosts);
+        xxx.Add(x);
+
+
+        //foreach (Recapitulation x in xx) {
+        //    x.account = GetAccountNo(x.recordType == g.repayment ? g.loan : x.recordType);
+        //    if (x.recordType == g.repayment) {
+        //        x.output = l.GetLoansTotal(month, year);
+        //       // x.output = xx.Where(a => a.recordType == g.withdraw).Sum(a => a.input);  // TODO: sve odobrene pozajmice
+        //        x.note = "Pozajmice";
+        //    }
+        //    if (x.recordType == g.monthlyFee) {
+        //        x.output = xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input);
+        //        x.input = xx.Where(a => a.recordType == g.monthlyFee).Sum(a => a.input);
+        //        //x.output = GetMonthlyFeeRequired(x.month, x.year);
+        //        //x.input = 0;
+        //        x.note = "Ulozi";
+        //    }
+        //    if (x.recordType == g.bankFee) {
+        //        x.output = x.input;
+        //        x.input = 0;
+        //        x.note = "Troškovi održavanja računa";
+        //    }
+        //    //if (x.recordType == g.otherFee) {
+        //    //    x.output = x.input;
+        //    //    x.input = 0;
+        //    //    x.note = "Ostali troškovi";
+        //    //}
+        //    if (x.recordType == g.manipulativeCosts) {
+        //        x.note = string.Format("Manipulativni troškovni {0}%", g.manipulativeCostsPerc());
+        //    }
+        //    //if(x.recordType == g.terminationWithdraw) {
+        //    //    x.output = x.input;
+        //    //    x.note = "Isplata uloga";
+        //    //}
+        //    if(x.recordType != g.withdraw && x.recordType != g.otherFee && x.recordType != g.terminationWithdraw) {
+        //        xxx.Add(x);
+        //    }
+        //}
+        return xxx;
+    }
+
+    /*  OLD
     private List<Recapitulation> PrepareEntryData(List<Recapitulation> xx, int year, int month) {
         List<Recapitulation> xxx = new List<Recapitulation>();
         Recapitulation r = new Recapitulation();
@@ -478,7 +558,7 @@ public class Account : System.Web.Services.WebService {
         }
         return xxx;
     }
-
+    */
 
     [WebMethod]
     public string LoadRecapitulation(int year, string type) {
@@ -931,16 +1011,6 @@ public class Account : System.Web.Services.WebService {
         x.loanId = reader.GetValue(7) == DBNull.Value ? null : reader.GetString(7);
         x.note = reader.GetValue(8) == DBNull.Value ? null : reader.GetString(8);
         x.lastDayInMonth = g.LastDayInMonth(x.year, Convert.ToInt32(x.month));
-
-        //if(x.recordType == RecordType.loan.ToString()) {
-        //    x.loan = x.amount;
-        //    x.repayment = x.amount;
-        //    x.repaid = Repaid(x.loanId);
-        //    x.restToRepayment = x.loan - x.repaid;
-        //    x.totalObligation = x.monthlyFee + x.repayment;
-        //}
-
-
         return x;
     }
  

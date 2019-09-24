@@ -11,12 +11,12 @@
                 <label for="month" class="mb-2 mr-sm-2">Mjesec:</label>
                 <select ng-model="d.month" class="form-control mb-2 mr-sm-2" ng-change="getMonthlyRecords(d)">
                     <!--<option ng-repeat="x in g.months" value="{{x.id}}">{{x.title}}</option>-->
-                    <option ng-value="x.id" ng-selected="x.id==d.month?true:false" ng-repeat="x in g.months" value="{{x.id}}">{{x.title}}</option>
+                    <option ng-value="x.id" ng-selected="x.id==d.month?true:false" ng-repeat="x in g.months" >{{x.title}}</option>
                 </select>
                 <label for="year" class="mb-2 mr-sm-2"> / </label>
                 <select ng-model="d.year" class="form-control mb-2 mr-sm-2" ng-change="getMonthlyRecords(d)">
                     <!--<option ng-repeat="x in g.years" value="{{x}}">{{x}}</option>-->
-                    <option ng-value="x" ng-selected="x==d.year?true:false" ng-repeat="x in g.years" value="{{x}}">{{x}}</option>
+                    <option ng-value="x" ng-selected="x==d.year?true:false" ng-repeat="x in g.years" >{{x}}</option>
                 </select>
                 <label for="year" class="mb-2 mr-sm-2"> g </label>
                 <button ng-click="getMonthlyRecords(d)" type="submit" class="btn btn-outline-primary mb-2 mr-sm-2"><i class="fas fa-filter"></i> Filter</button>
