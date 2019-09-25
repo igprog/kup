@@ -1,4 +1,7 @@
-﻿
+﻿body {
+    font-family: 'Encode Sans Expanded';
+    font-size: 14px;
+}
 /********** Sidebar **********/
 #body-row {
     margin-left:0;

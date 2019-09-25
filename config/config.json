@@ -1,5 +1,5 @@
 ﻿{
-  "version": "1.3.9",
+  "version": "1.4.0",
   "appname": "KUP - Janaf",
   "apptitle": "Kasa Uzajamne Pomoći",
   "debug": true,
@@ -39,7 +39,7 @@
       "ico": null
     },
     {
-      "tpl": "loan",
+      "tpl": "newloan",
       "title": "Nova Pozajmica",
       "src": "loan",
       "ico": "hand-holding-usd"
@@ -73,17 +73,17 @@
     {
       "tpl": "bankfee",
       "title": "Troškovi Održavanja Računa",
-      "ico": "file-invoice-dollar"
+      "ico": "wrench"
     },
     {
       "tpl": "interest",
       "title": "Kamate Po Štednji",
-      "ico": "file-invoice-dollar"
+      "ico": "chart-line"
     },
     {
       "tpl": "otherfee",
       "title": "Ostali Troškovi",
-      "ico": "file-invoice-dollar"
+      "ico": "shopping-cart"
     },
     {
       "tpl": null,
@@ -101,7 +101,7 @@
     {
       "tpl": "entry",
       "title": "Temeljnica",
-      "ico": "file-alt",
+      "ico": "file-invoice-dollar",
       "dashboard": {
         "class": "info"
       }

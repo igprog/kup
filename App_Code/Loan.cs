@@ -173,6 +173,75 @@ public class Loan : System.Web.Services.WebService {
     }
 
     [WebMethod]
+    public string Search(string search) {
+        try {
+            db.Loan();
+            string sql = string.Format(@"SELECT l.id, l.userId, l.loan, l.loanDate, l.repayment, l.manipulativeCosts, l.withdraw, l.dedline, l.isRepaid, l.note, u.firstName, u.lastName, b.code, b.title FROM Loan l
+                        LEFT OUTER JOIN Users u
+                        ON l.userId = u.id
+                        LEFT OUTER JOIN BuisinessUnit b
+                        ON u.buisinessUnitCode = b.code
+                        {0}", string.IsNullOrEmpty(search) ? "" : string.Format("WHERE u.firstName  LIKE '%{0}%' OR u.lastName LIKE '%{0}%'", search));
+            Loans xx = new Loans();
+            xx.data = new List<NewLoan>();
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            NewLoan x = ReadData(reader);
+                            xx.data.Add(x);
+                        }
+                    }
+                }
+                connection.Close();
+            }
+
+            xx.total = new Total();
+            xx.total.loan = xx.data.Sum(a => a.loan);
+            xx.total.repayment = xx.data.Sum(a => a.repayment);
+            xx.total.manipulativeCosts = xx.data.Sum(a => a.manipulativeCosts);
+            //xx.total.actualLoan = xx.data.Sum(a => a.actualLoan);
+            xx.total.withdraw = xx.data.Sum(a => a.withdraw);
+            xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
+
+            xx.monthlyTotal = new List<MonthlyTotal>();
+            xx.monthlyTotal = GetMonthlyTotal(xx.data);
+
+            return JsonConvert.SerializeObject(xx, Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+        }
+    }
+
+    [WebMethod]
+    public string Get(string id) {
+        try {
+            db.Loan();
+            string sql = string.Format(@"SELECT l.id, l.userId, l.loan, l.loanDate, l.repayment, l.manipulativeCosts, l.withdraw, l.dedline, l.isRepaid, l.note, u.firstName, u.lastName, b.code, b.title FROM Loan l
+                        LEFT OUTER JOIN Users u
+                        ON l.userId = u.id
+                        LEFT OUTER JOIN BuisinessUnit b
+                        ON u.buisinessUnitCode = b.code WHERE l.id = '{0}'", id);
+            NewLoan x = new NewLoan();
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            x = ReadData(reader);
+                        }
+                    }
+                }
+                connection.Close();
+            }
+            return JsonConvert.SerializeObject(x, Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+        }
+    }
+
+    [WebMethod]
     public string Delete(string id) {
         try {
             string sql = string.Format("DELETE FROM Loan WHERE id = '{0}'", id);
@@ -198,6 +267,7 @@ public class Loan : System.Web.Services.WebService {
         x.loanDate = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
         x.repayment = reader.GetValue(4) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(4));
         x.manipulativeCosts = reader.GetValue(5) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(5));
+        x.manipulativeCostsCoeff = s.Data().manipulativeCostsCoeff;
         //x.actualLoan = x.loan - x.manipulativeCosts;
         x.withdraw = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
         //TODO:  x.restToRepayment;

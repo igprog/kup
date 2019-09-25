@@ -116,7 +116,6 @@
                 { id: 'otherFee', title: 'Ostalo' }
             ]
         }
-
     }
 }])
 
@@ -453,13 +452,6 @@
 
 .controller('loanCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Loan';
-    var data = {
-        users: [],
-        loan: {},
-        pdf: null,
-        loadingPdf: false
-    };
-    $scope.d = data;
 
     var loadUsers = (bu, search) => {
         f.post('User', 'Load', { buisinessUnitCode: bu, search: search }).then((d) => {
@@ -474,7 +466,48 @@
             loadUsers(null, null);
         });
     }
-    init();
+
+    if ($scope.g.currTpl == './assets/partials/newloan.html') {
+        var data = {
+            users: [],
+            loan: {},
+            records: {},
+            month: f.month(),
+            year: f.year(),
+            buisinessUnitCode: null,
+            search: null,
+            pdf: null,
+            loadingPdf: false
+        };
+        $scope.d = data;
+        init();
+    } else {
+        $scope.d.records = null;
+        $scope.d.month = f.month();
+        $scope.d.year = f.year();
+        $scope.d.buisinessUnitCode = null,
+        $scope.d.search = null,
+        $scope.d.pdf = null,
+        $scope.d.loadingPdf = false;
+        $scope.d.showPdf = true;
+        loadUsers(null, null);
+    }
+
+
+    //var data = {
+    //    users: [],
+    //    loan: {},
+    //    records: {},
+    //    month: f.month(),
+    //    year: f.year(),
+    //    buisinessUnitCode: null,
+    //    search: null,
+    //    pdf: null,
+    //    loadingPdf: false
+    //};
+    //$scope.d = data;
+
+
 
     $scope.calculate = (x) => {
         if (x.loan > 0) {
@@ -494,6 +527,10 @@
 
     // TODO: staviti u globalne funkcije
     var validate = (x) => {
+         if (parseInt(x.loan) <= 0 || parseInt(x.repayment) <= 0 || parseInt(x.withdraw) <= 0 || parseInt(x.dedline) <= 0 || parseInt(x.manipulativeCosts) <= 0) {
+			alert('Neisprava unos!');
+            return false;
+        }
         if (!f.isValidDate(x.loanDate)) {
             alert('Neispravan datum!');
             return false;
@@ -510,6 +547,7 @@
         }
         x.loan.restToRepayment = x.loan.user.restToRepayment;
         f.post(service, 'Save', { x: x.loan }).then((d) => {
+            $scope.d.loan.loanDate = new Date($scope.d.loan.loanDate);
             alert(d);
         });
     }
@@ -539,23 +577,9 @@
         $scope.d.pdf = null;
     }
 
-}])
-
-.controller('loansCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
-    var service = 'Loan';
-    var data = {
-        records: {},
-        month: f.month(),
-        year: f.year(),
-        buisinessUnitCode: null,
-        pdf: null,
-        loadingPdf: false
-    };
-    $scope.d = data;
-
-
+    //TODO: Prebaciti loansCtrl u loan
     var load = (x) => {
-        f.post('Loan', 'Load', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
+        f.post(service, 'Load', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
             $scope.d.records = d;
         });
     }
@@ -564,12 +588,22 @@
         load(x);
     }
 
-    //$scope.load_recap = (x) => {
-    //    x.month = null;
-    //    load(x);
-    //}
+    $scope.search = (x) => {
+        f.post(service, 'Search', { search: x }).then((d) => {
+            $scope.d.records = d;
+        });
+    }
 
-    $scope.print = (x) => {
+    $scope.get = (id) => {
+        f.post(service, 'Get', { id: id }).then((d) => {
+            $scope.d.loan = d;
+            $scope.d.loan.loanDate = new Date(d.loanDate);
+            $scope.g.currTpl = f.currTpl('loan');
+            $scope.g.currTplTitle = "Pozajmica";
+        });
+    }
+
+    $scope.printLoans = (x) => {
         if (f.defined(x.records.length)) {
             if (x.records.length == 0) { return false; }
         }
@@ -581,11 +615,60 @@
         });
     }
 
-    $scope.removePdfLink = () => {
-        $scope.d.pdf = null;
-    }
-
 }])
+
+//.controller('loansCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+//    var service = 'Loan';
+//    var data = {
+//        records: {},
+//        month: f.month(),
+//        year: f.year(),
+//        buisinessUnitCode: null,
+//        search: null,
+//        pdf: null,
+//        loadingPdf: false
+//    };
+//    $scope.d = data;
+
+
+//    var load = (x) => {
+//        f.post(service, 'Load', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
+//            $scope.d.records = d;
+//        });
+//    }
+
+//    $scope.load = (x) => {
+//        load(x);
+//    }
+
+//    $scope.search = (x) => {
+//        f.post(service, 'Search', { search: x }).then((d) => {
+//            $scope.d.records = d;
+//        });
+//    }
+
+//    //$scope.load_recap = (x) => {
+//    //    x.month = null;
+//    //    load(x);
+//    //}
+
+//    $scope.print = (x) => {
+//        if (f.defined(x.records.length)) {
+//            if (x.records.length == 0) { return false; }
+//        }
+//        $scope.d.pdf = null;
+//        $scope.d.loadingPdf = true;
+//        f.post('Pdf', 'Loans', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, records: x.records }).then((d) => {
+//            $scope.d.pdf = f.pdfTempPath(d);
+//            $scope.d.loadingPdf = false;
+//        });
+//    }
+
+//    $scope.removePdfLink = () => {
+//        $scope.d.pdf = null;
+//    }
+
+//}])
 
 .controller('suspensionCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
         var service = 'Account';

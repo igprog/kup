@@ -1,4 +1,4 @@
-﻿<div ng-controller="loansCtrl">
+﻿<div ng-controller="loanCtrl">
     <div class="row">
         <div class="col-sm-10">
             <form class="form-inline">
@@ -21,10 +21,22 @@
             </form>
         </div>
         <div class="col-sm-2 text-right">
-            <button ng-show="!d.pdf" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d)">
+            <button ng-show="!d.pdf" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="printLoans(d)">
                 <loading-directive title="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf"></loading-directive>
             </button>
             <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+            <form>
+                <div class="input-group mb-3">
+                    <input ng-model="d.search" type="text" class="form-control" placeholder="Pretraži...(Prezime, Ime)">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-primary" type="submit" ng-click="search(d.search)"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
     <div ng-if="d.records.data.length>0" class="table-responsive">
@@ -39,6 +51,7 @@
                     <!--<th class="text-right">Pozajmica ({{config.currency}})</th>-->
                     <th class="text-right">Neotplaćena pozajmica ({{config.currency}})</th>
                     <th class="text-right">Za isplatu ({{config.currency}})</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -51,6 +64,7 @@
                     <!--<td class="text-right">{{x.actualLoan | number:2}}</td>-->
                     <td class="text-right">{{x.restToRepayment | number:2}}</td>
                     <td class="text-right">{{x.withdraw | number:2}}</td>
+                    <td><button class="btn btn-outline-primary" title="Pozajmica" ng-click="get(x.id, null)"><i class="fas fa-info"></i></button></td>
                 </tr>
             </tbody>
             <tfoot ng-if="d.records.data.length>0" class="thead-light">
@@ -61,6 +75,7 @@
                     <!--<th>{{d.records.total.actualLoan | number:2}}</th>-->
                     <th>{{d.records.total.restToRepayment | number:2}}</th>
                     <th>{{d.records.total.withdraw | number:2}}</th>
+                    <th></th>
                 </tr>
             </tfoot>
         </table>
