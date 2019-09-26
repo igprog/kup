@@ -1056,6 +1056,31 @@
         }
     }
 
+    //$scope.csvFileName = "users";
+    $scope.upload = function () {
+        var content = new FormData(document.getElementById("formUpload"));
+        $http({
+            url: 'UploadHandler.ashx',
+            method: 'POST',
+            headers: { 'Content-Type': undefined },
+            data: content,
+        }).then(function (response) {
+            //alert(response.data);
+
+            f.post('User', 'ImportUsersCsv', {}).then((d) => {
+                alert(d);
+            });
+            //if (response.data != 'OK') {
+            //    alert(response.data);
+            //} else {
+            //    $window.location.href = 'csv.html?' + $scope.csvFileName;
+            //}
+        },
+       function (response) {
+           alert(response.data);
+       });
+    }
+
 }])
 
 

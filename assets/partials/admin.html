@@ -38,6 +38,17 @@
             </div>
             <button ng-click="sql('drop', d.dropTbl)" type="submit" class="btn btn-outline-danger mb-2 mr-sm-2"><i class="fas fa-skull-crossbones"></i> Drop</button>
         </form>
+        <label class="fieldset-border">Upload Users</label>
+        <form id="formUpload" ng-submit="upload()" enctype="multipart/form-data" method="post">
+            <div class="row">
+                <div class="col-sm-6 pt5">
+                    <input ng-model="csvFileName" name="UploadedFile" id="UploadedFile" type="file" accept=".csv" class="form-control">
+                </div>
+                <div class="col-sm-6 pt5">
+                    <button type="submit" class="btn btn-outline-info"><i class="fa fa-upload"></i> Upload</button>
+                </div>
+            </div>
+        </form>
     </div>
     
 </div>

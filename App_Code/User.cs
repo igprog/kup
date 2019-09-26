@@ -7,6 +7,8 @@ using System.Data.SqlClient;
 using System.Web.Services;
 using System.Configuration;
 using Newtonsoft.Json;
+using System.IO;
+using System.Text;
 using Igprog;
 
 /// <summary>
@@ -55,6 +57,66 @@ public class User : System.Web.Services.WebService {
     public class UserStatus {
         public int status;
         public string statusDate;
+    }
+
+    private class UserCsv {
+
+    }
+
+    [WebMethod]
+    public string ImportUsersCsv() {
+        try {
+            db.Users();
+            string path = Server.MapPath("~/upload/users.csv");
+            List<NewUser> xx = new List<NewUser>();
+            using (var reader = new StreamReader(path, Encoding.ASCII)) {
+                while (!reader.EndOfStream) {
+                    var line = reader.ReadLine();
+                    var val = line.Split(';');
+                    if (!string.IsNullOrEmpty(val[0]) && val[0] != "id") {
+                        NewUser x = new NewUser();
+                        x.id = val[0];
+                        x.lastName = val[1];
+                        x.firstName = val[2];
+                        x.buisinessUnit = new BuisinessUnit.NewUnit();
+                        x.buisinessUnit.code = val[3];
+                        x.totalMebershipFees = Convert.ToInt32(val[4]);
+                        x.restToRepayment = Convert.ToInt32(val[5]);
+                        xx.Add(x);
+                    }
+                }
+            }
+
+
+            //TODO: truncate table Users, Loan, Account
+            //Loop kroz sve korisnike., spremiri korisnika u Users tbl, spremiti totalMebershipFees u Account tbl,
+            // spremiti restToRepayment u Loan kao novu pozajmicu i u tablicu Account.
+
+
+
+
+            //string sql = string.Format(@"BEGIN TRAN
+            //                            IF EXISTS (SELECT * from Users WITH (updlock,serializable) WHERE id = '{0}')
+            //                                BEGIN
+            //                                    UPDATE Users SET buisinessUnitCode = '{1}', firstName = N'{2}', lastName = N'{3}', pin = '{4}', birthDate = '{5}', accessDate = '{6}', terminationDate = '{7}', isActive = '{8}', monthlyFee = '{9}' WHERE id = '{0}'
+            //                                END
+            //                            ELSE
+            //                                BEGIN
+            //                                    INSERT INTO Users (id, buisinessUnitCode, firstName, lastName, pin, birthDate, accessDate, terminationDate, isActive, monthlyFee)
+            //                                    VALUES ('{0}', '{1}', N'{2}', N'{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
+            //                                END
+            //                        COMMIT TRAN", x.id, x.buisinessUnit.code, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
+            //using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            //    connection.Open();
+            //    using (SqlCommand command = new SqlCommand(sql, connection)) {
+            //        command.ExecuteNonQuery();
+            //    }
+            //    connection.Close();
+            //}
+            return JsonConvert.SerializeObject("Spremljeno", Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+        }
     }
 
     [WebMethod]
