@@ -48,6 +48,10 @@
                     <button type="submit" class="btn btn-outline-info"><i class="fa fa-upload"></i> Upload</button>
                 </div>
             </div>
+            <div ng-if="d.loading==true" class="text-center text-primary p-5">
+                <i class="fa fa-spinner {{d.loading==true?'fa-spin':''}} fa-4x"></i>
+                <div>Učitavanje...</div>
+            </div>
         </form>
     </div>
     

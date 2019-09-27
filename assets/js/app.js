@@ -527,7 +527,7 @@
 
     // TODO: staviti u globalne funkcije
     var validate = (x) => {
-         if (parseInt(x.loan) <= 0 || parseInt(x.repayment) <= 0 || parseInt(x.withdraw) <= 0 || parseInt(x.dedline) <= 0 || parseInt(x.manipulativeCosts) <= 0) {
+         if (parseInt(x.loan) <= 0 || parseInt(x.repayment) <= 0 || parseInt(x.withdraw) <= 0 || parseInt(x.dedline) <= 0) {
 			alert('Neisprava unos!');
             return false;
         }
@@ -1030,7 +1030,8 @@
         isLogin: false,
         userId: null,
         truncateTbl: null,
-        dropTbl: null
+        dropTbl: null,
+        loading: false
     }
     $scope.d = data;
 
@@ -1058,6 +1059,7 @@
 
     //$scope.csvFileName = "users";
     $scope.upload = function () {
+        $scope.d.loading = true;
         var content = new FormData(document.getElementById("formUpload"));
         $http({
             url: 'UploadHandler.ashx',
@@ -1069,6 +1071,7 @@
 
             f.post('User', 'ImportUsersCsv', {}).then((d) => {
                 alert(d);
+                $scope.d.loading = false;
             });
             //if (response.data != 'OK') {
             //    alert(response.data);

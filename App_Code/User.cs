@@ -78,41 +78,67 @@ public class User : System.Web.Services.WebService {
                         x.id = val[0];
                         x.lastName = val[1];
                         x.firstName = val[2];
+                        x.pin = val[3];
                         x.buisinessUnit = new BuisinessUnit.NewUnit();
-                        x.buisinessUnit.code = val[3];
-                        x.totalMebershipFees = Convert.ToInt32(val[4]);
-                        x.restToRepayment = Convert.ToInt32(val[5]);
+                        x.buisinessUnit.code = val[4];
+                        x.totalMebershipFees = Convert.ToInt32(val[5]);
+                        x.restToRepayment = Convert.ToInt32(val[6]);
+                        x.birthDate = g.Date(DateTime.Now);  //TODO
+                        x.accessDate = g.Date(DateTime.Now);  //TODO
+                        x.isActive = 1;
+                        x.monthlyFee = s.Data().monthlyFee;  //TODO
                         xx.Add(x);
                     }
                 }
             }
+            string sql = null;
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand()) {
+                    command.Connection = connection;
+                    using (SqlTransaction transaction = connection.BeginTransaction()) {
+                        sql = "DELETE FROM Users; DELETE FROM Loan; DELETE FROM Account;";
+                        command.CommandText = sql;
+                        command.Transaction = transaction;
+                        command.ExecuteNonQuery();
+                        foreach (NewUser u in xx) {
+                            sql = string.Format(@"INSERT INTO Users (id, buisinessUnitCode, firstName, lastName, pin, birthDate, accessDate, terminationDate, isActive, monthlyFee)
+                                                 VALUES ('{0}', '{1}', N'{2}', N'{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')"
+                                                , u.id, u.buisinessUnit.code, u.firstName, u.lastName, u.pin, u.birthDate, u.accessDate, u.terminationDate, u.isActive, u.monthlyFee);
+                            command.CommandText = sql;
+                            command.Transaction = transaction;
+                            command.ExecuteNonQuery();
 
+                            Loan.NewLoan l = new Loan.NewLoan();
+                            l.id = Guid.NewGuid().ToString();
+                            l.loan = u.restToRepayment;
+                            l.loanDate = u.accessDate;
+                            l.withdraw = u.restToRepayment;
+                            l.dedline = 12; //TODO
+                            l.note = "Početno stanje";
+                            string loanId = Guid.NewGuid().ToString();
+                            string monthlyFeeId = Guid.NewGuid().ToString();
+                            sql = string.Format(@"BEGIN
+                                                   INSERT INTO Loan (id, userId, loan, loanDate, repayment, manipulativeCosts, withdraw, dedline, isRepaid, note)
+                                                   VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', N'{9}');
 
-            //TODO: truncate table Users, Loan, Account
-            //Loop kroz sve korisnike., spremiri korisnika u Users tbl, spremiti totalMebershipFees u Account tbl,
-            // spremiti restToRepayment u Loan kao novu pozajmicu i u tablicu Account.
+                                                   INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+                                                   VALUES ('{13}', '{1}', '{6}', '{3}', '{10}', '{11}', '{12}', '{0}', N'{9}');
 
-
-
-
-            //string sql = string.Format(@"BEGIN TRAN
-            //                            IF EXISTS (SELECT * from Users WITH (updlock,serializable) WHERE id = '{0}')
-            //                                BEGIN
-            //                                    UPDATE Users SET buisinessUnitCode = '{1}', firstName = N'{2}', lastName = N'{3}', pin = '{4}', birthDate = '{5}', accessDate = '{6}', terminationDate = '{7}', isActive = '{8}', monthlyFee = '{9}' WHERE id = '{0}'
-            //                                END
-            //                            ELSE
-            //                                BEGIN
-            //                                    INSERT INTO Users (id, buisinessUnitCode, firstName, lastName, pin, birthDate, accessDate, terminationDate, isActive, monthlyFee)
-            //                                    VALUES ('{0}', '{1}', N'{2}', N'{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
-            //                                END
-            //                        COMMIT TRAN", x.id, x.buisinessUnit.code, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
-            //using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-            //    connection.Open();
-            //    using (SqlCommand command = new SqlCommand(sql, connection)) {
-            //        command.ExecuteNonQuery();
-            //    }
-            //    connection.Close();
-            //}
+                                                   INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+                                                   VALUES ('{16}', '{1}', '{15}', '{3}', '{10}', '{11}', '{14}', '', N'{9}');
+                                                END", l.id, u.id, l.loan, l.loanDate, l.repayment, l.manipulativeCosts
+                                                    , l.withdraw, l.dedline, l.isRepaid, l.note, g.GetMonth(l.loanDate)
+                                                    , g.GetYear(l.loanDate), g.withdraw, loanId, g.monthlyFee, u.monthlyFee, monthlyFeeId);
+                            command.CommandText = sql;
+                            command.Transaction = transaction;
+                            command.ExecuteNonQuery();
+                        }
+                        transaction.Commit();
+                    }
+                }
+                connection.Close();
+            }
             return JsonConvert.SerializeObject("Spremljeno", Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
