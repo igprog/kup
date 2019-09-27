@@ -1031,12 +1031,15 @@
         userId: null,
         truncateTbl: null,
         dropTbl: null,
+        bankFee: null,
+        interest: null,
+        otherFee: null,
         loading: false
     }
     $scope.d = data;
 
     $scope.login = (x) => {
-        f.post('Admin', 'LoginSupervisor', { username: x.userName, password: x.password }).then((d) => {
+        f.post(service, 'LoginSupervisor', { username: x.userName, password: x.password }).then((d) => {
             $scope.d.isLogin = d;
         });
     }
@@ -1051,13 +1054,12 @@
 
     $scope.sql = (method, tbl) => {
         if (confirm('Dali ste sigurni da želite izbrisati tablicu: ' + tbl + '?')) {
-            f.post('Admin', 'Sql', { method: method, tbl: tbl }).then((d) => {
+            f.post(service, 'Sql', { method: method, tbl: tbl }).then((d) => {
                 alert(d);
             });
         }
     }
 
-    //$scope.csvFileName = "users";
     $scope.upload = function () {
         $scope.d.loading = true;
         var content = new FormData(document.getElementById("formUpload"));
@@ -1067,22 +1069,23 @@
             headers: { 'Content-Type': undefined },
             data: content,
         }).then(function (response) {
-            //alert(response.data);
-
-            f.post('User', 'ImportUsersCsv', {}).then((d) => {
-                alert(d);
+            f.post(service, 'ImportUsersCsv', {}).then((d) => {
                 $scope.d.loading = false;
+                alert(d);
             });
-            //if (response.data != 'OK') {
-            //    alert(response.data);
-            //} else {
-            //    $window.location.href = 'csv.html?' + $scope.csvFileName;
-            //}
         },
        function (response) {
            alert(response.data);
        });
     }
+
+    $scope.saveStartBalance = (type, x) => {
+        f.post(service, 'SaveStartBalance', { type: type, x: x }).then((d) => {
+            alert(d);
+        });
+    }
+
+
 
 }])
 
