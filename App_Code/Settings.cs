@@ -19,7 +19,6 @@ public class Settings : System.Web.Services.WebService {
     }
 
     public class NewSettings {
-        public double startAccountBalance;
         public string currency;
         public double monthlyFee;
         public double manipulativeCostsCoeff;

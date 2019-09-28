@@ -1031,6 +1031,7 @@
         userId: null,
         truncateTbl: null,
         dropTbl: null,
+        manipulativeCosts: null,
         bankFee: null,
         interest: null,
         otherFee: null,

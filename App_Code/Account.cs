@@ -634,7 +634,6 @@ public class Account : System.Web.Services.WebService {
         }
         List<RecapMonthlyTotal> xx = new List<RecapMonthlyTotal>();
 
-        //TODO: Pocetno stanje
         if (type == g.loan || type == g.repayment || type == g.monthlyFee || type == g.giroaccount || type == g.loan) {
             RecapMonthlyTotal x = new RecapMonthlyTotal();
             x.month = "PS";
@@ -643,17 +642,14 @@ public class Account : System.Web.Services.WebService {
             x.total.note = "Početno stanje";
             startBalance = GetStartBalance(year, type);
             if (type == g.loan) {
-                //startBalance = GetStartBalance(year, type);
                 startBalance = GetLoanStartBalance(null, year);
-                x.total.output = startBalance; // GetLoanStartBalance(null, year);
-                // GetStartBalance(year, type);  // duguje
+                x.total.output = startBalance;
             }
             if (type == g.monthlyFee) {
-                x.total.input = startBalance; // GetStartBalance(year, type);  // potražuje 
+                x.total.input = startBalance;  // potražuje 
             }
             if (type == g.giroaccount) {
-                //x.total.accountBalance = GetStartBalance(year, type) + s.Data().startAccountBalance;
-                x.total.output = startBalance; // GetStartBalance(year, type) + s.Data().startAccountBalance;
+                x.total.output = startBalance;
             }
             xx.Add(x);
         }
@@ -680,27 +676,12 @@ public class Account : System.Web.Services.WebService {
                                                                     || a.recordType == g.monthlyFee
                                                                     || a.recordType == g.interest));
                 x.total.inputAccumulation = inputAccumulation.Sum(a => a.input) +  startBalance;
-                //x.total.inputAccumulation = inputAccumulation.Sum(a => a.input) + (type == g.giroaccount ? s.Data().startAccountBalance : startBalance);
-                //x.total.inputAccumulation = inputAccumulation.Sum(a => a.input) + (type == g.giroaccount ? s.Data().startAccountBalance : startBalance);
-
-
             }
 
             if (!string.IsNullOrEmpty(outputType)) {
                 if (outputType == g.loan) {
                     x.total.output = GetActivatedLoan(Convert.ToInt32(x.month), year, null);
                     x.total.outputAccumulation = GetActivatedLoanAccu(Convert.ToInt32(x.month), year, null) + startBalance;
-
-                    //var outputAccumulation = outputType != g.giroaccount
-                    //   ? data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && a.recordType == outputType)
-                    //   : data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year))
-                    //                                                    && (a.recordType == g.withdraw
-                    //                                                    || a.recordType == g.bankFee
-                    //                                                    || a.recordType == g.otherFee
-                    //                                                    || a.recordType == g.terminationWithdraw));
-
-                    // x.total.outputAccumulation = outputType != g.giroaccount ? outputAccumulation.Sum(a => a.input) : outputAccumulation.Sum(a => a.input) + startBalance;
-
 
                 } else {
                     var output = outputType != g.giroaccount
@@ -722,54 +703,7 @@ public class Account : System.Web.Services.WebService {
                                                                         || a.recordType == g.terminationWithdraw));
 
                     x.total.outputAccumulation = outputType != g.giroaccount ? outputAccumulation.Sum(a => a.input) : outputAccumulation.Sum(a => a.input) + startBalance;
-                    //x.total.outputAccumulation = outputAccumulation.Sum(a => a.input);
-
-
-                    //    List<Recapitulation> output;
-                    //if (outputType == g.giroaccount) {
-                    //    output = data.Where(a => a.month.ToString() == x.month && a.year == year && a.recordType == outputType).ToList();
-                    //} else if (outputType == g.withdraw || outputType == g.bankFee || outputType == g.otherFee || outputType == g.terminationWithdraw) {
-                    //    output = data.Where(a => a.month.ToString() == x.month && a.year == year
-                    //                        && (a.recordType == g.withdraw
-                    //                        || a.recordType == g.bankFee
-                    //                        || a.recordType == g.otherFee
-                    //                        || a.recordType == g.terminationWithdraw)).ToList();
-                    //} else if (outputType == g.loan) {
-                    //    output = GetActivatedLoan(Convert.ToInt32(x.month), year, null);
-                    //} else {
-                    //    output = new List<Recapitulation>();
-                    //}
                 }
-
-
-
-
-                //var output = outputType != g.giroaccount
-                //    ? data.Where(a => a.month.ToString() == x.month && a.year == year && a.recordType == outputType)
-                //    : data.Where(a => a.month.ToString() == x.month && a.year == year
-                //                                                    && (a.recordType == g.withdraw
-                //                                                    || a.recordType == g.bankFee
-                //                                                    || a.recordType == g.otherFee
-                //                                                    || a.recordType == g.terminationWithdraw));
-
-
-
-                //x.total.output = output.Sum(a => a.input);  // ***** Ovo nije greška (uvijek se vrijednost (amount iz Account.tbl) sprema u (a.input) *****
-
-                //***** Pozajmice *****
-                //if (outputType == g.loan) {
-                //    x.total.output = GetActivatedLoan(Convert.ToInt32(x.month), year, null);
-                //}
-                //*********************
-
-                //var outputAccumulation = outputType != g.giroaccount
-                //   ? data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && a.recordType == outputType)
-                //   : data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year))
-                //                                                    && (a.recordType == g.withdraw
-                //                                                    || a.recordType == g.bankFee
-                //                                                    || a.recordType == g.otherFee
-                //                                                    || a.recordType == g.terminationWithdraw));
-                //x.total.outputAccumulation = outputAccumulation.Sum(a => a.input);
             }
 
             if (x.total.input > 0 || x.total.output > 0) {
