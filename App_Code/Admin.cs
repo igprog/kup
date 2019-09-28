@@ -116,7 +116,7 @@ public class Admin : System.Web.Services.WebService {
                             l.loanDate = u.accessDate;
                             l.withdraw = u.restToRepayment;
                             l.dedline = 12; //TODO
-                            l.note = "Početno stanje";
+                            l.note = "PS";  // Pocetno stanje
                             string loanId = Guid.NewGuid().ToString();
                             string monthlyFeeId = Guid.NewGuid().ToString();
                             sql = string.Format(@"BEGIN
@@ -124,10 +124,10 @@ public class Admin : System.Web.Services.WebService {
                                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', N'{9}');
 
                                                    INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-                                                   VALUES ('{13}', '{1}', '{6}', '{3}', '{10}', '{11}', '{12}', '{0}', N'{9}');
+                                                   VALUES ('{13}', '{1}', '{6}', '{3}', '{10}', '{11}', '{12}', '{0}', '{9}');
 
                                                    INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-                                                   VALUES ('{16}', '{1}', '{15}', '{3}', '{10}', '{11}', '{14}', '', N'{9}');
+                                                   VALUES ('{16}', '{1}', '{15}', '{3}', '{10}', '{11}', '{14}', '', '{9}');
                                                 END", l.id, u.id, l.loan, l.loanDate, l.repayment, l.manipulativeCosts
                                                     , l.withdraw, l.dedline, l.isRepaid, l.note, g.GetMonth(l.loanDate)
                                                     , g.GetYear(l.loanDate), g.withdraw, loanId, g.monthlyFee, u.monthlyFee, monthlyFeeId);
@@ -151,12 +151,13 @@ public class Admin : System.Web.Services.WebService {
         try {
             string sql = string.Format(@"DELETE FROM Account WHERE recordType = '{0}';
                                         INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-                                        VALUES ('{1}', '', '{2}', '{3}', '{4}', '{5}', '{0}', '', N'{6}');"
+                                        VALUES ('{1}', '', '{2}', '{3}', '{4}', '{5}', '{0}', '', '{6}');"
                                         , type, Guid.NewGuid().ToString()
                                         , x
                                         , g.Date(DateTime.Now)
                                         , g.GetMonth(g.Date(DateTime.Now))
-                                        , g.GetYear(g.Date(DateTime.Now)), "Početno stanje");
+                                        , g.GetYear(g.Date(DateTime.Now))
+                                        , "PS");
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {

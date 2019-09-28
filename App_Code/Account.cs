@@ -62,6 +62,8 @@ public class Account : System.Web.Services.WebService {
         public double bankFee;
         public double otherFee;
         public double interest;
+
+        public List<RecapMonthlyTotal> monthlyTotalList;  // TODO
     }
 
     public class Accounts {
@@ -580,6 +582,37 @@ public class Account : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
+
+            //****TODO
+            sql = "select amount, mo, yr, recordType from Account";
+            List<Recapitulation> rr = new List<Recapitulation>();
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            Recapitulation r = new Recapitulation();
+                            r.input = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
+                            r.month = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToInt32(reader.GetInt32(1));
+                            r.year = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToInt32(reader.GetInt32(2));
+                            r.recordType = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
+                            rr.Add(r);
+                        }
+                    }
+                }
+                connection.Close();
+            }
+            x.monthlyTotalList = new List<RecapMonthlyTotal>();
+            for (int i = 1; i <= 12; i++) {
+                RecapMonthlyTotal rmt = new RecapMonthlyTotal();
+                rmt.month = i.ToString();
+                rmt.total = new Recapitulation();
+                rmt.total.input = rr.Where(a => a.month == i && a.year == DateTime.Now.Year).Sum(a => a.input);
+                x.monthlyTotalList.Add(rmt);
+            }
+            //*****
+
+
 
             return JsonConvert.SerializeObject(x, Formatting.Indented);
         } catch (Exception e) {

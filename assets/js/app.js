@@ -220,10 +220,10 @@
     var currency = (x) => {
         return x.toFixed(2) + ' ' + $scope.config.currency;
     }
+
     google.charts.load("current", { packages: ["corechart"] });
-    google.charts.setOnLoadCallback(drawChart);
-    function drawChart() {
-        debugger;
+    google.charts.setOnLoadCallback(drawPieChart);
+    function drawPieChart() {
         if ($scope.d.total == null) { return false; }
         if (!f.defined(google.visualization)) { return false;}
         var data = google.visualization.arrayToDataTable([
@@ -241,9 +241,40 @@
         chart.draw(data, options);
     }
 
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+        var x = $scope.d.total.monthlyTotalList;
+        var data = google.visualization.arrayToDataTable([
+          ['Mjesec', 'Iznos'],
+          ['01', x[0].total.input],
+          ['02', x[1].total.input],
+          ['03', x[2].total.input],
+          ['04', x[3].total.input],
+          ['05', x[4].total.input],
+          ['06', x[5].total.input],
+          ['07', x[6].total.input],
+          ['08', x[7].total.input],
+          ['09', x[8].total.input],
+          ['10', x[9].total.input],
+          ['11', x[10].total.input],
+          ['12', x[11].total.input]
+        ]);
+
+        var options = {
+            title: 'Uplata uloga',
+            hAxis: { title: 'Mjesec', titleTextStyle: { color: '#333' } },
+            vAxis: { minValue: 0 }
+        };
+
+        var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+
     var loadTotal = () => {
         f.post('Account', 'LoadTotal', {}).then((d) => {
             $scope.d.total = d;
+            drawPieChart();
             drawChart();
         });
     }
