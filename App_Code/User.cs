@@ -45,6 +45,8 @@ public class User : System.Web.Services.WebService {
         public double totalMebershipFees;
         public double totalMebershipFeesRequired;
         public double terminationWithdraw;
+        public double monthlyRepayment;
+
         //public List<UserStatus> statusHistory;
 
         //public string activeLoanId;

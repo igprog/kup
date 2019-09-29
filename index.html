@@ -29,10 +29,10 @@
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#" data-toggle="modal" data-target="#infoModal">Info</a>
+                    <a class="nav-link" href="#" data-toggle="modal" data-target="#infoModal"><i class="fa fa-info"></i> Info</a>
                 </li>
                 <li ng-if="d.isLogin" class="nav-item">
-                    <a class="nav-link" href="" ng-click="logout()">Odjava</a>
+                    <a class="nav-link" href="" ng-click="logout()"><i class="fa fa-sign-out-alt"></i> Odjava</a>
                 </li>
                 <li ng-if="d.isLogin" class="nav-item dropdown d-sm-block d-md-none">
                     <a class="nav-link dropdown-toggle" href="#" id="smallerscreenmenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -114,7 +114,8 @@
         <div class="col">
             <div style="min-height:50px">
             </div>
-            <div class="card" style="min-height:85%">
+            <ng-include ng-if="g.currTpl=='./assets/partials/dashboard.html'" src="g.currTpl"></ng-include>
+            <div ng-if="g.currTpl!=='./assets/partials/dashboard.html'" class="card" style="min-height:85%">
                 <h4 class="card-header">{{g.currTpl=='./assets/partials/dashboard.html'?config.apptitle:g.currTplTitle}}</h4>
                 <div class="card-body">
                     <ng-include src="g.currTpl"></ng-include>

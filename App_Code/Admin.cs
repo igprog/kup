@@ -75,13 +75,20 @@ public class Admin : System.Web.Services.WebService {
                     if (!string.IsNullOrEmpty(val[0]) && val[0] != "id") {
                         User.NewUser x = new User.NewUser();
                         x.id = val[0];
-                        x.lastName = val[1];
-                        x.firstName = val[2];
+                        x.firstName = val[1];
+                        x.lastName = val[2];
                         x.pin = val[3];
                         x.buisinessUnit = new BuisinessUnit.NewUnit();
                         x.buisinessUnit.code = val[4];
-                        x.totalMebershipFees = Convert.ToInt32(val[5]);
-                        x.restToRepayment = Convert.ToInt32(val[6]);
+                        x.total = new Account.Total();
+                        x.total.userPaymentWithMonthlyFee = Convert.ToInt32(val[5]);
+                        x.total.terminationWithdraw = Convert.ToInt32(val[6]);
+                        x.total.activatedLoan = Convert.ToInt32(val[7]);
+                        x.total.withdraw = Convert.ToInt32(val[8]);
+                        x.total.repayment = Convert.ToInt32(val[9]);
+                        x.monthlyRepayment = Convert.ToInt32(val[10]);
+                        //x.totalMebershipFees = Convert.ToInt32(val[5]);
+                        //x.restToRepayment = Convert.ToInt32(val[6]);
                         x.birthDate = g.Date(DateTime.Now);  //TODO
                         x.accessDate = g.Date(DateTime.Now);  //TODO
                         x.isActive = 1;
@@ -98,7 +105,8 @@ public class Admin : System.Web.Services.WebService {
                     using (SqlTransaction transaction = connection.BeginTransaction()) {
                         sql = string.Format(@"DELETE FROM Users;
                                                 DELETE FROM Loan;
-                                                DELETE FROM Account WHERE recordType = '{0}' OR recordType = '{1}' OR recordType = '{2}';", g.withdraw, g.monthlyFee, g.userPayment);
+                                                DELETE FROM Account WHERE recordType = '{0}' OR recordType = '{1}' OR recordType = '{2}' OR recordType = '{3}' OR recordType = '{4}';"
+                                                , g.withdraw, g.monthlyFee, g.userPayment, g.manipulativeCosts, g.repayment);
                         command.CommandText = sql;
                         command.Transaction = transaction;
                         command.ExecuteNonQuery();
@@ -112,25 +120,33 @@ public class Admin : System.Web.Services.WebService {
 
                             Loan.NewLoan l = new Loan.NewLoan();
                             l.id = Guid.NewGuid().ToString();
-                            l.loan = u.restToRepayment;
+                            l.user = new User.NewUser();
+                            l.user.id = u.id;
+                            l.loan = u.total.activatedLoan;
                             l.loanDate = u.accessDate;
-                            l.withdraw = u.restToRepayment;
-                            l.dedline = 12; //TODO
+                            l.withdraw = u.total.withdraw;
+                            l.manipulativeCosts = l.loan - l.withdraw;
+                            l.repayment = u.monthlyRepayment;
+                            l.dedline = Math.Round(l.loan / l.repayment, 0);
                             l.note = "PS";  // Pocetno stanje
-                            string loanId = Guid.NewGuid().ToString();
-                            string monthlyFeeId = Guid.NewGuid().ToString();
+
+                            string manipulativeCostsId = Guid.NewGuid().ToString();
+                            string withdrawId = Guid.NewGuid().ToString();
+                            string monthlyPaymentId = Guid.NewGuid().ToString();
                             sql = string.Format(@"BEGIN
                                                    INSERT INTO Loan (id, userId, loan, loanDate, repayment, manipulativeCosts, withdraw, dedline, isRepaid, note)
-                                                   VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', N'{9}');
+                                                   VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
 
                                                    INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-                                                   VALUES ('{13}', '{1}', '{6}', '{3}', '{10}', '{11}', '{12}', '{0}', '{9}');
+                                                   VALUES ('{12}', '{1}', '{5}', '{3}', '{10}', '{11}', 'manipulativeCosts', '{0}', 'PS')
 
                                                    INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-                                                   VALUES ('{16}', '{1}', '{15}', '{3}', '{10}', '{11}', '{14}', '', '{9}');
-                                                END", l.id, u.id, l.loan, l.loanDate, l.repayment, l.manipulativeCosts
-                                                    , l.withdraw, l.dedline, l.isRepaid, l.note, g.GetMonth(l.loanDate)
-                                                    , g.GetYear(l.loanDate), g.withdraw, loanId, g.monthlyFee, u.monthlyFee, monthlyFeeId);
+                                                   VALUES ('{13}', '{1}', '{6}', '{3}', '{10}', '{11}', 'withdraw', '{0}', 'PS')
+
+                                                   INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+                                                   VALUES ('{14}', '{1}', '{15}', '{3}', '{10}', '{11}', 'monthlyFee', '', 'PS')
+                                                  END", l.id, l.user.id, l.loan, l.loanDate, l.repayment, l.manipulativeCosts, l.withdraw, l.dedline, l.isRepaid, l.note, g.GetMonth(l.loanDate), g.GetYear(l.loanDate), manipulativeCostsId, withdrawId, monthlyPaymentId, u.total.userPaymentWithMonthlyFee);
+
                             command.CommandText = sql;
                             command.Transaction = transaction;
                             command.ExecuteNonQuery();
@@ -152,7 +168,8 @@ public class Admin : System.Web.Services.WebService {
             string sql = string.Format(@"DELETE FROM Account WHERE recordType = '{0}';
                                         INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
                                         VALUES ('{1}', '', '{2}', '{3}', '{4}', '{5}', '{0}', '', '{6}');"
-                                        , type, Guid.NewGuid().ToString()
+                                        , type
+                                        , Guid.NewGuid().ToString()
                                         , x
                                         , g.Date(DateTime.Now)
                                         , g.GetMonth(g.Date(DateTime.Now))

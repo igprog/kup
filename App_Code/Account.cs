@@ -58,6 +58,7 @@ public class Account : System.Web.Services.WebService {
         public double totalObligation;
         public double terminationWithdraw;
         public double activatedLoan;
+        public double withdraw;
         public double loanToRepaid;
         public double bankFee;
         public double otherFee;
