@@ -63,7 +63,7 @@ public class Admin : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    public string ImportUsersCsv() {
+    public string ImportUsersCsv(DateTime date) {
         try {
             db.Users();
             string path = Server.MapPath("~/upload/users.csv");
@@ -87,12 +87,12 @@ public class Admin : System.Web.Services.WebService {
                         x.total.withdraw = Convert.ToInt32(val[8]);
                         x.total.repayment = Convert.ToInt32(val[9]);
                         x.monthlyRepayment = Convert.ToInt32(val[10]);
+                        x.monthlyFee = Convert.ToInt32(val[11]);
                         //x.totalMebershipFees = Convert.ToInt32(val[5]);
                         //x.restToRepayment = Convert.ToInt32(val[6]);
-                        x.birthDate = g.Date(DateTime.Now);  //TODO
-                        x.accessDate = g.Date(DateTime.Now);  //TODO
+                        x.birthDate = g.Date(date);  //TODO
+                        x.accessDate = g.Date(date);  //TODO
                         x.isActive = 1;
-                        x.monthlyFee = s.Data().monthlyFee;  //TODO
                         xx.Add(x);
                     }
                 }
@@ -123,7 +123,7 @@ public class Admin : System.Web.Services.WebService {
                             l.user = new User.NewUser();
                             l.user.id = u.id;
                             l.loan = u.total.activatedLoan;
-                            l.loanDate = u.accessDate;
+                            l.loanDate = g.Date(date);
                             l.withdraw = u.total.withdraw;
                             l.manipulativeCosts = l.loan - l.withdraw;
                             l.repayment = u.monthlyRepayment;
@@ -163,17 +163,18 @@ public class Admin : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    public string SaveStartBalance(string type, double x) {
+    public string SaveStartBalance(string type, double x, DateTime date) {
         try {
+            string date_ = g.Date(date);
             string sql = string.Format(@"DELETE FROM Account WHERE recordType = '{0}';
                                         INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
                                         VALUES ('{1}', '', '{2}', '{3}', '{4}', '{5}', '{0}', '', '{6}');"
                                         , type
                                         , Guid.NewGuid().ToString()
                                         , x
-                                        , g.Date(DateTime.Now)
-                                        , g.GetMonth(g.Date(DateTime.Now))
-                                        , g.GetYear(g.Date(DateTime.Now))
+                                        , date_
+                                        , g.GetMonth(date_)
+                                        , g.GetYear(date_)
                                         , "PS");
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();

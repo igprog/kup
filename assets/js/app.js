@@ -1062,6 +1062,7 @@
         userId: null,
         truncateTbl: null,
         dropTbl: null,
+        date: new Date(),
         manipulativeCosts: null,
         bankFee: null,
         interest: null,
@@ -1092,7 +1093,7 @@
         }
     }
 
-    $scope.upload = function () {
+    $scope.upload = function (date) {
         $scope.d.loading = true;
         var content = new FormData(document.getElementById("formUpload"));
         $http({
@@ -1101,7 +1102,7 @@
             headers: { 'Content-Type': undefined },
             data: content,
         }).then(function (response) {
-            f.post(service, 'ImportUsersCsv', {}).then((d) => {
+            f.post(service, 'ImportUsersCsv', { date: date }).then((d) => {
                 $scope.d.loading = false;
                 alert(d);
             });
@@ -1111,8 +1112,8 @@
        });
     }
 
-    $scope.saveStartBalance = (type, x) => {
-        f.post(service, 'SaveStartBalance', { type: type, x: x }).then((d) => {
+    $scope.saveStartBalance = (type, x, date) => {
+        f.post(service, 'SaveStartBalance', { type: type, x: x, date: date }).then((d) => {
             alert(d);
         });
     }

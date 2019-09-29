@@ -47,7 +47,12 @@
             <h4 class="card-header">Import podataka (početno stanje)</h4>
             <div class="card-body">
                 <label>Korisnici</label>
-                <form id="formUpload" ng-submit="upload()" enctype="multipart/form-data" method="post">
+                <form id="formUpload" ng-submit="upload(d.date)" enctype="multipart/form-data" method="post">
+                    <div class="form-group">
+                        <label class="mb-2 mr-sm-2">Datum:</label>
+                        <input ng-model="d.date" type="date" onkeydown="return false" class="form-control" style="width:180px" />
+                    </div>
+                    
                     <div class="row">
                         <div class="col-sm-4">
                             <input ng-model="csvFileName" name="UploadedFile" id="UploadedFile" type="file" accept=".csv" class="form-control">
@@ -67,28 +72,28 @@
                             <label class="mb-2 mr-sm-2">Manipulativni troškovi:</label>
                             <input ng-model="d.manipulativeCosts" class="form-control mb-2 mr-sm-2" placeholder="Iznos..." allow-only-numbers />
                         </div>
-                        <button ng-click="saveStartBalance('manipulativeCosts', d.manipulativeCosts)" type="submit" class="btn btn-outline-success mb-2 mr-sm-2"><i class="fas fa-save"></i> Spremi</button>
+                        <button ng-click="saveStartBalance('manipulativeCosts', d.manipulativeCosts, d.date)" type="submit" class="btn btn-outline-success mb-2 mr-sm-2"><i class="fas fa-save"></i> Spremi</button>
                     </form>  
                     <form class="form-inline">
                         <div class="form-group">
                             <label class="mb-2 mr-sm-2">Troškovi održavanja računa:</label>
                             <input ng-model="d.bankFee" class="form-control mb-2 mr-sm-2" placeholder="Iznos..." allow-only-numbers />
                         </div>
-                        <button ng-click="saveStartBalance('bankFee', d.bankFee)" type="submit" class="btn btn-outline-success mb-2 mr-sm-2"><i class="fas fa-save"></i> Spremi</button>
+                        <button ng-click="saveStartBalance('bankFee', d.bankFee, d.date)" type="submit" class="btn btn-outline-success mb-2 mr-sm-2"><i class="fas fa-save"></i> Spremi</button>
                     </form>
                     <form class="form-inline">
                         <div class="form-group">
                             <label class="mb-2 mr-sm-2">Kamate po štednji:</label>
                             <input ng-model="d.interest" class="form-control mb-2 mr-sm-2" placeholder="Iznos..." allow-only-numbers />
                         </div>
-                        <button ng-click="saveStartBalance('interest', d.interest)" type="submit" class="btn btn-outline-success mb-2 mr-sm-2"><i class="fas fa-save"></i> Spremi</button>
+                        <button ng-click="saveStartBalance('interest', d.interest, d.date)" type="submit" class="btn btn-outline-success mb-2 mr-sm-2"><i class="fas fa-save"></i> Spremi</button>
                     </form>
                     <form class="form-inline">
                         <div class="form-group">
                             <label class="mb-2 mr-sm-2">Ostali troškovi:</label>
                             <input ng-model="d.otherFee" class="form-control mb-2 mr-sm-2" placeholder="Iznos..." allow-only-numbers />
                         </div>
-                        <button ng-click="saveStartBalance('otherFee', d.otherFee)" type="submit" class="btn btn-outline-success mb-2 mr-sm-2"><i class="fas fa-save"></i> Spremi</button>
+                        <button ng-click="saveStartBalance('otherFee', d.otherFee, d.date)" type="submit" class="btn btn-outline-success mb-2 mr-sm-2"><i class="fas fa-save"></i> Spremi</button>
                     </form>  
                 </div> 
                   
