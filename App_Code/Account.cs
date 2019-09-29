@@ -583,7 +583,6 @@ public class Account : System.Web.Services.WebService {
                 connection.Close();
             }
 
-            //****TODO
             sql = "select amount, mo, yr, recordType from Account";
             List<Recapitulation> rr = new List<Recapitulation>();
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
@@ -607,12 +606,18 @@ public class Account : System.Web.Services.WebService {
                 RecapMonthlyTotal rmt = new RecapMonthlyTotal();
                 rmt.month = i.ToString();
                 rmt.total = new Recapitulation();
-                rmt.total.input = rr.Where(a => a.month == i && a.year == DateTime.Now.Year).Sum(a => a.input);
+                rmt.total.input = rr.Where(a => a.month == i && a.year == DateTime.Now.Year 
+                                                            && (a.recordType == g.monthlyFee
+                                                            || a.recordType == g.userPayment
+                                                            || a.recordType == g.terminationWithdraw
+                                                            || a.recordType == g.repayment
+                                                            || a.recordType == g.interest)).Sum(a => a.input);
+                rmt.total.output = rr.Where(a => a.month == i && a.year == DateTime.Now.Year
+                                                            && (a.recordType == g.withdraw
+                                                            || a.recordType == g.bankFee
+                                                            || a.recordType == g.otherFee)).Sum(a => a.input);
                 x.monthlyTotalList.Add(rmt);
             }
-            //*****
-
-
 
             return JsonConvert.SerializeObject(x, Formatting.Indented);
         } catch (Exception e) {

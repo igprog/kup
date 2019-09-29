@@ -246,23 +246,23 @@
     function drawChart() {
         var x = $scope.d.total.monthlyTotalList;
         var data = google.visualization.arrayToDataTable([
-          ['Mjesec', 'Iznos'],
-          ['01', x[0].total.input],
-          ['02', x[1].total.input],
-          ['03', x[2].total.input],
-          ['04', x[3].total.input],
-          ['05', x[4].total.input],
-          ['06', x[5].total.input],
-          ['07', x[6].total.input],
-          ['08', x[7].total.input],
-          ['09', x[8].total.input],
-          ['10', x[9].total.input],
-          ['11', x[10].total.input],
-          ['12', x[11].total.input]
+          ['Mjesec', 'Uplate', 'Isplate'],
+          ['01', x[0].total.input, x[0].total.output],
+          ['02', x[1].total.input, x[1].total.output],
+          ['03', x[2].total.input, x[2].total.output],
+          ['04', x[3].total.input, x[3].total.output],
+          ['05', x[4].total.input, x[4].total.output],
+          ['06', x[5].total.input, x[5].total.output],
+          ['07', x[6].total.input, x[6].total.output],
+          ['08', x[7].total.input, x[7].total.output],
+          ['09', x[8].total.input, x[8].total.output],
+          ['10', x[9].total.input, x[9].total.output],
+          ['11', x[10].total.input, x[10].total.output],
+          ['12', x[11].total.input, x[11].total.output]
         ]);
 
         var options = {
-            title: 'Uplata uloga',
+            title: 'Promet',
             hAxis: { title: 'Mjesec', titleTextStyle: { color: '#333' } },
             vAxis: { minValue: 0 }
         };
