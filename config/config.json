@@ -1,11 +1,12 @@
 ﻿{
-  "version": "1.4.4",
+  "version": "1.4.5",
   "appname": "KUP - Janaf",
   "apptitle": "Kasa Uzajamne Pomoći",
   "debug": true,
   "showadminpage": true,
   "currency": "kn",
   "manipulativeCostsPerc": 2,
+  "fromYear": 2019,
   "menu": [
     {
       "tpl": "dashboard",

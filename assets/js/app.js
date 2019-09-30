@@ -139,37 +139,37 @@
                 localStorage.version = $scope.config.version;
             }
         }
-    }
+	}
+
+	var loadGlobalData = () => {
+	    var data = {
+	        currTpl: sessionStorage.getItem('islogin') == 'true' ? f.currTpl('dashboard') : f.currTpl('login'),
+	        currTplTitle: sessionStorage.getItem('islogin') == 'true' ? 'Naslovna' : null,
+	        currTplType: null,
+	        date: new Date(),
+	        month: new Date().getMonth() + 1,
+	        year: new Date().getFullYear(),
+	        months: f.months(),
+	        years: f.years($scope.config.fromYear),
+	        buisinessUnits: [],
+	        recordTypes: f.recordTypes(),
+	        clearView: false,
+	        total: null
+	    }
+	    f.post('BuisinessUnit', 'Load', {}).then((d) => {
+	        data.buisinessUnits = d;
+	    });
+	    $scope.g = data;
+	}
 
     var getConfig = () => {
         $http.get('./config/config.json').then((response) => {
             $scope.config = response.data;
             reloadPage();
+            loadGlobalData();
         });
     };
     getConfig();
-
-    var loadGlobalData = () => {
-        var data = {
-            currTpl: sessionStorage.getItem('islogin') == 'true' ? f.currTpl('dashboard') : f.currTpl('login'),
-            currTplTitle: sessionStorage.getItem('islogin') == 'true' ? 'Naslovna' : null,
-            currTplType: null,
-            date: new Date(),
-            month: new Date().getMonth() + 1,
-            year: new Date().getFullYear(),
-            months: f.months(),
-            years: f.years(2018),
-            buisinessUnits: [],
-            recordTypes: f.recordTypes(),
-            clearView: false,
-            total: null
-        }
-        f.post('BuisinessUnit', 'Load', {}).then((d) => {
-            data.buisinessUnits = d;
-        });
-        $scope.g = data;
-    }
-    loadGlobalData();
 
     var data = {
         admin: {

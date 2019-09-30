@@ -38,7 +38,7 @@
                 <tbody>
                     <tr ng-repeat="x in d.records.data track by $index">
                         <td>{{$index + 1}}</td>
-                        <td><input ng-model="x.recordDate" type="date" class="form-control" name="accessDate"></td>
+                        <td><input ng-model="x.recordDate" type="date" class="form-control" style="width:190px"></td>
                         <td>
                             <select ng-model="x.month" class="form-control mb-2 mr-sm-2">
                                 <option ng-value="y.id" ng-repeat="y in g.months" ng-selected="x.month===Number(y.id)?true:false">{{y.title}}</option>
