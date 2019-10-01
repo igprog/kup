@@ -1,18 +1,12 @@
 ﻿<div ng-controller="otherFeeCtrl">
-
     <div class="row">
         <div class="col-sm-10">
             <form class="form-inline">
-                <!--<label for="month" class="mb-2 mr-sm-2">Mjesec:</label>
-                <select ng-model="d.month" class="form-control mb-2 mr-sm-2">
-                    <option ng-repeat="x in g.months" value="{{x.id}}">{{x.title}}</option>
-                </select>
-                <label for="year" class="mb-2 mr-sm-2"> / </label>-->
-                <select ng-model="d.year" class="form-control mb-2 mr-sm-2">
+                <select ng-model="d.year" class="form-control mb-2 mr-sm-2" ng-change="load(d, 'bankFee')">
+                    <option value="" selected disabled>Godina</option>
                     <option ng-repeat="x in g.years" value="{{x}}">{{x}}</option>
                 </select>
-                <label for="year" class="mb-2 mr-sm-2"> g </label>
-                <button ng-click="load(d, 'bankFee')" type="submit" class="btn btn-outline-primary mb-2 mr-sm-2"><i class="fas fa-filter"></i> Filter</button>
+                <button ng-click="load(d, 'bankFee')" type="submit" class="btn btn-outline-primary mb-2 mr-sm-2" title="Filter"><i class="fas fa-filter"></i></button>
             </form>
         </div>
         <div class="col-sm-2 text-right">
@@ -23,20 +17,20 @@
         </div>
     </div>
     <div>
-        <div ng-if="d.records.data.length>0" class="table-responsive">
+        <div class="table-responsive">
             <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>br.</th>
-                        <th>Datum</th>
-                        <th>Mjesec</th>
-                        <th class="text-right">Iznos ({{config.currency}})</th>
+                        <th style="width:190px">Datum</th>
+                        <th style="width:200px">Mjesec</th>
+                        <th class="text-right" style="width:200px">Iznos ({{config.currency}})</th>
                         <th>Opis</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="x in d.records.data track by $index">
+                    <tr ng-if="d.records.data.length>0" ng-repeat="x in d.records.data track by $index">
                         <td>{{$index + 1}}</td>
                         <td><input ng-model="x.recordDate" type="date" class="form-control" style="width:190px"></td>
                         <td>
@@ -47,6 +41,12 @@
                         <td><input ng-model="x.amount" class="form-control text-right" allow-only-numbers /></td>
                         <td><input ng-model="x.note" class="form-control" /></td>
                         <td><button class="btn btn-outline-primary" ng-click="save(x, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            <button class="btn btn-outline-primary" ng-click="add('bankFee')" title="Dodaj novi"><i class="fas fa-plus"></i> Novi Unos</button>
+                        </td>
+                    </tr>
                 </tbody>
                 <tfoot ng-if="d.records.data.length>0" class="thead-light">
                     <tr class="text-right">
@@ -57,14 +57,7 @@
                 </tfoot>
             </table>
         </div>
-        <div>
-            <button class="btn btn-outline-primary" ng-click="add('bankFee')" title="Dodaj novi"><i class="fas fa-plus"></i> Novi Unos</button>
-        </div>
     </div>
-
-
-
-
     <pre ng-if="config.debug">{{d | json}}</pre>
 </div>
 

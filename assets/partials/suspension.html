@@ -3,23 +3,20 @@
         <div class="col-sm-10">
             <form class="form-inline">
                 <div class="form-group">
-                    <label for="buissinesUnitCode" class="mb-2 mr-sm-2">Poslovna jedinica:</label>
                     <select ng-model="d.buisinessUnitCode" class="form-control mb-2 mr-sm-2" name="buissinesUnitCode" ng-change="getMonthlyRecords(d)">
+                        <option value="" selected disabled>Poslovna jedinica</option>
                         <option ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.title}}</option>
                     </select>
+                    <select ng-model="d.month" class="form-control mb-2 mr-sm-2" ng-change="getMonthlyRecords(d)">
+                        <option value="" selected disabled>Mjesec</option>
+                        <option ng-value="x.id" ng-selected="x.id==d.month?true:false" ng-repeat="x in g.months">{{x.title}}</option>
+                    </select>
+                    <select ng-model="d.year" class="form-control mb-2 mr-sm-2" ng-change="getMonthlyRecords(d)">
+                        <option value="" selected disabled>Godina</option>
+                        <option ng-value="x" ng-selected="x==d.year?true:false" ng-repeat="x in g.years">{{x}}</option>
+                    </select>
+                    <button ng-click="getMonthlyRecords(d)" type="submit" class="btn btn-outline-primary mb-2 mr-sm-2" title="Filter"><i class="fas fa-filter"></i></button>
                 </div>
-                <label for="month" class="mb-2 mr-sm-2">Mjesec:</label>
-                <select ng-model="d.month" class="form-control mb-2 mr-sm-2" ng-change="getMonthlyRecords(d)">
-                    <!--<option ng-repeat="x in g.months" value="{{x.id}}">{{x.title}}</option>-->
-                    <option ng-value="x.id" ng-selected="x.id==d.month?true:false" ng-repeat="x in g.months" >{{x.title}}</option>
-                </select>
-                <label for="year" class="mb-2 mr-sm-2"> / </label>
-                <select ng-model="d.year" class="form-control mb-2 mr-sm-2" ng-change="getMonthlyRecords(d)">
-                    <!--<option ng-repeat="x in g.years" value="{{x}}">{{x}}</option>-->
-                    <option ng-value="x" ng-selected="x==d.year?true:false" ng-repeat="x in g.years" >{{x}}</option>
-                </select>
-                <label for="year" class="mb-2 mr-sm-2"> g </label>
-                <button ng-click="getMonthlyRecords(d)" type="submit" class="btn btn-outline-primary mb-2 mr-sm-2"><i class="fas fa-filter"></i> Filter</button>
             </form>
         </div>
         <div class="col-sm-2 text-right">

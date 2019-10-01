@@ -2,8 +2,8 @@
     <div class="row">
         <div class="col-sm-4">
             <div class="form-group">
-                <label for="buissinesUnitCode">Poslovna jedinica:</label>
                 <select ng-model="d.buisinessUnitCode" class="form-control" name="buissinesUnitCode" ng-click="load(d)">
+                    <option value="" selected disabled>Poslovna jedinica</option>
                     <option ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.title}}</option>
                 </select>
             </div>
@@ -13,7 +13,7 @@
         <div class="col-sm-4">
             <form>
                 <div class="input-group mb-3">
-                    <input ng-model="d.search" type="text" class="form-control" placeholder="Pretraži...(Mt.br, Prezime, Ime, OIB)">
+                    <input ng-model="d.search" type="text" class="form-control" placeholder="Pretraži...">
                     <div class="input-group-append">
                         <button class="btn btn-outline-primary" type="submit" ng-click="load(d)"><i class="fa fa-search"></i></button>
                     </div>

@@ -75,7 +75,7 @@
             var day = x.getDate();
             day = day < 10 ? '0' + day : day;
             var mo = x.getMonth();
-            mo = mo < 10 ? '0' + (mo + 1) : mo + 1;
+            mo = mo + 1 < 10 ? '0' + (mo + 1) : mo + 1;
             var yr = x.getFullYear();
             return yr + '-' + mo + '-' + day;
         },
@@ -325,6 +325,7 @@
     } else {
         $scope.d.buisinessUnitCode = null;
         $scope.d.search = null;
+        $scope.d.year = null;
         $scope.d.pdf = null;
         $scope.d.loadingPdf = false;
         $scope.d.showPdf = true;
@@ -756,6 +757,8 @@
     $scope.d = data;
 
     var getMonthlyRecords = (x) => {
+        if (x.month == null) { x.month = $scope.g.month; }
+        if (x.year == null) { x.year = $scope.g.year; }
         f.post(service, 'GetMonthlyFee', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
             $scope.d.records = d;
         });
@@ -835,6 +838,8 @@
     $scope.d = data;
 
     var getMonthlyRecords = (x) => {
+        if (x.month == null) { x.month = $scope.g.month; }
+        if (x.year == null) { x.year = $scope.g.year; }
         f.post(service, 'GetLoanUsers', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
             $scope.d.records = d;
         });

@@ -7,13 +7,12 @@
                     <select ng-model="d.user.id" class="form-control mb-2 mr-sm-2" name="user">
                         <option ng-repeat="x in d.users" value="{{x.id}}">{{x.id}} - {{x.lastName}} {{x.firstName}}</option>
                     </select>
+                    <label for="year" class="mb-2 mr-sm-2">Godina:</label>
+                    <select ng-model="d.year" class="form-control mb-2 mr-sm-2">
+                        <option ng-repeat="x in g.years" value="{{x}}">{{x}}</option>
+                    </select>
+                    <button ng-click="get('card', 'Kartica Korisnika', d.user.id, d.year)" type="submit" class="btn btn-outline-primary mb-2 mr-sm-2" title="Filter"><i class="fas fa-filter"></i></button>
                 </div>
-                <label for="year" class="mb-2 mr-sm-2"> / </label>
-                <select ng-model="d.year" class="form-control mb-2 mr-sm-2">
-                    <option ng-repeat="x in g.years" value="{{x}}">{{x}}</option>
-                </select>
-                <label for="year" class="mb-2 mr-sm-2"> g </label>
-                <button ng-click="get('card', 'Kartica Korisnika', d.user.id, d.year)" type="submit" class="btn btn-outline-primary mb-2 mr-sm-2"><i class="fas fa-filter"></i> Filter</button>
             </form>
         </div>
         <div class="col-sm-2 text-right">
