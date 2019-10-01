@@ -262,9 +262,9 @@
         ]);
 
         var options = {
-            title: 'Promet',
+            title: 'Promet ' + f.year(),
             hAxis: { title: 'Mjesec', titleTextStyle: { color: '#333' } },
-            vAxis: { minValue: 0 }
+            vAxis: { title: 'Iznos (' + $scope.config.currency + ')', minValue: 0 }
         };
 
         var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
