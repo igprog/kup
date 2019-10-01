@@ -29,6 +29,7 @@ public class Settings : System.Web.Services.WebService {
 
     public class PrintSettings {
         public string headerInfo;
+        public string orientation;
     }
 
     public NewSettings Data() {

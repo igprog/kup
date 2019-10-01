@@ -29,7 +29,7 @@ public class Loan : System.Web.Services.WebService {
         public string loanDate;
         public double repayment;
         public double manipulativeCosts;
-        //public double actualLoan;  // pozajmica - manipulativni troskovi
+        public double actualLoan;  // pozajmica - manipulativni troskovi
         public double withdraw;  // za isplatu (pozajmica - neotplacena pozajmica)
         public double dedline;
         public double restToRepayment;  //TODO
@@ -154,18 +154,15 @@ public class Loan : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
-
             xx.total = new Total();
             xx.total.loan = xx.data.Sum(a => a.loan);
             xx.total.repayment = xx.data.Sum(a => a.repayment);
             xx.total.manipulativeCosts = xx.data.Sum(a => a.manipulativeCosts);
-            //xx.total.actualLoan = xx.data.Sum(a => a.actualLoan);
+            xx.total.actualLoan = xx.data.Sum(a => a.actualLoan);
             xx.total.withdraw = xx.data.Sum(a => a.withdraw);
             xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
-
             xx.monthlyTotal = new List<MonthlyTotal>();
             xx.monthlyTotal = GetMonthlyTotal(xx.data);
-
             return JsonConvert.SerializeObject(xx, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
@@ -268,9 +265,10 @@ public class Loan : System.Web.Services.WebService {
         x.repayment = reader.GetValue(4) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(4));
         x.manipulativeCosts = reader.GetValue(5) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(5));
         x.manipulativeCostsCoeff = s.Data().manipulativeCostsCoeff;
-        //x.actualLoan = x.loan - x.manipulativeCosts;
+        x.actualLoan = x.loan - x.manipulativeCosts;
         x.withdraw = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
-        //TODO:  x.restToRepayment;
+        User u = new User();
+        x.restToRepayment = u.GetLoanAmount(x.user.id) - u.GetAmount(x.user.id, g.repayment);
         x.dedline = reader.GetValue(7) == DBNull.Value ? s.Data().defaultDedline : Convert.ToDouble(reader.GetString(7));
         x.isRepaid = reader.GetValue(8) == DBNull.Value ? 0 : reader.GetInt32(8);
         x.note = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);
@@ -282,23 +280,6 @@ public class Loan : System.Web.Services.WebService {
         return x;
     }
 
-    //public NewLoan GetRecord(string userId, int month, int year) {
-    //    string sql = string.Format("SELECT * FROM Loan WHERE userId = '{0}' AND mo = '{1}' AND yr = '{2}'", userId, month, year);
-    //    NewLoan x = new NewLoan();
-    //    using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-    //        connection.Open();
-    //        using (SqlCommand command = new SqlCommand(sql, connection)) {
-    //            using (SqlDataReader reader = command.ExecuteReader()) {
-    //                while (reader.Read()) {
-    //                    x = ReadData(reader);
-    //                }
-    //            }
-    //        }
-    //        connection.Close();
-    //    }
-    //    return x;
-    //}
-
     private List<MonthlyTotal> GetMonthlyTotal(List<NewLoan> data) {
         List<MonthlyTotal> xx = new List<MonthlyTotal>();
         for(int i=1; i<=12; i++) {
@@ -309,7 +290,7 @@ public class Loan : System.Web.Services.WebService {
             x.total.loan = aa.Sum(a => a.loan);
             x.total.repayment = aa.Sum(a => a.repayment);
             x.total.manipulativeCosts = aa.Sum(a => a.manipulativeCosts);
-            //x.total.actualLoan = aa.Sum(a => a.actualLoan);
+            x.total.actualLoan = aa.Sum(a => a.actualLoan);
             x.total.withdraw = aa.Sum(a => a.withdraw);
             x.total.restToRepayment = aa.Sum(a => a.restToRepayment);
             xx.Add(x);

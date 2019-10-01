@@ -1,1 +1,1 @@
-{"currency":"kn","monthlyFee":150,"manipulativeCostsCoeff":0.02,"defaultDedline":12,"account":{"giroAccount":"1000","loan":"1294","monthlyFee":"2493","manipulativeCosts":"7600","bankFee":"7383","otherFee":"1111"},"printSettings":{"headerInfo":"KUP JANAF\nKasa uzajamne pomoći"}}
+{"currency":"kn","monthlyFee":150,"manipulativeCostsCoeff":0.02,"defaultDedline":12,"account":{"giroAccount":"1000","loan":"1294","monthlyFee":"2493","manipulativeCosts":"7600","bankFee":"7383","otherFee":"1111"},"printSettings":{"headerInfo":"KUP JANAF\nKasa uzajamne pomoći","orientation":"h"}}

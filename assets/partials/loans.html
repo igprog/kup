@@ -45,9 +45,9 @@
                     <th>Mat. br.</th>
                     <th>Prezime</th>
                     <th>Ime</th>
-                    <th class="text-right">Pozajmica ({{config.currency}})</th>
+                    <th class="text-right">Odobrena pozajmica ({{config.currency}})</th>
                     <th class="text-right">Manipulativni troškovi ({{config.currency}})</th>
-                    <!--<th class="text-right">Pozajmica ({{config.currency}})</th>-->
+                    <th class="text-right">Pozajmica ({{config.currency}})</th>
                     <th class="text-right">Neotplaćena pozajmica ({{config.currency}})</th>
                     <th class="text-right">Za isplatu ({{config.currency}})</th>
                     <th></th>
@@ -60,7 +60,7 @@
                     <td>{{x.user.firstName}}</td>
                     <td class="text-right">{{x.loan | number:2}}</td>
                     <td class="text-right">{{x.manipulativeCosts | number:2}}</td>
-                    <!--<td class="text-right">{{x.actualLoan | number:2}}</td>-->
+                    <td class="text-right">{{x.actualLoan | number:2}}</td>
                     <td class="text-right">{{x.restToRepayment | number:2}}</td>
                     <td class="text-right">{{x.withdraw | number:2}}</td>
                     <td><button class="btn btn-outline-primary" title="Pozajmica" ng-click="get(x.id, null)"><i class="fas fa-info"></i></button></td>
@@ -71,7 +71,7 @@
                     <th colspan="3">Ukupno:</th>
                     <th>{{d.records.total.loan | number:2}}</th>
                     <th>{{d.records.total.manipulativeCosts | number:2}}</th>
-                    <!--<th>{{d.records.total.actualLoan | number:2}}</th>-->
+                    <th>{{d.records.total.actualLoan | number:2}}</th>
                     <th>{{d.records.total.restToRepayment | number:2}}</th>
                     <th>{{d.records.total.withdraw | number:2}}</th>
                     <th></th>

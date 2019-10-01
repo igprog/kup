@@ -525,22 +525,6 @@
         loadUsers(null, null);
     }
 
-
-    //var data = {
-    //    users: [],
-    //    loan: {},
-    //    records: {},
-    //    month: f.month(),
-    //    year: f.year(),
-    //    buisinessUnitCode: null,
-    //    search: null,
-    //    pdf: null,
-    //    loadingPdf: false
-    //};
-    //$scope.d = data;
-
-
-
     $scope.calculate = (x) => {
         if (x.loan > 0) {
             $scope.d.loan.manipulativeCosts = (x.loan * x.manipulativeCostsCoeff).toFixed(2);
@@ -557,7 +541,6 @@
         }
     }
 
-    // TODO: staviti u globalne funkcije
     var validate = (x) => {
          if (parseInt(x.loan) <= 0 || parseInt(x.repayment) <= 0 || parseInt(x.withdraw) <= 0 || parseInt(x.dedline) <= 0) {
 			alert('Neisprava unos!');
@@ -609,7 +592,6 @@
         $scope.d.pdf = null;
     }
 
-    //TODO: Prebaciti loansCtrl u loan
     var load = (x) => {
         f.post(service, 'Load', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
             $scope.d.records = d;
@@ -648,59 +630,6 @@
     }
 
 }])
-
-//.controller('loansCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
-//    var service = 'Loan';
-//    var data = {
-//        records: {},
-//        month: f.month(),
-//        year: f.year(),
-//        buisinessUnitCode: null,
-//        search: null,
-//        pdf: null,
-//        loadingPdf: false
-//    };
-//    $scope.d = data;
-
-
-//    var load = (x) => {
-//        f.post(service, 'Load', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
-//            $scope.d.records = d;
-//        });
-//    }
-
-//    $scope.load = (x) => {
-//        load(x);
-//    }
-
-//    $scope.search = (x) => {
-//        f.post(service, 'Search', { search: x }).then((d) => {
-//            $scope.d.records = d;
-//        });
-//    }
-
-//    //$scope.load_recap = (x) => {
-//    //    x.month = null;
-//    //    load(x);
-//    //}
-
-//    $scope.print = (x) => {
-//        if (f.defined(x.records.length)) {
-//            if (x.records.length == 0) { return false; }
-//        }
-//        $scope.d.pdf = null;
-//        $scope.d.loadingPdf = true;
-//        f.post('Pdf', 'Loans', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, records: x.records }).then((d) => {
-//            $scope.d.pdf = f.pdfTempPath(d);
-//            $scope.d.loadingPdf = false;
-//        });
-//    }
-
-//    $scope.removePdfLink = () => {
-//        $scope.d.pdf = null;
-//    }
-
-//}])
 
 .controller('suspensionCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
         var service = 'Account';

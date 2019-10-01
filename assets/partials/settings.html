@@ -78,6 +78,15 @@
                         <td><textarea ng-model="d.printSettings.headerInfo"class="form-control" rows="3"></textarea>
                     </tr>
                     <tr>
+                        <td>Orijentacija ispisa:</td>
+                        <td>
+                            <select ng-model="d.printSettings.orientation" class="form-control">
+                                <option value="h">Horizontalno</option>
+                                <option value="v">Vertikalno</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
                         <td colspan="2" class="text-right">
                             <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fa fa-save"></i> Spremi</button>
                         </td>
