@@ -457,15 +457,36 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
                 PdfPCell cell2 = new PdfPCell(new Phrase(string.Format("{0} {1}", x.user.lastName, x.user.firstName), GetFont()));
                 cell2.Border = 0;
                 table.AddCell(cell2);
-                PdfPCell cell3 = new PdfPCell(new Phrase(g.Currency(x.user.monthlyFee), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                PdfPCell cell3 = new PdfPCell(new Phrase(g.Format(x.user.monthlyFee), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 cell3.Border = 0;
                 table.AddCell(cell3);
-                PdfPCell cell4 = new PdfPCell(new Phrase(g.Currency(x.monthlyFee), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                PdfPCell cell4 = new PdfPCell(new Phrase(g.Format(x.monthlyFee), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 cell4.Border = 0;
                 table.AddCell(cell4);
                 PdfPCell cell5 = new PdfPCell(new Phrase(x.note, GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 cell5.Border = 0;
                 table.AddCell(cell5);
+
+                /***** User Payments *****/
+                if (x.userPayment.Count > 0) {
+                    foreach (Account.UserPayment y in x.userPayment) {
+                        PdfPCell cell6 = new PdfPCell(new Phrase("", GetFont()));
+                        cell6.Border = 0;
+                        table.AddCell(cell6);
+                        PdfPCell cell7 = new PdfPCell(new Phrase("", GetFont()));
+                        cell7.Border = 0;
+                        table.AddCell(cell7);
+                        PdfPCell cell8 = new PdfPCell(new Phrase("", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                        cell8.Border = 0;
+                        table.AddCell(cell8);
+                        PdfPCell cell9 = new PdfPCell(new Phrase(g.Format(y.amount), GetFont(8))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                        cell9.Border = 0;
+                        table.AddCell(cell9);
+                        PdfPCell cell10 = new PdfPCell(new Phrase(y.note, GetFont(8))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                        cell10.Border = 0;
+                        table.AddCell(cell10);
+                    }
+                }
             }
             doc.Add(table);
 
@@ -475,7 +496,7 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
             table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
             table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
             table.AddCell(new PdfPCell(new Phrase("Ukupno:", GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
-            table.AddCell(new PdfPCell(new Phrase(g.Currency(records.total.monthlyFee), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase(g.Currency(records.total.userPaymentWithMonthlyFee), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase("", GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             doc.Add(table);
 

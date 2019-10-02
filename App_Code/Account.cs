@@ -260,11 +260,14 @@ public class Account : System.Web.Services.WebService {
                 }
                 x = CheckMonthlyFee(x, user.id, g.monthlyFee);
                 x.userPayment = GetUserPayment(x, user.id);
+                x.userPaymentTotal = x.userPayment.Sum(a => a.amount);
                 x.user = user;
                 xx.data.Add(x);
             }
             xx.total = new Total();
             xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
+            xx.total.userPayment = xx.data.Sum(a => a.userPaymentTotal);
+            xx.total.userPaymentWithMonthlyFee = xx.total.monthlyFee + xx.total.userPayment;
             xx.total.repayment = xx.data.Sum(a => a.repayment);
             xx.total.totalObligation = xx.data.Sum(a => a.totalObligation);
             return JsonConvert.SerializeObject(xx, Formatting.Indented);
@@ -455,7 +458,7 @@ public class Account : System.Web.Services.WebService {
         x = new Recapitulation();
         x.note = "Ulozi";
         x.output = xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input);
-        x.input = xx.Where(a => a.recordType == g.monthlyFee).Sum(a => a.input);
+        x.input = xx.Where(a => a.recordType == g.monthlyFee || a.recordType == g.userPayment).Sum(a => a.input);
         x.account = GetAccountNo(g.monthlyFee);
         xxx.Add(x);
 
@@ -467,7 +470,7 @@ public class Account : System.Web.Services.WebService {
         xxx.Add(x);
 
         x = new Recapitulation();
-        x.note = string.Format("Manipulativni troškovni {0}%", g.manipulativeCostsPerc());
+        x.note = string.Format("Manipulativni troškovi {0}%", g.manipulativeCostsPerc());
         x.output = 0;
         x.input = xx.Where(a => a.recordType == g.manipulativeCosts).Sum(a => a.input);
         x.account = GetAccountNo(g.manipulativeCosts);
@@ -755,7 +758,7 @@ public class Account : System.Web.Services.WebService {
                 } else if (type == g.monthlyFee) {
                     x.total.note = string.Format("Promet uloga {0}/{1}", g.Month(i), year);
                 } else if (type == g.manipulativeCosts) {
-                    x.total.note = string.Format("{0}% Manipulativni troškovni {1}/{2}", g.manipulativeCostsPerc(), g.Month(i), year);
+                    x.total.note = string.Format("{0}% Manipulativni troškovi {1}/{2}", g.manipulativeCostsPerc(), g.Month(i), year);
                 } else if (type == g.giroaccount) {
                     x.total.note = string.Format("Promet Žiro-Računa {0}/{1}", g.Month(i), year);
                     x.total.accountBalance = x.total.outputAccumulation - x.total.inputAccumulation;
@@ -988,18 +991,26 @@ public class Account : System.Web.Services.WebService {
     public double GetActivatedLoan(int month, int year, string userId) {
         double loan = 0;
         string sql = string.Format(@"
-                    SELECT l.loan FROM Loan l
+                    SELECT SUM(CAST(l.loan AS decimal)) FROM Loan l
                     {0} ((CAST(l.loanDate AS datetime) >= CAST('{1}-{2}-01' AS datetime)) AND (CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)))"
-                        , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE l.userId = '{0}' AND", userId)
-                        , year
-                        , g.Month(month)
-                        , g.GetLastDayInMonth(year, month));
+                     , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE l.userId = '{0}' AND", userId)
+                     , year
+                     , g.Month(month)
+                     , g.GetLastDayInMonth(year, month));
+        //string sql = string.Format(@"
+        //            SELECT l.loan FROM Loan l
+        //            {0} ((CAST(l.loanDate AS datetime) >= CAST('{1}-{2}-01' AS datetime)) AND (CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)))"
+        //                , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE l.userId = '{0}' AND", userId)
+        //                , year
+        //                , g.Month(month)
+        //                , g.GetLastDayInMonth(year, month));
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
                     while (reader.Read()) {
-                        loan = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
+                        loan = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                        //loan = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
                     }
                 }
             }

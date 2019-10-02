@@ -335,13 +335,22 @@ public class Loan : System.Web.Services.WebService {
         }
 
         //U Account tbl uplati razliku za otplatu
+
         sql = string.Format(@"BEGIN TRAN
                                 BEGIN
                                     INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
                                     VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
                                     UPDATE Loan SET isRepaid = 1 WHERE id = '{7}'
                                 END
-                            COMMIT TRAN", Guid.NewGuid().ToString(), x.user.id, x.user.restToRepayment, x.loanDate, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), "loan", loanId, "Otplata novom pozajmicom");
+                            COMMIT TRAN", Guid.NewGuid().ToString(), x.user.id, x.user.restToRepayment, x.loanDate, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), g.repayment, loanId, "Otplata novom pozajmicom");
+
+        //sql = string.Format(@"BEGIN TRAN
+        //                        BEGIN
+        //                            INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+        //                            VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
+        //                            UPDATE Loan SET isRepaid = 1 WHERE id = '{7}'
+        //                        END
+        //                    COMMIT TRAN", Guid.NewGuid().ToString(), x.user.id, x.user.restToRepayment, x.loanDate, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), "loan", loanId, "Otplata novom pozajmicom");
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {

@@ -40,7 +40,7 @@
             </div>
         </div>
         <div ng-if="d.records.data.length>0" class="table-responsive">
-            <table class="table table-hover">
+            <table class="table">
                 <thead>
                     <tr>
                         <th>Mat. br.</th>
@@ -58,7 +58,7 @@
                         <td class="text-right">{{x.user.monthlyFee | number:2}}<button class="btn btn-outline-primary ml-2" ng-click="setMonthlyFee(x, $index)"><i class="fa fa-arrow-circle-right"></i></button></td>
                         <td>
                             <input ng-model="x.monthlyFee" class="form-control text-right" allow-only-numbers />
-                            <div ng-if="x.userPayment.length>0" ng-repeat="y in x.userPayment" class="small">
+                            <div ng-if="x.userPayment.length>0" ng-repeat="y in x.userPayment" class="bg-light p-2 m-2 small">
                                 <label>Datum:</label>
                                 <input ng-model="y.recordDate" class="form-control" />
                                 <label>Iznos:</label>
@@ -66,7 +66,7 @@
                                 <label>Napomena:</label>
                                 <input ng-model="y.note" class="form-control" />
                                 <div class="pt-2 text-right">
-                                    <button class="btn btn-outline-primary" ng-click="saveUserPayment(x, y, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button>
+                                    <button class="btn btn-outline-secondary" ng-click="saveUserPayment(x, y, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button>
                                 </div>
                             </div>
                             <div class="text-right pt-2">
@@ -79,13 +79,12 @@
                 <tfoot ng-if="d.records.data.length>0" class="thead-light">
                     <tr class="text-right">
                         <th colspan="3">Ukupno:</th>
-                        <th>{{d.records.total.monthlyFee | number:2}}</th>
+                        <th>{{d.records.total.userPaymentWithMonthlyFee | number:2}}</th>
                         <th colspan="2"></th>
                     </tr>
                 </tfoot>
             </table>
         </div>
     </div>
-   
     <pre ng-if="config.debug">{{d | json}}</pre>
 </div>

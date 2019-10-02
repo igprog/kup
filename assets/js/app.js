@@ -705,9 +705,7 @@
         x.month = d.month;
         x.year = d.year;
         f.post('Account', 'SaveMonthlyFee', { x: x }).then((d) => {
-            //TODO:
-            //$scope.d.user.records[idx].repaid = d.repaid;
-            //$scope.d.user.records[idx].restToRepayment = d.restToRepayment;
+            getMonthlyRecords($scope.d);
         });
     }
 
@@ -728,10 +726,8 @@
         }
         y.month = d.month;
         y.year = d.year;
-        f.post('Account', 'SaveUserPayment', {userId: x.user.id, y: y }).then((d) => {
-            //TODO:
-            //$scope.d.user.records[idx].repaid = d.repaid;
-            //$scope.d.user.records[idx].restToRepayment = d.restToRepayment;
+        f.post('Account', 'SaveUserPayment', { userId: x.user.id, y: y }).then((d) => {
+            getMonthlyRecords($scope.d);
         });
     }
 
