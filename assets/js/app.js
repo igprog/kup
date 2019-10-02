@@ -542,6 +542,11 @@
     }
 
     var validate = (x) => {
+        debugger;
+        if (x.user.id == null) {
+            alert('Odaberite korisnika!');
+            return false;
+        }
          if (parseInt(x.loan) <= 0 || parseInt(x.repayment) <= 0 || parseInt(x.withdraw) <= 0 || parseInt(x.dedline) <= 0) {
 			alert('Neisprava unos!');
             return false;
@@ -558,6 +563,7 @@
         //x.loan.loanDate = document.getElementById('loanDate').innerText; // f.setDate(date);
         x.loan.loanDate = f.setDate(x.loan.loanDate);
         if (!validate(x.loan)) {
+            $scope.d.loan.loanDate = new Date($scope.d.loan.loanDate);
             return false;
         }
         x.loan.restToRepayment = x.loan.user.restToRepayment;

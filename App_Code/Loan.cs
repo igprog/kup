@@ -100,7 +100,9 @@ public class Loan : System.Web.Services.WebService {
             string sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Loan WITH (updlock,serializable) WHERE id = '{0}')
                                                 BEGIN
-                                                   UPDATE Loan SET userId = '{1}', loan = '{2}', loanDate = '{3}', repayment = '{4}', manipulativeCosts = '{5}', withdraw = '{6}', dedline = '{7}', isRepaid = '{8}', note = '{9}' WHERE id = '{0}'
+                                                   UPDATE Loan SET userId = '{1}', loan = '{2}', loanDate = '{3}', repayment = '{4}', manipulativeCosts = '{5}', withdraw = '{6}', dedline = '{7}', isRepaid = '{8}', note = '{9}' WHERE id = '{0}';
+                                                   UPDATE Account SET userId = '{1}', amount = '{5}', recordDate = '{3}', mo = '{10}', yr = '{11}', note = 'Manipulativni troškovi' WHERE loanId = '{0}' AND recordType = 'manipulativeCosts';
+                                                   UPDATE Account SET userId = '{1}', amount = '{5}', recordDate = '{3}', mo = '{10}', yr = '{11}', note = 'Isplata pozajmice' WHERE loanId = '{0}' AND recordType = 'withdraw';
                                                 END
                                             ELSE
                                                 BEGIN
@@ -114,6 +116,24 @@ public class Loan : System.Web.Services.WebService {
                                                    VALUES ('{13}', '{1}', '{6}', '{3}', '{10}', '{11}',  'withdraw', '{0}', 'Isplata pozajmice')
                                                 END
                                         COMMIT TRAN", x.id, x.user.id, x.loan, x.loanDate, x.repayment, x.manipulativeCosts, x.withdraw, x.dedline, x.isRepaid, x.note, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), manipulativeCostsId, withdrawId);
+
+            //string sql = string.Format(@"BEGIN TRAN
+            //                                IF EXISTS (SELECT * from Loan WITH (updlock,serializable) WHERE id = '{0}')
+            //                                    BEGIN
+            //                                       UPDATE Loan SET userId = '{1}', loan = '{2}', loanDate = '{3}', repayment = '{4}', manipulativeCosts = '{5}', withdraw = '{6}', dedline = '{7}', isRepaid = '{8}', note = '{9}' WHERE id = '{0}'
+            //                                    END
+            //                                ELSE
+            //                                    BEGIN
+            //                                       INSERT INTO Loan (id, userId, loan, loanDate, repayment, manipulativeCosts, withdraw, dedline, isRepaid, note)
+            //                                       VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
+
+            //                                       INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+            //                                       VALUES ('{12}', '{1}', '{5}', '{3}', '{10}', '{11}', 'manipulativeCosts', '{0}', 'Manipulativni troškovi')
+
+            //                                       INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+            //                                       VALUES ('{13}', '{1}', '{6}', '{3}', '{10}', '{11}',  'withdraw', '{0}', 'Isplata pozajmice')
+            //                                    END
+            //                            COMMIT TRAN", x.id, x.user.id, x.loan, x.loanDate, x.repayment, x.manipulativeCosts, x.withdraw, x.dedline, x.isRepaid, x.note, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), manipulativeCostsId, withdrawId);
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -131,7 +151,15 @@ public class Loan : System.Web.Services.WebService {
     [WebMethod]
     public string Load(int? month, int year, string buisinessUnitCode) {
         try {
-            db.Loan();
+            Loans xx = LoadData(month, year, buisinessUnitCode);
+            return JsonConvert.SerializeObject(xx, Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+        }
+    }
+
+    public Loans LoadData(int? month, int year, string buisinessUnitCode) {
+        db.Loan();
             string sql = string.Format(@"SELECT l.id, l.userId, l.loan, l.loanDate, l.repayment, l.manipulativeCosts, l.withdraw, l.dedline, l.isRepaid, l.note, u.firstName, u.lastName, b.code, b.title FROM Loan l
                         LEFT OUTER JOIN Users u
                         ON l.userId = u.id
@@ -163,10 +191,7 @@ public class Loan : System.Web.Services.WebService {
             xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
             xx.monthlyTotal = new List<MonthlyTotal>();
             xx.monthlyTotal = GetMonthlyTotal(xx.data);
-            return JsonConvert.SerializeObject(xx, Formatting.Indented);
-        } catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
-        }
+        return xx;
     }
 
     [WebMethod]
@@ -268,7 +293,7 @@ public class Loan : System.Web.Services.WebService {
         x.actualLoan = x.loan - x.manipulativeCosts;
         x.withdraw = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
         User u = new User();
-        x.restToRepayment = u.GetLoanAmount(x.user.id) - u.GetAmount(x.user.id, g.repayment);
+        x.restToRepayment = GetTotalLoan(x.loanDate) - GetTotalLoanRepayed(x.loanDate);
         x.dedline = reader.GetValue(7) == DBNull.Value ? s.Data().defaultDedline : Convert.ToDouble(reader.GetString(7));
         x.isRepaid = reader.GetValue(8) == DBNull.Value ? 0 : reader.GetInt32(8);
         x.note = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);
@@ -335,6 +360,13 @@ public class Loan : System.Web.Services.WebService {
         }
 
         //U Account tbl uplati razliku za otplatu
+        //sql = string.Format(@"BEGIN TRAN
+        //                        BEGIN
+        //                            INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+        //                            VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
+        //                            UPDATE Loan SET isRepaid = 1 WHERE id = '{7}'
+        //                        END
+        //                    COMMIT TRAN", Guid.NewGuid().ToString(), x.user.id, x.user.restToRepayment, x.loanDate, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), g.repayment, loanId, "Otplata novom pozajmicom");
 
         sql = string.Format(@"BEGIN TRAN
                                 BEGIN
@@ -342,15 +374,8 @@ public class Loan : System.Web.Services.WebService {
                                     VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
                                     UPDATE Loan SET isRepaid = 1 WHERE id = '{7}'
                                 END
-                            COMMIT TRAN", Guid.NewGuid().ToString(), x.user.id, x.user.restToRepayment, x.loanDate, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), g.repayment, loanId, "Otplata novom pozajmicom");
+                            COMMIT TRAN", Guid.NewGuid().ToString(), x.user.id, x.user.restToRepayment, x.loanDate, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), g.loan, loanId, "Otplata novom pozajmicom");
 
-        //sql = string.Format(@"BEGIN TRAN
-        //                        BEGIN
-        //                            INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-        //                            VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
-        //                            UPDATE Loan SET isRepaid = 1 WHERE id = '{7}'
-        //                        END
-        //                    COMMIT TRAN", Guid.NewGuid().ToString(), x.user.id, x.user.restToRepayment, x.loanDate, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), "loan", loanId, "Otplata novom pozajmicom");
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -374,6 +399,42 @@ public class Loan : System.Web.Services.WebService {
         //}
 
 
+    }
+
+     public double GetTotalLoan(string loanDate) {
+        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, l.loan)) FROM Loan l WHERE CONVERT(datetime, l.loanDate) < CONVERT(datetime, '{0}') ", loanDate);
+        double x = 0;
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
+    }
+
+    public double GetTotalLoanRepayed(string loanDate) {
+        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, a.amount)) FROM Account a
+                                    LEFT OUTER JOIN Loan l ON l.id = a.loanId
+                                    WHERE CONVERT(datetime, l.loanDate) < CONVERT(datetime, '{0}') AND a.recordType = '{1}'", loanDate, g.repayment);
+        double x = 0;
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
     }
 
 }

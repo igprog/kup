@@ -451,7 +451,8 @@ public class Account : System.Web.Services.WebService {
         x.note = "Pozajmice";
         Loan l = new Loan();
         x.output = l.GetLoansTotal(month, year);
-        x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input);
+        Loan.Loans loans = l.LoadData(month, year, null);
+        x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input) + loans.total.restToRepayment;
         x.account = GetAccountNo(g.loan);
         xxx.Add(x);
 
@@ -724,7 +725,6 @@ public class Account : System.Web.Services.WebService {
                 if (outputType == g.loan) {
                     x.total.output = GetActivatedLoan(Convert.ToInt32(x.month), year, null);
                     x.total.outputAccumulation = GetActivatedLoanAccu(Convert.ToInt32(x.month), year, null) + startBalance;
-
                 } else {
                     var output = outputType != g.giroaccount
                         ? data.Where(a => a.month.ToString() == x.month && a.year == year && a.recordType == outputType)
@@ -1022,18 +1022,18 @@ public class Account : System.Web.Services.WebService {
     public double GetActivatedLoanAccu(int month, int year, string userId) {
         double loan = 0;
         string sql = string.Format(@"
-                    SELECT l.loan FROM Loan l
+                    SELECT SUM(CAST(l.loan AS decimal)) FROM Loan l
                     {0} ((CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)))"
-                        , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE l.userId = '{0}' AND", userId)
-                        , year
-                        , g.Month(month)
-                        , g.GetLastDayInMonth(year, month));
+                       , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE l.userId = '{0}' AND", userId)
+                       , year
+                       , g.Month(month)
+                       , g.GetLastDayInMonth(year, month));
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
                     while (reader.Read()) {
-                        loan = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
+                        loan = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
                     }
                 }
             }

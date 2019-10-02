@@ -319,7 +319,7 @@ public class User : System.Web.Services.WebService {
      public double GetAmount(string id, string type) {
         db.Account();
         double x = 0;
-        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, amount)) FROM Account WHERE userId = '{0}' and recordType = '{1}'", id, type);
+        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, amount)) FROM Account WHERE userId = '{0}' AND recordType = '{1}'", id, type);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
