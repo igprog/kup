@@ -588,8 +588,7 @@
 
     $scope.remove = (x) => {
         if (confirm('Briši pozajmicu?')) {
-            alert('TODO'); return false;
-            f.post('Loan', 'Delete', { id: d.id }).then((d) => {
+            f.post('Loan', 'Delete', { id: x.id }).then((d) => {
                 alert(d);
             });
         }

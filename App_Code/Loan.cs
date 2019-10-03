@@ -266,8 +266,8 @@ public class Loan : System.Web.Services.WebService {
     [WebMethod]
     public string Delete(string id) {
         try {
-            //TODO: Brisati sve iz Accounta gdje je loanId == id;
-            string sql = string.Format(@"DELETE FROM Loan WHERE id = '{0}'", id);
+            string sql = string.Format(@"DELETE FROM Loan WHERE id = '{0}';
+                                        DELETE FROM Account WHERE loanId = '{0}'", id);
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -373,9 +373,9 @@ public class Loan : System.Web.Services.WebService {
                                 BEGIN
                                     INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
                                     VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
-                                    UPDATE Loan SET isRepaid = 1 WHERE id = '{7}'
+                                    UPDATE Loan SET isRepaid = 1 WHERE id = '{9}'
                                 END
-                            COMMIT TRAN", Guid.NewGuid().ToString(), x.user.id, x.user.restToRepayment, x.loanDate, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), g.loan, loanId, "Otplata novom pozajmicom");
+                            COMMIT TRAN", Guid.NewGuid().ToString(), x.user.id, x.user.restToRepayment, x.loanDate, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), g.loan, x.id, "Otplata novom pozajmicom", loanId);
 
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
