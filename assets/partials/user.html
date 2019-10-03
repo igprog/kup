@@ -1,46 +1,41 @@
 ﻿<div ng-controller="userCtrl">
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="form-group">
-                <label for="accessDate">Datum pristupa:</label>
-                <input ng-model="d.user.accessDate" type="date" onkeydown="return false" class="form-control" style="width:190px" />
-                <!--<date-directive id="'accessDate'" date="d.user.accessDate" todaybtn="true"></date-directive>-->
-            </div>
-        </div>
-        <div ng-if="d.showPdf" class="col-sm-6 text-right">
-            <button ng-show="!d.pdf && !g.clearView" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d, 'NewUser')">
-                <loading-directive title="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf"></loading-directive>
-            </button>
-            <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
-        </div>
-        <hr />
+    <div ng-if="d.showPdf" class="text-right">
+        <button ng-show="!d.pdf && !g.clearView" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d, 'NewUser')">
+            <loading-directive title="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf"></loading-directive>
+        </button>
+        <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
     </div>
-    <div class="row">
+    <div class="row mt-3">
         <div class="col-sm-6">
-            <div class="card">
+            <div class="card shadow">
                 <div class="card-body">
                     <form>
                         <div class="form-group">
+                            <label for="accessDate">Datum pristupa:</label>
+                            <input ng-model="d.user.accessDate" type="date" onkeydown="return false" class="form-control" style="width:190px" />
+                            <!--<date-directive id="'accessDate'" date="d.user.accessDate" todaybtn="true"></date-directive>-->
+                        </div>
+                        <div class="form-group">
                             <label for="buissinesUnitCode">Poslovna jedinica:</label>
                             <select ng-model="d.user.buisinessUnit.code" class="form-control" name="buissinesUnitCode">
-                                <option ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.code}} - {{x.title}}</option>
+                                <option ng-if="x.code!==null" ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.code}} - {{x.title}}</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="id">Matični broj:</label>
-                            <input ng-model="d.user.id" type="text" class="form-control" name="id">
+                            <input ng-model="d.user.id" type="text" class="form-control" name="id" required>
                         </div>
                         <div class="form-group">
                             <label for="lastName">Prezime:</label>
-                            <input ng-model="d.user.lastName" type="text" class="form-control" name="lastName">
+                            <input ng-model="d.user.lastName" type="text" class="form-control" name="lastName" required>
                         </div>
                         <div class="form-group">
                             <label for="firstName">Ime:</label>
-                            <input ng-model="d.user.firstName" type="text" class="form-control" name="firstName">
+                            <input ng-model="d.user.firstName" type="text" class="form-control" name="firstName" required>
                         </div>
                         <div class="form-group">
                             <label for="pin">OIB:</label>
-                            <input ng-model="d.user.pin" type="text" class="form-control" name="pin" allow-only-numbers>
+                            <input ng-model="d.user.pin" type="text" class="form-control" name="pin" maxlength="11" allow-only-numbers>
                         </div>
                         <div class="form-group">
                             <label for="birthDate">Datum rođenja:</label>
@@ -51,7 +46,7 @@
                         <div class="form-group">
                             <label for="monthlyPayment">Mjesečni ulog:</label>
                             <div class="input-group">
-                                <input ng-model="d.user.monthlyFee" type="text" class="form-control" name="monthlyPayment" allow-only-numbers>
+                                <input ng-model="d.user.monthlyFee" type="text" class="form-control" name="monthlyPayment" required allow-only-numbers>
                                 <div class="input-group-append">
                                     <span class="input-group-text">{{config.currency}}</span>
                                 </div>
@@ -65,7 +60,7 @@
             </div>
         </div>
         <div class="col-sm-6">
-            <div ng-if="d.user.id!==null" class="card">
+            <div ng-if="d.user.id!==null" class="card shadow">
                 <div class="card-body">
                     <div>Ukupno uplaćeno uloga: {{d.user.totalMebershipFees | number:2}} {{config.currency}} <label ng-if="d.user.totalMebershipFeesRequired > d.user.totalMebershipFees" class="text-danger">(Dug: {{d.user.totalMebershipFeesRequired | number:2}} {{config.currency}})</label></div>
                     <div>Ukupno neotplaćeno pozajmica: <label class="{{d.user.restToRepayment>0?'text-danger':''}}">{{d.user.restToRepayment | number:2}} {{config.currency}}</label></div>

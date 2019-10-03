@@ -333,6 +333,14 @@
     }
 
     var validate = (x) => {
+        if (x.buisinessUnit.code == null) {
+            alert('Odaberite poslovnu jedinicu!');
+            return false;
+        }
+        if (x.id == null || x.firstName == null || x.lastName == null ) {
+            alert('Nepotpuni unos!');
+            return false;
+        }
         //x.accessDate = document.getElementById('accessDate').innerText;
         //x.birthDate = document.getElementById('birthDate').innerText;
         if (!f.isValidDate(x.accessDate)) {
@@ -351,7 +359,13 @@
         if (x.birthDate != null) {
             x.birthDate = f.setDate(x.birthDate);
         }
-        if (!validate(x)) { return false; }
+        if (!validate(x)) {
+            $scope.d.user.accessDate = new Date($scope.d.user.accessDate);
+            if ($scope.d.user.birthDate != null) {
+                $scope.d.user.birthDate = new Date($scope.d.user.birthDate);
+            }
+            return false;
+        }
         f.post(service, 'Save', { x: x }).then((d) => {
             alert(d);
             $scope.d.user.accessDate = new Date($scope.d.user.accessDate);
@@ -542,7 +556,6 @@
     }
 
     var validate = (x) => {
-        debugger;
         if (x.user.id == null) {
             alert('Odaberite korisnika!');
             return false;
@@ -571,6 +584,15 @@
             $scope.d.loan.loanDate = new Date($scope.d.loan.loanDate);
             alert(d);
         });
+    }
+
+    $scope.remove = (x) => {
+        if (confirm('Briši pozajmicu?')) {
+            alert('TODO'); return false;
+            f.post('Loan', 'Delete', { id: d.id }).then((d) => {
+                alert(d);
+            });
+        }
     }
 
     $scope.getUser = (id) => {
@@ -735,6 +757,14 @@
         f.post('Account', 'SaveUserPayment', { userId: x.user.id, y: y }).then((d) => {
             getMonthlyRecords($scope.d);
         });
+    }
+
+    $scope.removeUserPayment = (y) => {
+        if (confirm('Briši uplatu ' + y.amount + ' ' + $scope.config.currency + '?')) {
+            f.post('Account', 'Delete', { id: y.id }).then((d) => {
+                getMonthlyRecords($scope.d);
+            });
+        }
     }
 
     $scope.print = (x) => {

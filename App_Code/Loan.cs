@@ -266,7 +266,8 @@ public class Loan : System.Web.Services.WebService {
     [WebMethod]
     public string Delete(string id) {
         try {
-            string sql = string.Format("DELETE FROM Loan WHERE id = '{0}'", id);
+            //TODO: Brisati sve iz Accounta gdje je loanId == id;
+            string sql = string.Format(@"DELETE FROM Loan WHERE id = '{0}'", id);
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
