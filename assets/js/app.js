@@ -296,9 +296,11 @@
 
     var load = (x) => {
         if (f.defined(x.buisinessUnitCode)) {
+            $scope.d.loading = true;
             f.post(service, 'Load', { buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
                 $scope.d.users = d;
                 $scope.d.year = f.year();
+                $scope.d.loading = false;
             });
         }
     }
@@ -318,7 +320,8 @@
             statusDate: new Date(),
             pdf: null,
             loadingPdf: false,
-            showPdf: false
+            showPdf: false,
+            loading: false
         }
         $scope.d = data;
         init();
@@ -329,6 +332,7 @@
         $scope.d.pdf = null;
         $scope.d.loadingPdf = false;
         $scope.d.showPdf = true;
+        $scope.d.loading = true;
         load($scope.d);
     }
 
@@ -500,8 +504,10 @@
     var service = 'Loan';
 
     var loadUsers = (bu, search) => {
+        $scope.d.loading = true;
         f.post('User', 'Load', { buisinessUnitCode: bu, search: search }).then((d) => {
             $scope.d.users = d;
+            $scope.d.loading = false;
         });
     }
 
@@ -523,7 +529,8 @@
             buisinessUnitCode: null,
             search: null,
             pdf: null,
-            loadingPdf: false
+            loadingPdf: false,
+            loading: false
         };
         $scope.d = data;
         init();
@@ -536,6 +543,7 @@
         $scope.d.pdf = null,
         $scope.d.loadingPdf = false;
         $scope.d.showPdf = true;
+        $scope.d.loading = false;
         loadUsers(null, null);
     }
 
@@ -603,8 +611,10 @@
     }
 
     $scope.print = (x) => {
-        x.loan.loanDate = document.getElementById('loanDate').innerText;
+        //x.loan.loanDate = document.getElementById('loanDate').innerText;
+        x.loan.loanDate = f.setDate(x.loan.loanDate);
         if (!validate(x.loan)) {
+            $scope.d.loan.loanDate = new Date($scope.d.loan.loanDate);
             return false;
         }
         $scope.d.pdf = null;
@@ -620,8 +630,10 @@
     }
 
     var load = (x) => {
+        $scope.d.loading = true;
         f.post(service, 'Load', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
             $scope.d.records = d;
+            $scope.d.loading = false;
         });
     }
 
@@ -708,15 +720,18 @@
         buisinessUnitCode: null,
         search: null,
         pdf: null,
-        loadingPdf: false
+        loadingPdf: false,
+        loading: false
     }
     $scope.d = data;
 
     var getMonthlyRecords = (x) => {
         if (x.month == null) { x.month = $scope.g.month; }
         if (x.year == null) { x.year = $scope.g.year; }
+        $scope.d.loading = true;
         f.post(service, 'GetMonthlyFee', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
             $scope.d.records = d;
+            $scope.d.loading = false;
         });
     }
 
@@ -793,15 +808,18 @@
         buisinessUnitCode: null,
         search: null,
         pdf: null,
-        loadingPdf: false
+        loadingPdf: false,
+        loading: false
     }
     $scope.d = data;
 
     var getMonthlyRecords = (x) => {
         if (x.month == null) { x.month = $scope.g.month; }
         if (x.year == null) { x.year = $scope.g.year; }
+        $scope.d.loading = true;
         f.post(service, 'GetLoanUsers', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
             $scope.d.records = d;
+            $scope.d.loading = false;
         });
     }
 
@@ -1108,7 +1126,9 @@
         scope: {
             title: '=',
             loadingtitle: '=',
-            value: '='
+            value: '=',
+            pdf: '=',
+            size: '='
         },
         templateUrl: './assets/partials/directive/loading.html'
     };

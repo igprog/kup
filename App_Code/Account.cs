@@ -442,10 +442,18 @@ public class Account : System.Web.Services.WebService {
         List<Recapitulation> xxx = new List<Recapitulation>();
         Recapitulation x = new Recapitulation();
         x.note = "Žiro račun";
-        x.output = xx.Where(a => a.recordType == g.monthlyFee).Sum(a => a.input) + xx.Where(a => a.recordType == g.userPayment).Sum(a => a.input) + xx.Where(a => a.recordType == g.repayment).Sum(a => a.input);
-        x.input = xx.Where(a => a.recordType == g.withdraw).Sum(a => a.input) + xx.Where(a => a.recordType == g.bankFee).Sum(a => a.input) + xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input);
+        x.output = xx.Where(a => a.recordType == g.monthlyFee).Sum(a => a.input)
+            + xx.Where(a => a.recordType == g.userPayment).Sum(a => a.input)
+            + xx.Where(a => a.recordType == g.repayment).Sum(a => a.input)
+            + xx.Where(a => a.recordType == g.interest).Sum(a => a.input);
+        x.input = xx.Where(a => a.recordType == g.withdraw).Sum(a => a.input)
+            + xx.Where(a => a.recordType == g.bankFee).Sum(a => a.input)
+            + xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input)
+            + xx.Where(a => a.recordType == g.otherFee).Sum(a => a.input);
         x.account = GetAccountNo(g.giroaccount);
-        xxx.Add(x);
+        if (x.output > 0 || x.input > 0) {
+            xxx.Add(x);
+        }
 
         x = new Recapitulation();
         x.note = "Pozajmice";
@@ -454,28 +462,54 @@ public class Account : System.Web.Services.WebService {
         Loan.Loans loans = l.LoadData(month, year, null);
         x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input) + loans.total.restToRepayment;
         x.account = GetAccountNo(g.loan);
-        xxx.Add(x);
+        if (x.output > 0 || x.input > 0) {
+            xxx.Add(x);
+        }
 
         x = new Recapitulation();
         x.note = "Ulozi";
         x.output = xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input);
         x.input = xx.Where(a => a.recordType == g.monthlyFee || a.recordType == g.userPayment).Sum(a => a.input);
         x.account = GetAccountNo(g.monthlyFee);
-        xxx.Add(x);
-
-        x = new Recapitulation();
-        x.note = "Troškovi održavanja računa";
-        x.output = xx.Where(a => a.recordType == g.bankFee).Sum(a => a.input);
-        x.input = 0;
-        x.account = GetAccountNo(g.monthlyFee);
-        xxx.Add(x);
+        if (x.output > 0 || x.input > 0) {
+            xxx.Add(x);
+        }
 
         x = new Recapitulation();
         x.note = string.Format("Manipulativni troškovi {0}%", g.manipulativeCostsPerc());
         x.output = 0;
         x.input = xx.Where(a => a.recordType == g.manipulativeCosts).Sum(a => a.input);
         x.account = GetAccountNo(g.manipulativeCosts);
-        xxx.Add(x);
+        if (x.output > 0 || x.input > 0) {
+            xxx.Add(x);
+        }
+
+        x = new Recapitulation();
+        x.note = "Troškovi održavanja računa";
+        x.output = xx.Where(a => a.recordType == g.bankFee).Sum(a => a.input);
+        x.input = 0;
+        x.account = GetAccountNo(g.monthlyFee);
+        if (x.output > 0 || x.input > 0) {
+            xxx.Add(x);
+        }
+
+        x = new Recapitulation();
+        x.note = "Kamate po štednji";
+        x.output = 0;
+        x.input = xx.Where(a => a.recordType == g.interest).Sum(a => a.input);
+        x.account = GetAccountNo(g.interest);
+        if (x.output > 0 || x.input > 0) {
+            xxx.Add(x);
+        }
+
+        x = new Recapitulation();
+        x.note = "Ostali troškovi";
+        x.output = xx.Where(a => a.recordType == g.otherFee).Sum(a => a.input);
+        x.input = 0;
+        x.account = GetAccountNo(g.otherFee);
+        if (x.output > 0 || x.input > 0) {
+            xxx.Add(x);
+        }
 
         return xxx;
     }

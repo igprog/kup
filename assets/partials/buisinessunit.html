@@ -5,13 +5,13 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th>Kod.</th>
+                        <th style="width:200px">Kod.</th>
                         <th>Naziv</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="x in d track by $index">
+                    <tr ng-if="x.id!==null" ng-repeat="x in d track by $index">
                         <td><button class="btn btn-outline-danger" ng-click="remove(x.id, $index)"><i class="fas fa-minus"></i></button></td>
                         <td><input ng-model="x.code" class="form-control" /></td>
                         <td><input ng-model="x.title" class="form-control" /></td>
