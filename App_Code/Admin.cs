@@ -72,26 +72,27 @@ public class Admin : System.Web.Services.WebService {
                 while (!reader.EndOfStream) {
                     var line = reader.ReadLine();
                     var val = line.Split(';');
-                    if (!string.IsNullOrEmpty(val[0]) && val[0] != "id") {
+                    int n;
+                    if(int.TryParse(val[0], out n)) { 
                         User.NewUser x = new User.NewUser();
                         x.id = val[0];
-                        x.firstName = val[1];
-                        x.lastName = val[2];
-                        x.pin = val[3];
+                        string[] fullName = val[1].Split(' ');
+                        x.firstName = fullName[1];
+                        x.lastName = fullName[0];
+                        x.pin = val[2];
+                        x.birthDate = g.ConvertDate(val[3]);
+                        x.accessDate = g.ConvertDate(val[4]);
+                        x.terminationDate = g.ConvertDate(val[5]);
                         x.buisinessUnit = new BuisinessUnit.NewUnit();
-                        x.buisinessUnit.code = val[4];
+                        x.buisinessUnit.code = val[6];
                         x.total = new Account.Total();
-                        x.total.userPaymentWithMonthlyFee = Convert.ToInt32(val[5]);
-                        x.total.terminationWithdraw = Convert.ToInt32(val[6]);
-                        x.total.activatedLoan = Convert.ToInt32(val[7]);
-                        x.total.withdraw = Convert.ToInt32(val[8]);
-                        x.total.repayment = Convert.ToInt32(val[9]);
-                        x.monthlyRepayment = Convert.ToInt32(val[10]);
-                        x.monthlyFee = Convert.ToInt32(val[11]);
-                        //x.totalMebershipFees = Convert.ToInt32(val[5]);
-                        //x.restToRepayment = Convert.ToInt32(val[6]);
-                        x.birthDate = g.Date(date);  //TODO
-                        x.accessDate = g.Date(date);  //TODO
+                        x.total.userPaymentWithMonthlyFee = g.ConvertToDouble(val[7]);
+                        x.total.terminationWithdraw = g.ConvertToDouble(val[8]);
+                        x.total.activatedLoan = g.ConvertToDouble(val[9]);
+                        x.total.withdraw = g.ConvertToDouble(val[10]);
+                        x.total.repayment = g.ConvertToDouble(val[11]);
+                        x.monthlyRepayment = g.ConvertToDouble(val[12]);
+                        x.monthlyFee = g.ConvertToDouble(val[13]);
                         x.isActive = 1;
                         xx.Add(x);
                     }

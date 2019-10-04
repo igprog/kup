@@ -68,6 +68,14 @@ namespace Igprog {
             return SetDayMonthDate(GetLastDayInMonth(year, month), month);
         }
 
+        public string ConvertDate(string date) {
+            string date_ = null;
+            if(!string.IsNullOrEmpty(date)) {
+                date_ = SetDate(Convert.ToInt32(date.Substring(0, 2)), Convert.ToInt32(date.Substring(3, 2)), Convert.ToInt32(date.Substring(6, 4)));
+            }
+            return date_;
+        }
+
         public void CreateFolder(string path) {
             if (!Directory.Exists(path)) {
                 Directory.CreateDirectory(path);
@@ -103,6 +111,14 @@ namespace Igprog {
 
         public string GetYear(string date) {
             return date.Substring(0, 4);
+        }
+
+        public double ConvertToDouble(string val) {
+            double val_ = 0;
+            if (!string.IsNullOrWhiteSpace(val)) {
+                val_ = Convert.ToDouble(val);
+            }
+            return val_;
         }
 
     }
