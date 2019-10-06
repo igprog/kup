@@ -903,73 +903,6 @@
 
 }])
 
-.controller('otherFeeCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
-        var service = 'Account';
-        var data = {
-            fee: {},
-            records: {},
-            date: new Date(),
-            month: $scope.g.month,
-            year: $scope.g.year,
-            recordType: null,
-            pdf: null,
-            loadingPdf: false
-        }
-        $scope.d = data;
-
-        $scope.save = (x, d, idx) => {
-            if (x.id === null) {
-                x.recordDate = f.setDate(x.recordDate);
-            }
-            f.post(service, 'SaveOtherFee', { x: x }).then((d) => {
-                $scope.d.records.data[idx] = d;
-                load(x, x.recordType);
-
-            });
-        }
-
-        var load = (x, type) => {
-            f.post(service, 'Load', { year: x.year, type: type }).then((d) => {
-                $scope.d.records = d;
-                angular.forEach(d.data, function (value, key) {
-                    $scope.d.records.data[key].recordDate = new Date(value.recordDate);
-                    $scope.d.records.data[key].month = parseInt(value.month);
-                });
-            });
-        }
-
-        $scope.load = (x, type) => {
-            return load(x, type);
-        }
-
-        $scope.add = (type) => {
-            f.post(service, 'Init', { type:type }).then((d) => {
-                d.recordDate = new Date(d.recordDate);
-                $scope.d.records.data.push(d);
-            });
-        }
-
-        $scope.print = (x) => {
-            alert('TODO');
-            /*
-            if (f.defined(x.records.data.length)) {
-                if (x.records.data.length == 0) { return false; }
-            }
-            $scope.d.pdf = null;
-            $scope.d.loadingPdf = true;
-            f.post('Pdf', 'Entry', { month: x.month, year: x.year, records: x.records }).then((d) => {
-                $scope.d.pdf = f.pdfTempPath(d);
-                $scope.d.loadingPdf = false;
-            });
-            */
-        }
-
-        $scope.removePdfLink = () => {
-            $scope.d.pdf = null;
-        }
-
-}])
-
 .controller('recapitulationCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Account';
     var data = {
@@ -1148,6 +1081,89 @@
         templateUrl: './assets/partials/directive/link.html'
     };
 })
+
+.directive('feeDirective', () => {
+    return {
+        restrict: 'E',
+        scope: {
+            type: '='
+        },
+        templateUrl: './assets/partials/directive/fee.html',
+        controller: 'feeCtrl'
+    };
+})
+.controller('feeCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+
+    var service = 'Account';
+    var init = () => {
+        $http.get('./config/config.json').then((response) => {
+            $scope.config = response.data;
+            var data = {
+                fee: {},
+                records: {},
+                date: new Date(),
+                month: f.month(),
+                year: f.year(),
+                months: f.months(),
+                years: f.years($scope.config.fromYear),
+                pdf: null,
+                loadingPdf: false
+            }
+            $scope.d = data;
+        });
+    }
+    init();
+        
+        $scope.save = (x, d, idx, type) => {
+            x.recordType = type;
+            if (x.id === null) {
+                x.recordDate = f.setDate(x.recordDate);
+            }
+            f.post(service, 'SaveOtherFee', { x: x }).then((d) => {
+                $scope.d.records.data[idx] = d;
+                load(x, x.recordType);
+            });
+        }
+
+        var load = (x, type) => {
+            f.post(service, 'Load', { year: x.year, type: type }).then((d) => {
+                $scope.d.records = d;
+                angular.forEach(d.data, function (value, key) {
+                    $scope.d.records.data[key].recordDate = new Date(value.recordDate);
+                    $scope.d.records.data[key].month = parseInt(value.month);
+                });
+            });
+        }
+
+        $scope.load = (x, type) => {
+            return load(x, type);
+        }
+
+        $scope.add = (type) => {
+            f.post(service, 'Init', { type: type }).then((d) => {
+                d.recordDate = new Date(d.recordDate);
+                $scope.d.records.data.push(d);
+            });
+        }
+
+        $scope.print = (x, type) => {
+            if (f.defined(x.records.data.length)) {
+                if (x.records.data.length == 0) { return false; }
+            }
+            $scope.d.pdf = null;
+            $scope.d.loadingPdf = true;
+            f.post('Pdf', 'Fee', { month: x.month, year: x.year, records: x.records, type: type }).then((d) => {
+                $scope.d.pdf = f.pdfTempPath(d);
+                $scope.d.loadingPdf = false;
+            });
+
+        }
+
+        $scope.removePdfLink = () => {
+            $scope.d.pdf = null;
+        }
+
+}])
 
 
     /*
