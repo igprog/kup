@@ -72,19 +72,22 @@
       }
     },
     {
-      "tpl": "bankfee",
+      "tpl": "fee",
       "title": "Troškovi Održavanja Računa",
-      "ico": "wrench"
+      "ico": "wrench",
+      "type":  "bankFee"
     },
     {
-      "tpl": "interest",
+      "tpl": "fee",
       "title": "Kamate Po Štednji",
-      "ico": "chart-line"
+      "ico": "chart-line",
+      "type": "interest"
     },
     {
-      "tpl": "otherfee",
+      "tpl": "fee",
       "title": "Ostali Troškovi",
-      "ico": "shopping-cart"
+      "ico": "shopping-cart",
+      "type": "otherFee"
     },
     {
       "tpl": null,
