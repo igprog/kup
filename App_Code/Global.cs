@@ -30,9 +30,10 @@ namespace Igprog {
         #endregion RecordType
         public string giroaccount = "giroaccount";
         public string loan = "loan";  // otplata novom pozajmicom ?
+        public string income = "income";
+        public string expense = "expense";
+        public string incomeExpenseDiff = "incomeExpenseDiff";
         public string allUnitsTitle = "JANAF ukupno";
-        public string income;
-        public string incomeExpenseDiff;
 
         public string ReffDate(int? month, int year) {
             if(month == 13) {

@@ -986,7 +986,13 @@
 
     load = (x) => {
         x.type = $scope.g.currTplType;
-        f.post(service, 'LoadRecapitulation', { year: x.year, type: x.type }).then((d) => {
+        var method = null;
+        if (x.type == 'income' || x.type == 'incomeExpenseDiff') {
+            method = 'LoadBalance';
+        } else {
+            method = 'LoadRecapitulation';
+        }
+        f.post(service, method, { year: x.year, type: x.type }).then((d) => {
             $scope.d.records = d;
             $scope.g.clearView = false;
         });
