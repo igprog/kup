@@ -128,6 +128,8 @@ public class Account : System.Web.Services.WebService {
         public string manipulativeCosts;
         public string bankFee;
         public string otherFee;
+        public string income;
+        public string incomeExpenseDiff;
     }
 
     [WebMethod]
@@ -683,6 +685,12 @@ public class Account : System.Web.Services.WebService {
         }
         if (type == g.otherFee) {
             x = s.Data().account.otherFee;
+        }
+        if (type == g.income) {
+            x = s.Data().account.income;
+        }
+        if (type == g.incomeExpenseDiff) {
+            x = s.Data().account.incomeExpenseDiff;
         }
         return x;
     }

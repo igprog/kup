@@ -31,6 +31,8 @@ namespace Igprog {
         public string giroaccount = "giroaccount";
         public string loan = "loan";  // otplata novom pozajmicom ?
         public string allUnitsTitle = "JANAF ukupno";
+        public string income;
+        public string incomeExpenseDiff;
 
         public string ReffDate(int? month, int year) {
             if(month == 13) {

@@ -16,7 +16,6 @@ using Igprog;
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
 public class BuisinessUnit : System.Web.Services.WebService {
-    string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
     DataBase db = new DataBase();
     Global g = new Global();
     public BuisinessUnit() { 
@@ -52,7 +51,7 @@ public class BuisinessUnit : System.Web.Services.WebService {
                                                    VALUES ('{0}', '{1}', '{2}')
                                                 END
                                         COMMIT TRAN", x.id, x.code, x.title);
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     command.ExecuteNonQuery();
@@ -76,7 +75,7 @@ public class BuisinessUnit : System.Web.Services.WebService {
             all.id = null;
             all.title = g.allUnitsTitle;
             xx.Add(all);
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     using (SqlDataReader reader = command.ExecuteReader()) {
@@ -98,7 +97,7 @@ public class BuisinessUnit : System.Web.Services.WebService {
     public string Delete(string id) {
         try {
             string sql = string.Format("DELETE FROM BuisinessUnit WHERE id = '{0}'", id);
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     command.ExecuteReader();
@@ -124,7 +123,7 @@ public class BuisinessUnit : System.Web.Services.WebService {
         try {
             db.BuisinessUnit();
             string sql = string.Format("SELECT * FROM BuisinessUnit WHERE code = '{0}'", code);
-            using (SqlConnection connection = new SqlConnection(connectionString)) {
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
                     using (SqlDataReader reader = command.ExecuteReader()) {

@@ -1014,6 +1014,42 @@
 
 }])
 
+//.controller('kontoCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+//    var service = 'Konto';
+
+//    $scope.save = (x) => {
+//        f.post(service, 'Save', { x: x }).then((d) => {
+//            alert(d);
+//        });
+//    }
+
+//    var load = () => {
+//        f.post(service, 'Load', {}).then((d) => {
+//            $scope.d = d;
+//        });
+//    }
+//    load();
+
+//    var remove = (id) => {
+//        f.post(service, 'Delete', { id: id }).then((d) => {
+//        });
+//    }
+
+//    $scope.add = () => {
+//        f.post(service, 'Init', {}).then((d) => {
+//            $scope.d.push(d);
+//        });
+//    }
+
+//    $scope.remove = (id, idx) => {
+//        if (confirm('Briši?')) {
+//            $scope.d.splice(idx, 1);
+//            remove(id);
+//        }
+//    }
+
+//}])
+
 .controller('settingsCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Settings';
 
