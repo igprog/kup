@@ -6,7 +6,7 @@
   "showadminpage": true,
   "currency": "kn",
   "manipulativeCostsPerc": 2,
-  "fromYear": 2019,
+  "fromYear": 2017,
   "menu": [
     {
       "tpl": "dashboard",

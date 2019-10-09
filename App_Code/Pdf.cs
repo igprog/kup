@@ -698,7 +698,7 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
     }
 
     [WebMethod]
-    public string Entry(int month, int year, Account.EntryTotal records) {
+    public string Entry(int month, int year, Account.EntryTotal records, string type) {
         try {
             PrintDoc pd = PreparePrintDoc(false);
             Document doc = pd.doc;
@@ -707,8 +707,10 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
 
             Paragraph p = new Paragraph();
             p.Alignment = Element.ALIGN_CENTER;
-            p.Add(new Paragraph(string.Format("Temeljnica za knjiženje br. {0}", month), GetFont(12, Font.BOLD)));
-            p.Add(new Paragraph(string.Format("Knjižiti na dan {0}", g.SetDayMonthDate(g.GetLastDayInMonth(year, month), month)), GetFont()));
+            p.Add(new Paragraph(string.Format("Temeljnica za knjiženje br. {0}{1}"
+                                , month
+                                , !string.IsNullOrEmpty(type) ? (string.Format("/{0}", type == g.entry_I ? "I" : "II")) : ""), GetFont(12, Font.BOLD)));
+            p.Add(new Paragraph(string.Format("Knjižiti na dan {0}.{1}", g.SetDayMonthDate(g.GetLastDayInMonth(year, month), month), year), GetFont()));
             doc.Add(p);
 
             PdfPTable table = new PdfPTable(4);

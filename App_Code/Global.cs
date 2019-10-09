@@ -33,6 +33,8 @@ namespace Igprog {
         public string income = "income";
         public string expense = "expense";
         public string incomeExpenseDiff = "incomeExpenseDiff";
+        public string entry_I = "entry_I";
+        public string entry_II = "entry_II";
         public string allUnitsTitle = "JANAF ukupno";
 
         public string ReffDate(int? month, int year) {

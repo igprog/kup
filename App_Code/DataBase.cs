@@ -40,18 +40,6 @@ namespace Igprog {
             CreateTable(sql);
         }
 
-        //public void Konto() {
-        //    string tbl = "Konto";
-        //    string sql = string.Format(@"{0}
-        //                CREATE TABLE {1}
-        //                (id NVARCHAR (50),
-        //                code NVARCHAR (50),
-        //                title NVARCHAR (50),
-        //                type NVARCHAR (50))", CheckTbl(tbl), tbl);
-        //    CreateTable(sql);
-        //}
-
-
         public void Account() {
             string tbl = "Account";
             string sql = string.Format(@"{0}

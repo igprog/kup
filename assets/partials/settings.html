@@ -1,105 +1,113 @@
 ﻿<div ng-controller="settingsCtrl">
     <div class="row">
-        <div class="col-sm-5">
-            <div class="table-responsive">
-                <table class="table">
-                    <tr>
-                        <td>Valuta:</td>
-                        <td><input ng-model="d.currency" class="form-control text-right" /></td>
-                    </tr>
-                    <tr>
-                        <td>Zadani mjesečni ulog:</td>
-                        <td><input ng-model="d.monthlyFee" class="form-control text-right" allow-only-numbers /></td>
-                    </tr>
-                    <tr>
-                        <td>Manipulativni troškovi (koeficjent):</td>
-                        <td><input ng-model="d.manipulativeCostsCoeff" class="form-control text-right" allow-only-numbers /></td>
-                    </tr>
-                    <tr>
-                        <td>Zadani rok otplate (mjeseci):</td>
-                        <td><input ng-model="d.defaultDedline" class="form-control text-right" allow-only-numbers /></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="text-right">
-                            <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fa fa-save"></i> Spremi</button>
-                        </td>
-                    </tr>
-                </table>
+        <div class="col-sm-6 p-3">
+            <div class="card shadow">
+                <div class="card-body table-responsive">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td>Valuta:</td>
+                            <td><input ng-model="d.currency" class="form-control text-right" /></td>
+                        </tr>
+                        <tr>
+                            <td>Zadani mjesečni ulog:</td>
+                            <td><input ng-model="d.monthlyFee" class="form-control text-right" allow-only-numbers /></td>
+                        </tr>
+                        <tr>
+                            <td>Manipulativni troškovi (koeficjent):</td>
+                            <td><input ng-model="d.manipulativeCostsCoeff" class="form-control text-right" allow-only-numbers /></td>
+                        </tr>
+                        <tr>
+                            <td>Zadani rok otplate (mjeseci):</td>
+                            <td><input ng-model="d.defaultDedline" class="form-control text-right" allow-only-numbers /></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-right">
+                                <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fa fa-save"></i> Spremi</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-    <hr />
     <div class="row">
-        <div class="col-sm-5">
-            <label>Konto</label>
-            <div class="table-responsive">
-                <table class="table">
-                    <tr>
-                        <td>Žiro račun:</td>
-                        <td><input ng-model="d.account.giroAccount" class="form-control text-right" /></td>
-                    </tr>
-                    <tr>
-                        <td>Pozajmice:</td>
-                        <td><input ng-model="d.account.loan" class="form-control text-right" /></td>
-                    </tr>
-                    <tr>
-                        <td>Ulozi:</td>
-                        <td><input ng-model="d.account.monthlyFee" class="form-control text-right" /></td>
-                    </tr>
-                    <tr>
-                        <td>Manipulativni troškovi:</td>
-                        <td><input ng-model="d.account.manipulativeCosts" class="form-control text-right" /></td>
-                    </tr>
-                    <tr>
-                        <td>Erste:</td>
-                        <td><input ng-model="d.account.bankFee" class="form-control text-right" /></td>
-                    </tr>
-                    <tr>
-                        <td>Razni materijalni troškovi:</td>
-                        <td><input ng-model="d.account.otherFee" class="form-control text-right" /></td>
-                    </tr>
-                    <tr>
-                        <td>Prihodi:</td>
-                        <td><input ng-model="d.account.income" class="form-control text-right" /></td>
-                    </tr>
-                    <tr>
-                        <td>Razlika prihoda i rashoda:</td>
-                        <td><input ng-model="d.account.incomeExpenseDiff" class="form-control text-right" /></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="text-right">
-                            <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fa fa-save"></i> Spremi</button>
-                        </td>
-                    </tr>
-                </table>
+        <div class="col-sm-6 p-3">
+            <div class="card shadow">
+                <div class="card-header">Konto</div>
+                <div class="card-body table-responsive">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td>Žiro račun:</td>
+                            <td><input ng-model="d.account.giroAccount" class="form-control text-right" /></td>
+                        </tr>
+                        <tr>
+                            <td>Pozajmice:</td>
+                            <td><input ng-model="d.account.loan" class="form-control text-right" /></td>
+                        </tr>
+                        <tr>
+                            <td>Ulozi:</td>
+                            <td><input ng-model="d.account.monthlyFee" class="form-control text-right" /></td>
+                        </tr>
+                        <tr>
+                            <td>Manipulativni troškovi:</td>
+                            <td><input ng-model="d.account.manipulativeCosts" class="form-control text-right" /></td>
+                        </tr>
+                        <tr>
+                            <td>Troškovi održavanja štednog računa:</td>
+                            <td><input ng-model="d.account.bankFee" class="form-control text-right" /></td>
+                        </tr>
+                        <tr>
+                            <td>Kamate po štednji:</td>
+                            <td><input ng-model="d.account.interest" class="form-control text-right" /></td>
+                        </tr>
+                        <tr>
+                            <td>Razni materijalni troškovi:</td>
+                            <td><input ng-model="d.account.otherFee" class="form-control text-right" /></td>
+                        </tr>
+                        <tr>
+                            <td>Prihodi:</td>
+                            <td><input ng-model="d.account.income" class="form-control text-right" /></td>
+                        </tr>
+                        <tr>
+                            <td>Razlika prihoda i rashoda:</td>
+                            <td><input ng-model="d.account.incomeExpenseDiff" class="form-control text-right" /></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-right">
+                                <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fa fa-save"></i> Spremi</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-    <hr />
     <div class="row">
-        <div class="col-sm-5">
-            <label>Postavke ispisa</label>
-            <div class="table-responsive">
-                <table class="table">
-                    <tr>
-                        <td>Tekst zaglavlja:</td>
-                        <td><textarea ng-model="d.printSettings.headerInfo"class="form-control" rows="3"></textarea>
-                    </tr>
-                    <tr>
-                        <td>Orijentacija ispisa:</td>
-                        <td>
-                            <select ng-model="d.printSettings.orientation" class="form-control">
-                                <option value="h">Horizontalno</option>
-                                <option value="v">Vertikalno</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="text-right">
-                            <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fa fa-save"></i> Spremi</button>
-                        </td>
-                    </tr>
-                </table>
+        <div class="col-sm-6 p-3">
+            <div class="card shadow">
+                <div class="card-header">Postavke ispisa</div>
+                <div class="card-body table-responsive">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td>Tekst zaglavlja:</td>
+                            <td><textarea ng-model="d.printSettings.headerInfo" class="form-control" rows="3"></textarea>
+                        </tr>
+                        <tr>
+                            <td>Orijentacija ispisa:</td>
+                            <td>
+                                <select ng-model="d.printSettings.orientation" class="form-control">
+                                    <option value="h">Horizontalno</option>
+                                    <option value="v">Vertikalno</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-right">
+                                <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fa fa-save"></i> Spremi</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

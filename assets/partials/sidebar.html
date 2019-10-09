@@ -44,37 +44,44 @@
                 <span class="menu-collapsed">Žiro - Račun</span>
             </a>
         </li>
-        <li id='submenu1' class="collapse sidebar-submenu">
-            <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('recapitulation', 'Prihodi', 'income')">
-                <span class="fa fa-bars fa-fw mr-3"></span>
-                <span class="menu-collapsed">Prihodi</span>
-            </a>
-        </li>
-        <li id='submenu1' class="collapse sidebar-submenu">
+        <link-directive href="'#submenu2'" tpl="'null'" desc="'Bilanca'" ico="'balance-scale-left'"></link-directive>
+        <li id='submenu2' class="collapse sidebar-submenu">
             <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('recapitulation', 'Razlika rashoda i prihoda', 'incomeExpenseDiff')">
                 <span class="fa fa-bars fa-fw mr-3"></span>
                 <span class="menu-collapsed">Razlika rashoda i prihoda</span>
             </a>
         </li>
-        <link-directive src="null" desc="null" ico="null"></link-directive>
-        <link-directive href="'#submenu2'" tpl="'null'" desc="'Postavke'" ico="'cogs'"></link-directive>
         <li id='submenu2' class="collapse sidebar-submenu">
+            <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('recapitulation', 'Prihodi', 'income')">
+                <span class="fa fa-bars fa-fw mr-3"></span>
+                <span class="menu-collapsed">Prihodi</span>
+            </a>
+        </li>
+        <li id='submenu2' class="collapse sidebar-submenu">
+            <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('entrybalance', 'Temeljnica I', 'entry_I')">
+                <span class="fa fa-bars fa-fw mr-3"></span>
+                <span class="menu-collapsed">Temeljnica I</span>
+            </a>
+        </li>
+        <li id='submenu2' class="collapse sidebar-submenu">
+            <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('entrybalance', 'Temeljnica II', 'entry_II')">
+                <span class="fa fa-bars fa-fw mr-3"></span>
+                <span class="menu-collapsed">Temeljnica II</span>
+            </a>
+        </li>
+        <link-directive src="null" desc="null" ico="null"></link-directive>
+        <link-directive href="'#submenu3'" tpl="'null'" desc="'Postavke'" ico="'cogs'"></link-directive>
+        <li id='submenu3' class="collapse sidebar-submenu">
             <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('settings', 'Generalne postavke')">
                 <span class="fa fa-cog fa-fw mr-3"></span>
                 <span class="menu-collapsed">Generalne postavke</span>
             </a>
         </li>
-        <li id='submenu2' class="collapse sidebar-submenu">
+        <li id='submenu3' class="collapse sidebar-submenu">
             <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('buisinessunit', 'Poslovne jedinice')">
                 <span class="fa fa-building fa-fw mr-3"></span>
                 <span class="menu-collapsed">Poslovne jedinice</span>
             </a>
         </li>
-        <!--<li id='submenu2' class="collapse sidebar-submenu">
-            <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('konto', 'Konto')">
-                <span class="fa fa-building fa-fw mr-3"></span>
-                <span class="menu-collapsed">Konto</span>
-            </a>
-        </li>-->
     </ul>
 </div>

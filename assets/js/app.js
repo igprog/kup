@@ -877,6 +877,64 @@
     var load = (x) => {
         f.post(service, 'LoadEntry', { month: x.month, year: x.year }).then((d) => {
             $scope.d.records = d;
+            $scope.g.clearView = false;
+        });
+    }
+
+    var loadBalance = (x) => {
+        f.post(service, 'LoadBalanceEntry', { year: x.year, type: x.type }).then((d) => {
+            $scope.d.records = d;
+            $scope.g.clearView = false;
+        });
+    }
+
+    $scope.load = (x) => {
+        x.type = $scope.g.currTplType;
+        x.title = $scope.g.currTplTitle;
+        if (x.type == 'entry_I' || x.type == 'entry_II') {
+            return loadBalance(x);
+        } else {
+            return load(x);
+        }
+    }
+
+    $scope.print = (x) => {
+        if (f.defined(x.records.data.length)) {
+            if (x.records.data.length == 0) { return false; }
+        }
+        $scope.d.pdf = null;
+        $scope.d.loadingPdf = true;
+        f.post('Pdf', 'Entry', { month: x.month, year: x.year, records: x.records, type: null }).then((d) => {
+            $scope.d.pdf = f.pdfTempPath(d);
+            $scope.d.loadingPdf = false;
+        });
+       
+    }
+
+    $scope.removePdfLink = () => {
+        $scope.d.pdf = null;
+    }
+
+}])
+
+.controller('entryBalanceCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+    var service = 'Account';
+    var data = {
+        records: {},
+        year: $scope.g.year,
+        type: $scope.g.currTplType,
+        title: $scope.g.currTplTitle,
+        pdf: null,
+        loadingPdf: false
+    }
+    $scope.d = data;
+
+    var load = (x) => {
+        x.type = $scope.g.currTplType;
+        x.title = $scope.g.currTplTitle;
+        f.post(service, 'LoadBalanceEntry', { year: x.year, type: x.type }).then((d) => {
+            $scope.d.records = d;
+            $scope.g.clearView = false;
         });
     }
 
@@ -890,11 +948,11 @@
         }
         $scope.d.pdf = null;
         $scope.d.loadingPdf = true;
-        f.post('Pdf', 'Entry', { month: x.month, year: x.year, records: x.records }).then((d) => {
+        f.post('Pdf', 'Entry', { month: 12, year: x.year, records: x.records, type: x.type }).then((d) => {
             $scope.d.pdf = f.pdfTempPath(d);
             $scope.d.loadingPdf = false;
         });
-       
+
     }
 
     $scope.removePdfLink = () => {
@@ -919,6 +977,7 @@
 
     $scope.save = (x, d, idx) => {
         x.recordType = d.type;
+        x.year = d.year;
         if (x.id === null) {
             x.recordDate = f.setDate(x.recordDate);
         }
@@ -986,6 +1045,7 @@
 
     load = (x) => {
         x.type = $scope.g.currTplType;
+        x.title = $scope.g.currTplTitle;
         var method = null;
         if (x.type == 'income' || x.type == 'incomeExpenseDiff') {
             method = 'LoadBalance';
@@ -1019,42 +1079,6 @@
     }
 
 }])
-
-//.controller('kontoCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
-//    var service = 'Konto';
-
-//    $scope.save = (x) => {
-//        f.post(service, 'Save', { x: x }).then((d) => {
-//            alert(d);
-//        });
-//    }
-
-//    var load = () => {
-//        f.post(service, 'Load', {}).then((d) => {
-//            $scope.d = d;
-//        });
-//    }
-//    load();
-
-//    var remove = (id) => {
-//        f.post(service, 'Delete', { id: id }).then((d) => {
-//        });
-//    }
-
-//    $scope.add = () => {
-//        f.post(service, 'Init', {}).then((d) => {
-//            $scope.d.push(d);
-//        });
-//    }
-
-//    $scope.remove = (id, idx) => {
-//        if (confirm('Briši?')) {
-//            $scope.d.splice(idx, 1);
-//            remove(id);
-//        }
-//    }
-
-//}])
 
 .controller('settingsCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Settings';
