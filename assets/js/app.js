@@ -869,6 +869,8 @@
         records: {},
         month: $scope.g.month,
         year: $scope.g.year,
+        type: $scope.g.currTplType,
+        title: $scope.g.currTplTitle,
         pdf: null,
         loadingPdf: false
     }

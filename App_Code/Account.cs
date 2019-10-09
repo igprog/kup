@@ -519,10 +519,11 @@ public class Account : System.Web.Services.WebService {
 
             et.data = new List<Recapitulation>();
             Recapitulation x = new Recapitulation();
-
+            double input = 0;
+            double output = 0;
             if (type == g.entry_I) {
-                double input = GetStartBalance(year, g.income);
-                double output = LoadBalanceSql(year, g.expense);
+                input = GetStartBalance(year, g.income);
+                output = LoadBalanceSql(year, g.expense);
                 x = new Recapitulation();
                 x.note = "Prijenos viška prihoda";
                 x.output = input - output;
@@ -530,18 +531,62 @@ public class Account : System.Web.Services.WebService {
                 et.data.Add(x);
 
                 x = new Recapitulation();
-                x.note = "Donos";
+                x.note = "Donos sa 73/75/76...";
                 x.input = input - output;
                 x.account = GetAccountNo(g.income);
                 et.data.Add(x);
             } else if (type == g.entry_II) {
+                input = LoadBalanceSql(year, g.otherFee);
+                string note = string.Format("Prijenos na {0}", GetAccountNo(g.incomeExpenseDiff));
+                if (input > 0 ) {
+                    x = new Recapitulation();
+                    x.note = note;
+                    x.input = input;
+                    x.account = GetAccountNo(g.otherFee);
+                    et.data.Add(x);
+                }
 
+                input = LoadBalanceSql(year, g.bankFee);
+                if (input > 0) {
+                    x = new Recapitulation();
+                    x.note = note;
+                    x.input = input;
+                    x.account = GetAccountNo(g.bankFee);
+                    et.data.Add(x);
+                }
+
+                output = LoadBalanceSql(year, g.interest);
+                if (output > 0) {
+                    x = new Recapitulation();
+                    x.note = note;
+                    x.output = output;
+                    x.account = GetAccountNo(g.interest);
+                    et.data.Add(x);
+                }
+
+                output = LoadBalanceSql(year, g.manipulativeCosts);
+                if (output > 0) {
+                    x = new Recapitulation();
+                    x.note = note;
+                    x.output = output;
+                    x.account = GetAccountNo(g.manipulativeCosts);
+                    et.data.Add(x);
+                }
+
+                input = LoadBalanceSql(year, g.income);
+                output = LoadBalanceSql(year, g.expense);
+                x = new Recapitulation();
+                x.note = "Donos sa 73/75/76...";
+                x.input = input;
+                x.output = output;
+                x.account = GetAccountNo(g.incomeExpenseDiff);
+                et.data.Add(x);
             }
            
-
             et.total = new Recapitulation();
-                et.total.input = et.data.Sum(a => a.input);
-                et.total.output = et.data.Sum(a => a.output);
+            et.total.input = et.data.Sum(a => a.input);
+            et.total.output = et.data.Sum(a => a.output);
+
             return JsonConvert.SerializeObject(et, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
@@ -607,12 +652,12 @@ public class Account : System.Web.Services.WebService {
             RecapMonthlyTotal x = new RecapMonthlyTotal();
             xx.data = new List<RecapMonthlyTotal>();
             if (type == g.incomeExpenseDiff) {
-                double input = GetStartBalance(year, g.income);
+                double input = LoadBalanceSql(year, g.income);
                 double output = LoadBalanceSql(year, g.expense);
                 x.month = "12";
                 x.total = new Recapitulation();
                 x.total.date = "31.12";
-                x.total.note = "Donos";
+                x.total.note = "Donos sa 73/75/76...";
                 x.total.input = input;
                 x.total.output = output;
                 xx.data.Add(x);
@@ -661,10 +706,10 @@ public class Account : System.Web.Services.WebService {
         string _sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE yr = '{0}' AND a.note <> 'PS'", year);
         if (type == g.income) {
             sql = string.Format(@"{0} AND (a.recordType = '{1}' OR a.recordType = '{2}')", _sql, g.interest, g.manipulativeCosts);
-        } else if (type == g.income) {
+        } else if (type == g.expense) {
             sql = string.Format(@"{0} AND (a.recordType = '{1}' OR a.recordType = '{2}')", _sql, g.bankFee, g.otherFee);
         } else {
-            sql = _sql;
+            sql = string.Format(@"{0} AND a.recordType = '{1}'", _sql, type);
         }
           
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
@@ -796,6 +841,9 @@ public class Account : System.Web.Services.WebService {
         }
         if (type == g.bankFee) {
             x = s.Data().account.bankFee;
+        }
+        if (type == g.interest) {
+            x = s.Data().account.interest;
         }
         if (type == g.otherFee) {
             x = s.Data().account.otherFee;
