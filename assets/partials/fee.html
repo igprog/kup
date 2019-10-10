@@ -20,6 +20,7 @@
         <table class="table table-hover">
             <thead>
                 <tr>
+                    <th></th>
                     <th>Br.</th>
                     <th style="width:190px">Datum</th>
                     <th style="width:200px">Mjesec</th>
@@ -30,6 +31,9 @@
             </thead>
             <tbody>
                 <tr ng-if="d.records.data.length>0" ng-repeat="x in d.records.data track by $index">
+                    <td>
+                        <button class="btn btn-outline-danger" ng-click="remove(x)" title="Briši"><i class="fas fa-trash-alt"></i> Briši</button>
+                    </td>
                     <td>{{$index + 1}}.</td>
                     <td><input ng-model="x.recordDate" type="date" class="form-control" style="width:190px"></td>
                     <td>
@@ -39,17 +43,19 @@
                     </td>
                     <td><input ng-model="x.note" class="form-control" /></td>
                     <td><input ng-model="x.amount" class="form-control text-right" allow-only-numbers /></td>
-                    <td><button class="btn btn-outline-primary" ng-click="save(x, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button></td>
+                    <td>
+                        <button class="btn btn-outline-primary" ng-click="save(x, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button>
+                    </td>
                 </tr>
                 <tr>
-                    <td colspan="6">
+                    <td colspan="7">
                         <button class="btn btn-outline-primary" ng-click="add(d.type)" title="Dodaj novi"><i class="fas fa-plus"></i> Novi Unos</button>
                     </td>
                 </tr>
             </tbody>
             <tfoot class="thead-light">
                 <tr class="text-right">
-                    <th colspan="4">Ukupno:</th>
+                    <th colspan="5">Ukupno:</th>
                     <th>
                         <span ng-if="d.type=='bankFee'">{{d.records.total.bankFee | number:2}}</span>
                         <span ng-if="d.type=='interest'">{{d.records.total.interest | number:2}}</span>

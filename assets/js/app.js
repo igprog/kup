@@ -231,10 +231,11 @@
           ['Ulozi: ' + currency($scope.d.total.userPaymentWithMonthlyFee), $scope.d.total.userPaymentWithMonthlyFee],
           ['Pozajmice: ' + currency($scope.d.total.activatedLoan), $scope.d.total.activatedLoan],
           ['Troškovi održavanja računa: ' + currency($scope.d.total.bankFee), $scope.d.total.bankFee],
+          ['Kamate po štednji: ' + currency($scope.d.total.interest), $scope.d.total.interest],
           ['Ostali troškovi: ' + currency($scope.d.total.otherFee), $scope.d.total.otherFee]
         ]);
         var options = {
-            title: '',
+            title: 'Ukupni promet',
             is3D: true
         };
         var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
@@ -246,7 +247,7 @@
     function drawChart() {
         var x = $scope.d.total.monthlyTotalList;
         var data = google.visualization.arrayToDataTable([
-          ['Mjesec', 'Uplate', 'Isplate'],
+          ['Mjesec', 'Prihodi', 'Rashodi'],
           ['01', x[0].total.input, x[0].total.output],
           ['02', x[1].total.input, x[1].total.output],
           ['03', x[2].total.input, x[2].total.output],
@@ -262,7 +263,7 @@
         ]);
 
         var options = {
-            title: 'Promet ' + f.year(),
+            title: 'Prihodi i rashodi u ' + f.year(),
             hAxis: { title: 'Mjesec', titleTextStyle: { color: '#333' } },
             vAxis: { title: 'Iznos (' + $scope.config.currency + ')', minValue: 0 }
         };
@@ -1012,6 +1013,14 @@
         });
     }
 
+    $scope.remove = (x) => {
+        if (confirm('Briši unos ' + x.note + ' (' + x.amount + ' ' + $scope.config.currency + ')?')) {
+            f.post('Account', 'Delete', { id: x.id }).then((d) => {
+                load(x);
+            });
+        }
+    }
+
     $scope.print = (x) => {
         if (f.defined(x.records.data.length)) {
             if (x.records.data.length == 0) { return false; }
@@ -1180,7 +1189,7 @@
         restrict: 'E',
         scope: {
             id: '=',
-            title: '=',
+            headertitle: '=',
             data: '=',
             src: '='
         },

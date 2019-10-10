@@ -744,32 +744,6 @@ public class Account : System.Web.Services.WebService {
                 connection.Close();
             }
 
-            sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE a.recordType = '{0}'", g.bankFee);
-            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(sql, connection)) {
-                    using (SqlDataReader reader = command.ExecuteReader()) {
-                        while (reader.Read()) {
-                            x.bankFee = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
-                        }
-                    }
-                }
-                connection.Close();
-            }
-
-            sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE a.recordType = '{0}'", g.otherFee);
-            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(sql, connection)) {
-                    using (SqlDataReader reader = command.ExecuteReader()) {
-                        while (reader.Read()) {
-                            x.otherFee = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
-                        }
-                    }
-                }
-                connection.Close();
-            }
-
             sql = "SELECT SUM(CAST(loan AS DECIMAL(10,2))) FROM Loan";
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
@@ -782,6 +756,10 @@ public class Account : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
+
+            x.bankFee = GetTotalVal(g.bankFee);
+            x.interest = GetTotalVal(g.interest);
+            x.otherFee = GetTotalVal(g.otherFee);
 
             sql = "SELECT amount, mo, yr, recordType FROM Account";
             List<Recapitulation> rr = new List<Recapitulation>();
@@ -806,15 +784,11 @@ public class Account : System.Web.Services.WebService {
                 RecapMonthlyTotal rmt = new RecapMonthlyTotal();
                 rmt.month = i.ToString();
                 rmt.total = new Recapitulation();
-                rmt.total.input = rr.Where(a => a.month == i && a.year == DateTime.Now.Year 
-                                                            && (a.recordType == g.monthlyFee
-                                                            || a.recordType == g.userPayment
-                                                            || a.recordType == g.terminationWithdraw
-                                                            || a.recordType == g.repayment
-                                                            || a.recordType == g.interest)).Sum(a => a.input);
+                rmt.total.input = rr.Where(a => a.month == i && a.year == DateTime.Now.Year
+                                                           && (a.recordType == g.manipulativeCosts
+                                                           || a.recordType == g.interest)).Sum(a => a.input);
                 rmt.total.output = rr.Where(a => a.month == i && a.year == DateTime.Now.Year
-                                                            && (a.recordType == g.withdraw
-                                                            || a.recordType == g.bankFee
+                                                            && (a.recordType == g.bankFee
                                                             || a.recordType == g.otherFee)).Sum(a => a.input);
                 x.monthlyTotalList.Add(rmt);
             }
@@ -823,6 +797,23 @@ public class Account : System.Web.Services.WebService {
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
         }
+    }
+
+    private double GetTotalVal(string type) {
+        double x = 0;
+        string sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE a.recordType = '{0}'", type);
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                        }
+                    }
+                }
+                connection.Close();
+            }
+        return x;
     }
 
     private string GetAccountNo(string type) {
