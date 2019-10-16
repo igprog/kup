@@ -242,10 +242,12 @@
         chart.draw(data, options);
     }
 
-    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.load('current', { 'packages': ['bar'] });
     google.charts.setOnLoadCallback(drawChart);
+
     function drawChart() {
         var x = $scope.d.total.monthlyTotalList;
+        if (!f.defined(google.visualization)) { return false; }
         var data = google.visualization.arrayToDataTable([
           ['Mjesec', 'Prihodi', 'Rashodi'],
           ['01', x[0].total.input, x[0].total.output],
@@ -263,12 +265,14 @@
         ]);
 
         var options = {
-            title: 'Prihodi i rashodi u ' + f.year(),
-            hAxis: { title: 'Mjesec', titleTextStyle: { color: '#333' } },
-            vAxis: { title: 'Iznos (' + $scope.config.currency + ')', minValue: 0 }
+            chart: {
+                title: 'Prihodi i rashodi u ' + f.year() + ' g.',
+                hAxis: { title: 'Mjesec', titleTextStyle: { color: '#333' } },
+                vAxis: { title: 'Iznos (' + $scope.config.currency + ')', minValue: 0 }
+            }
         };
 
-        var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+        var chart = new google.charts.Bar(document.getElementById('chart_div'));
         chart.draw(data, options);
     }
 
