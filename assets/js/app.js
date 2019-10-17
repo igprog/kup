@@ -376,7 +376,7 @@
             return false;
         }
         f.post(service, 'Save', { x: x }).then((d) => {
-            alert(d);
+            alert(d.msg);
             $scope.d.user.accessDate = new Date($scope.d.user.accessDate);
             $scope.d.user.birthDate = new Date($scope.d.user.birthDate);
             $scope.d.showPdf = true;

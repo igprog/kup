@@ -29,7 +29,7 @@ public class User : System.Web.Services.WebService {
     public User() {
     }
 
-      public class NewUser {
+    public class NewUser {
         public string id;
         //public string buisinessUnitCode;
         public BuisinessUnit.NewUnit buisinessUnit;
@@ -61,11 +61,16 @@ public class User : System.Web.Services.WebService {
         public string statusDate;
     }
 
+    public class Response {
+        public bool status;
+        public string msg;
+        public NewUser user; 
+    }
+
     [WebMethod]
     public string Init() {
         NewUser x = new NewUser();
         x.id = null;
-        //x.buisinessUnitCode = null;
         x.buisinessUnit = new BuisinessUnit.NewUnit();
         x.firstName = null;
         x.lastName = null;
@@ -89,8 +94,11 @@ public class User : System.Web.Services.WebService {
     [WebMethod]
     public string Save(NewUser x) {
         try {
+            Response r = new Response();
             db.Users();
-            string sql = string.Format(@"BEGIN TRAN
+            r = CheckUser(x);
+            if (r.status == true) {
+                string sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Users WITH (updlock,serializable) WHERE id = '{0}')
                                                 BEGIN
                                                    UPDATE Users SET buisinessUnitCode = '{1}', firstName = N'{2}', lastName = N'{3}', pin = '{4}', birthDate = '{5}', accessDate = '{6}', terminationDate = '{7}', isActive = '{8}', monthlyFee = '{9}' WHERE id = '{0}'
@@ -101,17 +109,56 @@ public class User : System.Web.Services.WebService {
                                                    VALUES ('{0}', '{1}', N'{2}', N'{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
                                                 END
                                         COMMIT TRAN", x.id, x.buisinessUnit.code, x.firstName, x.lastName, x.pin, x.birthDate, x.accessDate, x.terminationDate, x.isActive, x.monthlyFee);
-            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(sql, connection)) {
-                    command.ExecuteNonQuery();
+                using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection)) {
+                        command.ExecuteNonQuery();
+                    }
+                    connection.Close();
                 }
-                connection.Close();
             }
-            return JsonConvert.SerializeObject("Spremljeno", Formatting.Indented);
+            return JsonConvert.SerializeObject(r, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
         }
+    }
+
+    private Response CheckUser(NewUser x) {
+        Response r = new Response();
+        r.status = true;
+        r.user = new NewUser();
+        string sql = null;
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            sql = string.Format(@"SELECT id FROM Users WHERE id = '{0}'", x.id);
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        r.user.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
+                    }
+                }
+            }
+            sql = string.Format(@"SELECT pin FROM Users WHERE pin = '{0}'", x.pin);
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        r.user.pin = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
+                    }
+                }
+            }
+            connection.Close();
+        }
+        if (!string.IsNullOrEmpty(r.user.id)) {
+            r.msg = string.Format("Korisnik sa matičnim brojem {0} je već registriran.", r.user.id);
+            r.status = false;
+        }
+        if (!string.IsNullOrEmpty(r.user.pin)) {
+            r.msg = string.Format("{0}Korisnik sa OIB-om {1} je već registriran."
+                , !string.IsNullOrEmpty(r.msg) ? string.Format(@"{0}
+", r.msg) : "", r.user.pin);
+            r.status = false;
+        }
+        return r;
     }
 
     [WebMethod]
