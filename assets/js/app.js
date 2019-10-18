@@ -452,11 +452,15 @@
                 return false;
             }
             f.post('Pdf', method, { user: x.user }).then((d) => {
+                $scope.d.user.accessDate = new Date($scope.d.user.accessDate);
+                $scope.d.user.birthDate = new Date($scope.d.user.birthDate);
                 $scope.d.pdf = f.pdfTempPath(d);
                 $scope.d.loadingPdf = false;
             });
         } else {
             f.post('Pdf', method, { year: x.year, user: x.user }).then((d) => {
+                $scope.d.user.accessDate = new Date($scope.d.user.accessDate);
+                $scope.d.user.birthDate = new Date($scope.d.user.birthDate);
                 $scope.d.pdf = f.pdfTempPath(d);
                 $scope.d.loadingPdf = false;
             });
