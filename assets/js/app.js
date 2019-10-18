@@ -1230,6 +1230,24 @@
     };
 })
 
+.directive('jsonDirective', () => {
+    return {
+        restrict: 'E',
+        scope: {
+            data: '=',
+            debug: '='
+        },
+        templateUrl: './assets/partials/directive/json.html',
+        controller: 'jsonCtrl'
+    };
+})
+.controller('jsonCtrl', ['$scope', ($scope) => {
+    $scope.isShow = false;
+    $scope.show = () => {
+        $scope.isShow = !$scope.isShow;
+    }
+}])
+
 
     /*
 .directive('dateDirective', () => {

@@ -59,6 +59,5 @@
             </form>
         </div>
     </div>
-   
-    <pre ng-if="config.debug">{{d | json}}</pre>
+    <json-directive data="d" debug="config.debug"></json-directive>
 </div>

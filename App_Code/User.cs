@@ -116,6 +116,8 @@ public class User : System.Web.Services.WebService {
                     }
                     connection.Close();
                 }
+                r.status = true;
+                r.msg = "Spremljeno";
             }
             return JsonConvert.SerializeObject(r, Formatting.Indented);
         } catch (Exception e) {
