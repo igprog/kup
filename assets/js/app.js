@@ -122,9 +122,9 @@
 
 .controller('appCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
 
-    window.onbeforeunload = () => {
-        return "Your work will be lost.";
-    };
+    //window.onbeforeunload = () => {
+    //    return "Your work will be lost.";
+    //};
 
     $scope.today = new Date();
 
@@ -631,6 +631,7 @@
         f.post('Pdf', 'Loan', { loan: x.loan }).then((d) => {
             $scope.d.pdf = f.pdfTempPath(d);
             $scope.d.loadingPdf = false;
+            $scope.d.loan.loanDate = new Date($scope.d.loan.loanDate);
         });
     }
 
