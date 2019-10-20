@@ -754,6 +754,9 @@
     }
 
     $scope.save = (x, d, idx) => {
+        if (x.monthlyFee === '') {
+            x.monthlyFee = 0;
+        }
         x.month = d.month;
         x.year = d.year;
         f.post('Account', 'SaveMonthlyFee', { x: x }).then((d) => {
@@ -1253,6 +1256,36 @@
     }
 }])
 
+.directive('allowOnlyNumbers', function () {
+    return {
+        restrict: 'A',
+        link: function (scope, elm, attrs, ctrl) {
+            elm.on('keydown', function (event) {
+                var $input = $(this);
+                var value = $input.val();
+                value = value.replace(',', '.');
+                $input.val(value);
+                if (event.which == 64 || event.which == 16) {
+                    return false;
+                } else if (event.which >= 48 && event.which <= 57) {
+                    return true;
+                } else if (event.which >= 96 && event.which <= 105) {
+                    return true;
+                } else if ([8, 13, 27, 37, 38, 39, 40].indexOf(event.which) > -1) {
+                    return true;
+                } else if (event.which == 110 || event.which == 188 || event.which == 190) {
+                    return true;
+                } else if (event.which == 46) {
+                    return true;
+                } else {
+                    event.preventDefault();
+                    return false;
+                }
+            });
+        }
+    }
+})
+
 
     /*
 .directive('dateDirective', () => {
@@ -1322,35 +1355,6 @@
 }])
 */
 
-.directive('allowOnlyNumbers', function () {
-    return {
-        restrict: 'A',
-        link: function (scope, elm, attrs, ctrl) {
-            elm.on('keydown', function (event) {
-                var $input = $(this);
-                var value = $input.val();
-                value = value.replace(',', '.');
-                $input.val(value);
-                if (event.which == 64 || event.which == 16) {
-                    return false;
-                } else if (event.which >= 48 && event.which <= 57) {
-                    return true;
-                } else if (event.which >= 96 && event.which <= 105) {
-                    return true;
-                } else if ([8, 13, 27, 37, 38, 39, 40].indexOf(event.which) > -1) {
-                    return true;
-                } else if (event.which == 110 || event.which == 188 || event.which == 190) {
-                    return true;
-                } else if (event.which == 46) {
-                    return true;
-                } else {
-                    event.preventDefault();
-                    return false;
-                }
-            });
-        }
-    }
-})
 /********** Directives **********/
 
 ;

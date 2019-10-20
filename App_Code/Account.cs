@@ -253,6 +253,8 @@ public class Account : System.Web.Services.WebService {
                     x.recordType = null;
                     x.loanId = null;
                     x.note = string.Format("OD {0}", g.Month(month));
+                    x.month = month.ToString();
+                    x.year = year;
                     //x = CheckLoan(x, user.id, month, year);  //TODO
                 }
                 x = CheckMonthlyFee(x, user.id, g.monthlyFee);
