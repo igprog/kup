@@ -318,7 +318,7 @@ public class User : System.Web.Services.WebService {
                         , sqlString
                         , !string.IsNullOrEmpty(buisinessUnitCode) || !string.IsNullOrEmpty(search) ? "WHERE" : ""
                         , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("u.buisinessUnitCode = '{0}'", buisinessUnitCode): ""
-                        , !string.IsNullOrEmpty(search) ? string.Format("{0} u.id LIKE '%{1}%' OR u.firstName LIKE '%{1}%' OR u.lastName LIKE '%{1}%' OR u.pin LIKE '%{1}%'"
+                        , !string.IsNullOrEmpty(search) ? string.Format("{0} u.id LIKE '%{1}%' OR u.firstName LIKE N'%{1}%' OR u.lastName LIKE N'%{1}%' OR u.pin LIKE '%{1}%'"
                                                                         , !string.IsNullOrEmpty(buisinessUnitCode) && !string.IsNullOrEmpty(search) ? "AND" : ""                                             
                                                                         , search) : "");
         List<NewUser> xx = new List<NewUser>();
@@ -334,6 +334,7 @@ public class User : System.Web.Services.WebService {
             }
             connection.Close();
         }
+        xx = xx.OrderBy(a => a.lastName).ToList();
         return xx;
     }
 
@@ -345,7 +346,7 @@ public class User : System.Web.Services.WebService {
                         , sqlString
                         , !string.IsNullOrEmpty(buisinessUnitCode) || !string.IsNullOrEmpty(search) ? "WHERE" : ""
                         , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("u.buisinessUnitCode = '{0}'", buisinessUnitCode) : ""
-                        , !string.IsNullOrEmpty(search) ? string.Format("{0} (u.firstName LIKE '%{1}%' OR u.lastName LIKE '%{1}%')"
+                        , !string.IsNullOrEmpty(search) ? string.Format("{0} (u.firstName LIKE N'%{1}%' OR u.lastName LIKE N'%{1}%')"
                                                                       , !string.IsNullOrEmpty(buisinessUnitCode) && !string.IsNullOrEmpty(search) ? "AND" : ""
                                                                       , search) : ""
                         , string.IsNullOrEmpty(buisinessUnitCode) && string.IsNullOrEmpty(search) ? "WHERE" : "AND" );

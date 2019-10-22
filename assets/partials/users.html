@@ -29,7 +29,6 @@
                     <th>Mat. br.</th>
                     <th>Prezime</th>
                     <th>Ime</th>
-                    <th>OIB</th>
                     <th>Posl. jedinice</th>
                     <th colspan="2"></th>
                 </tr>
@@ -39,7 +38,6 @@
                     <td>{{x.id}}</td>
                     <td>{{x.lastName}}</td>
                     <td>{{x.firstName}}</td>
-                    <td>{{x.pin}}</td>
                     <td>{{x.buisinessUnit.code}} - {{x.buisinessUnit.title}}</td>
                     <td>
                         <button class="btn btn-outline-primary" title="Korisnički Profil" ng-click="get('user', 'Korisnički Profil', x.id, null)"><i class="fas fa-user"></i></button>

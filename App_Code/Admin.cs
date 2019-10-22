@@ -68,7 +68,7 @@ public class Admin : System.Web.Services.WebService {
             db.Users();
             string path = Server.MapPath("~/upload/users.csv");
             List<User.NewUser> xx = new List<User.NewUser>();
-            using (var reader = new StreamReader(path, Encoding.ASCII)) {
+            using (var reader = new StreamReader(path, Encoding.Default)) {
                 while (!reader.EndOfStream) {
                     var line = reader.ReadLine();
                     var val = line.Split(';');
@@ -88,8 +88,8 @@ public class Admin : System.Web.Services.WebService {
                         x.total = new Account.Total();
                         x.total.userPaymentWithMonthlyFee = g.ConvertToDouble(val[7]);
                         x.total.terminationWithdraw = g.ConvertToDouble(val[8]);
-                        x.total.activatedLoan = g.ConvertToDouble(val[9]);
-                        x.total.withdraw = g.ConvertToDouble(val[10]);
+                        x.total.activatedLoan = g.ConvertToDouble(val[10]);
+                        x.total.withdraw = x.total.activatedLoan - (x.total.activatedLoan * s.Data().manipulativeCostsCoeff); //g.ConvertToDouble(val[11]);
                         x.total.repayment = g.ConvertToDouble(val[11]);
                         x.monthlyRepayment = g.ConvertToDouble(val[12]);
                         x.monthlyFee = g.ConvertToDouble(val[13]);
@@ -127,26 +127,48 @@ public class Admin : System.Web.Services.WebService {
                             l.loanDate = g.Date(date);
                             l.withdraw = u.total.withdraw;
                             l.manipulativeCosts = l.loan - l.withdraw;
-                            l.repayment = u.monthlyRepayment;
+                            l.repayment = u.total.repayment; // u.monthlyRepayment;
                             l.dedline = Math.Round(l.loan / l.repayment, 0);
                             l.note = "PS";  // Pocetno stanje
 
                             string manipulativeCostsId = Guid.NewGuid().ToString();
                             string withdrawId = Guid.NewGuid().ToString();
                             string monthlyPaymentId = Guid.NewGuid().ToString();
+                            string repaidId = Guid.NewGuid().ToString();
                             sql = string.Format(@"BEGIN
                                                    INSERT INTO Loan (id, userId, loan, loanDate, repayment, manipulativeCosts, withdraw, dedline, isRepaid, note)
                                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
 
                                                    INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-                                                   VALUES ('{12}', '{1}', '{5}', '{3}', '{10}', '{11}', 'manipulativeCosts', '{0}', 'PS')
+                                                   VALUES ('{14}', '{1}', '{5}', '{3}', '{10}', '{11}', 'manipulativeCosts', '{0}', 'PS')
 
                                                    INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-                                                   VALUES ('{13}', '{1}', '{6}', '{3}', '{10}', '{11}', 'withdraw', '{0}', 'PS')
+                                                   VALUES ('{15}', '{1}', '{6}', '{3}', '{10}', '{11}', 'withdraw', '{0}', 'PS')
 
                                                    INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-                                                   VALUES ('{14}', '{1}', '{15}', '{3}', '{10}', '{11}', 'monthlyFee', '', 'PS')
-                                                  END", l.id, l.user.id, l.loan, l.loanDate, l.repayment, l.manipulativeCosts, l.withdraw, l.dedline, l.isRepaid, l.note, g.GetMonth(l.loanDate), g.GetYear(l.loanDate), manipulativeCostsId, withdrawId, monthlyPaymentId, u.total.userPaymentWithMonthlyFee);
+                                                   VALUES ('{16}', '{1}', '{12}', '{3}', '{10}', '{11}', 'monthlyFee', '', 'PS')
+
+                                                   INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+                                                   VALUES ('{17}', '{1}', '{13}', '{3}', '{10}', '{11}', 'repayment', '{0}', 'PS')
+                                                  END"
+                                                        , l.id
+                                                        , l.user.id
+                                                        , l.loan
+                                                        , l.loanDate
+                                                        , l.repayment
+                                                        , l.manipulativeCosts
+                                                        , l.withdraw
+                                                        , l.dedline
+                                                        , l.isRepaid
+                                                        , l.note
+                                                        , g.GetMonth(l.loanDate)
+                                                        , g.GetYear(l.loanDate)
+                                                        , u.total.userPaymentWithMonthlyFee
+                                                        , l.repayment
+                                                        , manipulativeCostsId
+                                                        , withdrawId
+                                                        , monthlyPaymentId
+                                                        , repaidId);
 
                             command.CommandText = sql;
                             command.Transaction = transaction;
