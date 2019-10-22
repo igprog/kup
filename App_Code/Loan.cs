@@ -182,6 +182,7 @@ public class Loan : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
+            xx.data = xx.data.OrderByDescending(a => Convert.ToDateTime(a.loanDate)).ToList();
             xx.total = new Total();
             xx.total.loan = xx.data.Sum(a => a.loan);
             xx.total.repayment = xx.data.Sum(a => a.repayment);
@@ -219,6 +220,7 @@ public class Loan : System.Web.Services.WebService {
                 connection.Close();
             }
 
+            xx.data = xx.data.OrderByDescending(a => Convert.ToDateTime(a.loanDate)).ToList();
             xx.total = new Total();
             xx.total.loan = xx.data.Sum(a => a.loan);
             xx.total.repayment = xx.data.Sum(a => a.repayment);

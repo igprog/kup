@@ -27,8 +27,7 @@
             <thead>
                 <tr>
                     <th>Mat. br.</th>
-                    <th>Prezime</th>
-                    <th>Ime</th>
+                    <th>Korisnik</th>
                     <th>Posl. jedinice</th>
                     <th colspan="2"></th>
                 </tr>
@@ -36,9 +35,8 @@
             <tbody>
                 <tr ng-repeat="x in d.users" class="{{x.isActive==0?'text-danger':''}}">
                     <td>{{x.id}}</td>
-                    <td>{{x.lastName}}</td>
-                    <td>{{x.firstName}}</td>
-                    <td>{{x.buisinessUnit.code}} - {{x.buisinessUnit.title}}</td>
+                    <td>{{x.lastName}} {{x.firstName}}</td>
+                    <td>{{x.buisinessUnit.title}}</td>
                     <td>
                         <button class="btn btn-outline-primary" title="Korisnički Profil" ng-click="get('user', 'Korisnički Profil', x.id, null)"><i class="fas fa-user"></i></button>
                         <button class="btn btn-outline-danger" title="Kartica Korisnika" ng-click="get('card', 'Kartica Korisnika', x.id, d.year)"><i class="fas fa-id-card"></i></button>

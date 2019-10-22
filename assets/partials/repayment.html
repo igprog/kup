@@ -41,11 +41,11 @@
         </div>
         <loading-directive loadingtitle="'Učitavanje...'" value="d.loading" size="5"></loading-directive>
         <div ng-if="d.records.data.length>0&&!d.loading" class="table-responsive">
-            <table class="table table-hover">
+            <table class="table">
                 <thead>
                     <tr>
                         <th>Mat. br.</th>
-                        <th>Prezime i ime</th>
+                        <th>Korisnik</th>
                         <th class="text-right">Ugovorena rata ({{config.currency}})</th>
                         <th class="text-right">Uplaćeno ({{config.currency}})</th>
                         <th class="text-right">Ostatak za otplatu ({{config.currency}})</th>
