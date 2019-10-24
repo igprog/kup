@@ -238,7 +238,7 @@ public class Account : System.Web.Services.WebService {
     public string GetMonthlyFee(int month, int year, string buisinessUnitCode, string search) {
         try {
             User u = new User();
-            List<User.NewUser> users = u.GetUsers(buisinessUnitCode, search);
+            List<User.NewUser> users = u.GetUsers(buisinessUnitCode, search, true);
             db.Account();
             Accounts xx = new Accounts();
             xx.data = new List<NewAccount>();
@@ -324,7 +324,7 @@ public class Account : System.Web.Services.WebService {
     public string GetMonthlyRecords(int month, int year, string buisinessUnitCode, string search) {
         try {
             User u = new User();
-            List<User.NewUser> users = u.GetUsers(buisinessUnitCode, search);
+            List<User.NewUser> users = u.GetUsers(buisinessUnitCode, search, false);
             db.Account();
             Accounts xx = new Accounts();
             xx.data = new List<NewAccount>();

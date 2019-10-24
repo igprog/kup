@@ -66,6 +66,7 @@ public class Admin : System.Web.Services.WebService {
     public string ImportUsersCsv(DateTime date) {
         try {
             db.Users();
+            string recordDate = g.Date(date);
             string path = Server.MapPath("~/upload/users.csv");
             List<User.NewUser> xx = new List<User.NewUser>();
             using (var reader = new StreamReader(path, Encoding.Default)) {
@@ -93,7 +94,13 @@ public class Admin : System.Web.Services.WebService {
                         x.total.repayment = g.ConvertToDouble(val[11]);
                         x.monthlyRepayment = g.ConvertToDouble(val[12]);
                         x.monthlyFee = g.ConvertToDouble(val[13]);
-                        x.isActive = 1;
+                        if (string.IsNullOrWhiteSpace(val[5])) {
+                            x.isActive = 1;
+                        } else {
+                            x.isActive = 0;
+                            x.terminationDate = g.ConvertDate(val[5]);
+                            x.total.terminationWithdraw = g.ConvertToDouble(val[8]);
+                        }
                         xx.Add(x);
                     }
                 }
@@ -106,8 +113,8 @@ public class Admin : System.Web.Services.WebService {
                     using (SqlTransaction transaction = connection.BeginTransaction()) {
                         sql = string.Format(@"DELETE FROM Users;
                                                 DELETE FROM Loan;
-                                                DELETE FROM Account WHERE recordType = '{0}' OR recordType = '{1}' OR recordType = '{2}' OR recordType = '{3}' OR recordType = '{4}';"
-                                                , g.withdraw, g.monthlyFee, g.userPayment, g.manipulativeCosts, g.repayment);
+                                                DELETE FROM Account WHERE recordType = '{0}' OR recordType = '{1}' OR recordType = '{2}' OR recordType = '{3}' OR recordType = '{4}' OR recordType = '{5}';"
+                                                , g.withdraw, g.monthlyFee, g.userPayment, g.manipulativeCosts, g.repayment, g.terminationWithdraw);
                         command.CommandText = sql;
                         command.Transaction = transaction;
                         command.ExecuteNonQuery();
@@ -124,7 +131,7 @@ public class Admin : System.Web.Services.WebService {
                             l.user = new User.NewUser();
                             l.user.id = u.id;
                             l.loan = u.total.activatedLoan;
-                            l.loanDate = g.Date(date);
+                            l.loanDate = recordDate;
                             l.withdraw = u.total.withdraw;
                             l.manipulativeCosts = l.loan - l.withdraw;
                             l.repayment = u.total.repayment; // u.monthlyRepayment;
@@ -173,6 +180,18 @@ public class Admin : System.Web.Services.WebService {
                             command.CommandText = sql;
                             command.Transaction = transaction;
                             command.ExecuteNonQuery();
+
+                            if (u.total.terminationWithdraw > 0) {
+                                string terminationWithdrawId = Guid.NewGuid().ToString();
+                                sql = string.Format(@"INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+                                                   VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', 'terminationWithdraw', '', 'PS')"
+                                                , terminationWithdrawId, u.id, u.total.terminationWithdraw, recordDate, g.GetMonth(recordDate), g.GetYear(recordDate));
+                                command.CommandText = sql;
+                                command.Transaction = transaction;
+                                command.ExecuteNonQuery();
+                            }
+                            
+
                         }
                         transaction.Commit();
                     }

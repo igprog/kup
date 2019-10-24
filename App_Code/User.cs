@@ -206,7 +206,7 @@ public class User : System.Web.Services.WebService {
     [WebMethod]
     public string Load(string buisinessUnitCode, string search) {
         try {
-            return JsonConvert.SerializeObject(GetUsers(buisinessUnitCode, search), Formatting.Indented);
+            return JsonConvert.SerializeObject(GetUsers(buisinessUnitCode, search, false), Formatting.Indented);
         }catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
         }
@@ -233,7 +233,7 @@ public class User : System.Web.Services.WebService {
             x.totalMebershipFees = GetAmount(id, g.monthlyFee);
             DateTime now = DateTime.UtcNow;
             x.totalMebershipFeesRequired = a.GetMonthlyFeeRequiredAccu(x.id, now.Month, now.Year);  //TODO: provjeriti dali to treba???
-            x.terminationWithdraw = x.totalMebershipFees - x.restToRepayment - (x.totalMebershipFeesRequired - x.totalMebershipFees); 
+            x.terminationWithdraw = x.totalMebershipFees - x.restToRepayment;  //  - (x.totalMebershipFeesRequired - x.totalMebershipFees); // TODO: Provjeriti dali treba totalMebershipFeesRequired
             //x.activeLoanId = GetActiveLoanId(id);
             if (year != null) {
                 x.records = a.GetRecords(x.id, year);
@@ -312,7 +312,7 @@ public class User : System.Web.Services.WebService {
         return x;
     }
 
-    public List<NewUser> GetUsers(string buisinessUnitCode, string search) {
+    public List<NewUser> GetUsers(string buisinessUnitCode, string search, bool activeUsers) {
         db.Users();
         string sql = string.Format(@"{0} {1} {2} {3}"
                         , sqlString
@@ -334,6 +334,9 @@ public class User : System.Web.Services.WebService {
             }
             connection.Close();
         }
+        if (activeUsers) {
+            xx = xx.Where(a => a.isActive == 1).ToList();
+        }
         xx = xx.OrderBy(a => a.lastName).ToList();
         return xx;
     }
@@ -342,7 +345,7 @@ public class User : System.Web.Services.WebService {
         db.Users();
         string sql = string.Format(@"{0}
                         LEFT OUTER JOIN Loan l on u.id = l.userId
-                        {1} {2} {3} {4} l.isRepaid = 0"
+                        {1} {2} {3} {4} l.isRepaid = 0 AND u.isActive = 1"
                         , sqlString
                         , !string.IsNullOrEmpty(buisinessUnitCode) || !string.IsNullOrEmpty(search) ? "WHERE" : ""
                         , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("u.buisinessUnitCode = '{0}'", buisinessUnitCode) : ""
