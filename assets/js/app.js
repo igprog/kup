@@ -115,6 +115,9 @@
                 { id: 'interest', title: 'Kamata po štednji' },
                 { id: 'otherFee', title: 'Ostalo' }
             ]
+        },
+        currency: (x, currency) => {
+            return parseInt(x).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ' + currency;
         }
     }
 }])
@@ -217,10 +220,6 @@
         total: null
     }
 
-    var currency = (x) => {
-        return x.toFixed(2) + ' ' + $scope.config.currency;
-    }
-
     google.charts.load("current", { packages: ["corechart"] });
     google.charts.setOnLoadCallback(drawPieChart);
     function drawPieChart() {
@@ -228,11 +227,11 @@
         if (!f.defined(google.visualization)) { return false;}
         var data = google.visualization.arrayToDataTable([
           ['Task', ''],
-          ['Ulozi: ' + currency($scope.d.total.userPaymentWithMonthlyFee), $scope.d.total.userPaymentWithMonthlyFee],
-          ['Pozajmice: ' + currency($scope.d.total.activatedLoan), $scope.d.total.activatedLoan],
-          ['Troškovi održavanja računa: ' + currency($scope.d.total.bankFee), $scope.d.total.bankFee],
-          ['Kamate po štednji: ' + currency($scope.d.total.interest), $scope.d.total.interest],
-          ['Ostali troškovi: ' + currency($scope.d.total.otherFee), $scope.d.total.otherFee]
+          ['Ulozi: ' + f.currency($scope.d.total.userPaymentWithMonthlyFee, $scope.config.currency), $scope.d.total.userPaymentWithMonthlyFee],
+          ['Pozajmice: ' + f.currency($scope.d.total.activatedLoan, $scope.config.currency), $scope.d.total.activatedLoan],
+          ['Troškovi održavanja računa: ' + f.currency($scope.d.total.bankFee, $scope.config.currency), $scope.d.total.bankFee],
+          ['Kamate po štednji: ' + f.currency($scope.d.total.interest, $scope.config.currency), $scope.d.total.interest],
+          ['Ostali troškovi: ' + f.currency($scope.d.total.otherFee, $scope.config.currency), $scope.d.total.otherFee]
         ]);
         var options = {
             title: 'Ukupni promet',
