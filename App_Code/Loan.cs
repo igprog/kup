@@ -116,24 +116,6 @@ public class Loan : System.Web.Services.WebService {
                                                    VALUES ('{13}', '{1}', '{6}', '{3}', '{10}', '{11}',  'withdraw', '{0}', 'Isplata pozajmice')
                                                 END
                                         COMMIT TRAN", x.id, x.user.id, x.loan, x.loanDate, x.repayment, x.manipulativeCosts, x.withdraw, x.dedline, x.isRepaid, x.note, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), manipulativeCostsId, withdrawId);
-
-            //string sql = string.Format(@"BEGIN TRAN
-            //                                IF EXISTS (SELECT * from Loan WITH (updlock,serializable) WHERE id = '{0}')
-            //                                    BEGIN
-            //                                       UPDATE Loan SET userId = '{1}', loan = '{2}', loanDate = '{3}', repayment = '{4}', manipulativeCosts = '{5}', withdraw = '{6}', dedline = '{7}', isRepaid = '{8}', note = '{9}' WHERE id = '{0}'
-            //                                    END
-            //                                ELSE
-            //                                    BEGIN
-            //                                       INSERT INTO Loan (id, userId, loan, loanDate, repayment, manipulativeCosts, withdraw, dedline, isRepaid, note)
-            //                                       VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
-
-            //                                       INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-            //                                       VALUES ('{12}', '{1}', '{5}', '{3}', '{10}', '{11}', 'manipulativeCosts', '{0}', 'Manipulativni troškovi')
-
-            //                                       INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-            //                                       VALUES ('{13}', '{1}', '{6}', '{3}', '{10}', '{11}',  'withdraw', '{0}', 'Isplata pozajmice')
-            //                                    END
-            //                            COMMIT TRAN", x.id, x.user.id, x.loan, x.loanDate, x.repayment, x.manipulativeCosts, x.withdraw, x.dedline, x.isRepaid, x.note, g.GetMonth(x.loanDate), g.GetYear(x.loanDate), manipulativeCostsId, withdrawId);
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -182,7 +164,8 @@ public class Loan : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
-            xx.data = xx.data.OrderByDescending(a => Convert.ToDateTime(a.loanDate)).ToList();
+         
+            xx.data = xx.data.OrderBy(a => a.user.lastName).ToList();
             xx.total = new Total();
             xx.total.loan = xx.data.Sum(a => a.loan);
             xx.total.repayment = xx.data.Sum(a => a.repayment);
@@ -220,7 +203,7 @@ public class Loan : System.Web.Services.WebService {
                 connection.Close();
             }
 
-            xx.data = xx.data.OrderByDescending(a => Convert.ToDateTime(a.loanDate)).ToList();
+            xx.data = xx.data.OrderBy(a => a.user.lastName).ToList();
             xx.total = new Total();
             xx.total.loan = xx.data.Sum(a => a.loan);
             xx.total.repayment = xx.data.Sum(a => a.repayment);

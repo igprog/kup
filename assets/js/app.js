@@ -651,8 +651,10 @@
     }
 
     $scope.search = (x) => {
+        $scope.d.loading = true;
         f.post(service, 'Search', { search: x }).then((d) => {
             $scope.d.records = d;
+            $scope.d.loading = false;
         });
     }
 

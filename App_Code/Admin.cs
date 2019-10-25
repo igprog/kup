@@ -135,7 +135,11 @@ public class Admin : System.Web.Services.WebService {
                             l.withdraw = u.total.withdraw;
                             l.manipulativeCosts = l.loan - l.withdraw;
                             l.repayment = u.total.repayment; // u.monthlyRepayment;
-                            l.dedline = Math.Round(l.loan / l.repayment, 0);
+                            if ( u.monthlyRepayment > 0) {
+                                l.dedline = Math.Round((l.loan - l.repayment) / u.monthlyRepayment, 0);
+                            } else {
+                                l.dedline = 0;
+                            }
                             l.note = "PS";  // Pocetno stanje
 
                             string manipulativeCostsId = Guid.NewGuid().ToString();
@@ -162,7 +166,7 @@ public class Admin : System.Web.Services.WebService {
                                                         , l.user.id
                                                         , l.loan
                                                         , l.loanDate
-                                                        , l.repayment
+                                                        , u.monthlyRepayment
                                                         , l.manipulativeCosts
                                                         , l.withdraw
                                                         , l.dedline
