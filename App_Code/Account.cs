@@ -63,6 +63,8 @@ public class Account : System.Web.Services.WebService {
         public double bankFee;
         public double otherFee;
         public double interest;
+        public double input;
+        public double output;
 
         public List<RecapMonthlyTotal> monthlyTotalList;  // TODO
     }
@@ -705,7 +707,8 @@ public class Account : System.Web.Services.WebService {
         double val = 0;
         db.Account();
         string sql = null;
-        string _sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE yr = '{0}' AND a.note <> 'PS'", year);
+        //string _sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE yr = '{0}' AND a.note <> 'PS'", year);
+        string _sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE yr = '{0}'", year);
         if (type == g.income) {
             sql = string.Format(@"{0} AND (a.recordType = '{1}' OR a.recordType = '{2}')", _sql, g.interest, g.manipulativeCosts);
         } else if (type == g.expense) {
@@ -794,7 +797,8 @@ public class Account : System.Web.Services.WebService {
                                                             || a.recordType == g.otherFee)).Sum(a => a.input);
                 x.monthlyTotalList.Add(rmt);
             }
-
+            x.input = x.monthlyTotalList.Sum(a => a.total.input);
+            x.output = x.monthlyTotalList.Sum(a => a.total.output);
             return JsonConvert.SerializeObject(x, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
@@ -1027,15 +1031,6 @@ public class Account : System.Web.Services.WebService {
         } else {
             sql = _sql;
         }
-
-        //string sql = string.Format(@"SELECT SUM(CONVERT(DECIMAL, a.amount)) FROM Account a WHERE a.yr < {0} {1}"
-        // , year
-        // , type != g.giroaccount ? string.Format("AND a.recordType = '{0}'", type)
-        //                         : string.Format("AND (a.recordType = '{0}' OR a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}')"
-        //                                        , g.repayment
-        //                                        , g.monthlyFee
-        //                                        , g.manipulativeCosts
-        //                                        , g.interest));
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -1206,20 +1201,12 @@ public class Account : System.Web.Services.WebService {
                      , year
                      , g.Month(month)
                      , g.GetLastDayInMonth(year, month));
-        //string sql = string.Format(@"
-        //            SELECT l.loan FROM Loan l
-        //            {0} ((CAST(l.loanDate AS datetime) >= CAST('{1}-{2}-01' AS datetime)) AND (CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)))"
-        //                , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE l.userId = '{0}' AND", userId)
-        //                , year
-        //                , g.Month(month)
-        //                , g.GetLastDayInMonth(year, month));
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
                     while (reader.Read()) {
                         loan = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
-                        //loan = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
                     }
                 }
             }

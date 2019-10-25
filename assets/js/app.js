@@ -248,7 +248,7 @@
         var x = $scope.d.total.monthlyTotalList;
         if (!f.defined(google.visualization)) { return false; }
         var data = google.visualization.arrayToDataTable([
-          ['Mjesec', 'Prihodi', 'Rashodi'],
+          ['Mjesec', 'Prihodi: ' + f.currency($scope.d.total.input, $scope.config.currency), 'Rashodi: ' + f.currency($scope.d.total.output, $scope.config.currency)],
           ['01', x[0].total.input, x[0].total.output],
           ['02', x[1].total.input, x[1].total.output],
           ['03', x[2].total.input, x[2].total.output],

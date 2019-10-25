@@ -86,7 +86,7 @@
     },
     {
       "tpl": "fee",
-      "title": "Ostali Troškovi",
+      "title": "Razni Materijalni Troškovi",
       "ico": "shopping-cart",
       "type": "otherFee"
     },
