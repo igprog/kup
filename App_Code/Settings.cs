@@ -14,7 +14,8 @@ using Igprog;
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
 public class Settings : System.Web.Services.WebService {
-    string path = "~/App_Data/json/settings.json";
+    string path = "~/settings/settings.json";
+    string folder = "~/settings/";
     public Settings() { 
     }
 
@@ -24,7 +25,14 @@ public class Settings : System.Web.Services.WebService {
         public double manipulativeCostsCoeff;
         public int defaultDedline;
         public Account.AccountNo account;
+        public StartBalance startBalance;
         public PrintSettings printSettings;
+    }
+
+    public class StartBalance {
+        public double giroAccountInput;  // Potrazuje
+        public double giroAccountOutput;  // Duguje
+        public string date;
     }
 
     public class PrintSettings {
@@ -46,6 +54,9 @@ public class Settings : System.Web.Services.WebService {
     [WebMethod]
     public string Save(string x) {
         try {
+            if (!Directory.Exists(Server.MapPath(folder))) {
+                Directory.CreateDirectory(Server.MapPath(folder));
+            }
             WriteFile(path, x);
             return Load();
         } catch(Exception e) { return ("Error: " + e); }

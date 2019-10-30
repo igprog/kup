@@ -79,6 +79,11 @@
             var yr = x.getFullYear();
             return yr + '-' + mo + '-' + day;
         },
+        lastDayInMonth(month, year) {
+            var lastDay = new Date(year, month, 0).getDate();
+            var month_ = month < 10 ? '0' + month : month;
+            return lastDay + '.' + month_ + '.' + year;
+        },
         pdfTempPath: (x) => {
             return './upload/pdf/temp/' + x + '.pdf';
         },
@@ -885,6 +890,7 @@
         year: $scope.g.year,
         type: $scope.g.currTplType,
         title: $scope.g.currTplTitle,
+        date: null,
         pdf: null,
         loadingPdf: false
     }
@@ -894,6 +900,7 @@
         f.post(service, 'LoadEntry', { month: x.month, year: x.year }).then((d) => {
             $scope.d.records = d;
             $scope.g.clearView = false;
+            $scope.d.date = f.lastDayInMonth(x.month, x.year);
         });
     }
 
@@ -1137,9 +1144,13 @@
         dropTbl: null,
         date: new Date(),
         manipulativeCosts: null,
+        manipulativeCostsNote: 'PS',
         bankFee: null,
+        bankFeeNote: 'PS',
         interest: null,
+        interestNote: 'PS',
         otherFee: null,
+        otherFeeNote: 'PS',
         loading: false
     }
     $scope.d = data;
@@ -1185,13 +1196,11 @@
        });
     }
 
-    $scope.saveStartBalance = (type, x, date) => {
-        f.post(service, 'SaveStartBalance', { type: type, x: x, date: date }).then((d) => {
+    $scope.saveStartBalance = (type, x, date, note) => {
+        f.post(service, 'SaveStartBalance', { type: type, x: x, date: date, note:note }).then((d) => {
             alert(d);
         });
     }
-
-
 
 }])
 

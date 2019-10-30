@@ -892,7 +892,11 @@ public class Account : System.Web.Services.WebService {
             if (type == g.monthlyFee) {
                 x.total.input = startBalance;  // potražuje 
             }
-            if (type == g.giroaccount) {
+            if (type == g.giroaccount && year > Convert.ToDateTime(s.Data().startBalance.date).Year) {
+
+               // startBalance = startBalance + s.Data().startBalance.giroAccountOutput; // 2346692.40; //TODO
+                //TODO: duguje potražuje pocetno stanje ???
+
                 x.total.output = startBalance;
             }
             xx.Add(x);
@@ -907,19 +911,49 @@ public class Account : System.Web.Services.WebService {
             if (!string.IsNullOrEmpty(inputType)) {
                 var input = inputType != g.giroaccount
                     ? data.Where(a => a.month.ToString() == x.month && a.year == year && a.recordType == inputType)
-                    : data.Where(a => a.month.ToString() == x.month && a.year == year
-                                                                    && (a.recordType == g.repayment
-                                                                    || a.recordType == g.monthlyFee
-                                                                    || a.recordType == g.interest));
+                    : data.Where(a => a.month.ToString() == x.month && a.year == year && g.DateDiff(g.SetDate(g.GetLastDayInMonth(year, Convert.ToInt32(a.month)), Convert.ToInt32(a.month), year), s.Data().startBalance.date, false) > 0
+                                                                    && (a.recordType == g.withdraw
+                                                                    || a.recordType == g.bankFee
+                                                                    || a.recordType == g.otherFee
+                                                                    || a.recordType == g.terminationWithdraw));
+                //if (inputType == g.giroaccount && g.DateDiff(g.SetDate(g.GetLastDayInMonth(year, Convert.ToInt32(x.month)), Convert.ToInt32(x.month), year), s.Data().startBalance.date, false) >= 0) {
+                //    x.total.input = input.Sum(a => a.input) + s.Data().startBalance.giroAccountInput;
+                //} else {
+                //    x.total.input = input.Sum(a => a.input);
+                //}
                 x.total.input = input.Sum(a => a.input);
 
                 var inputAccumulation = inputType != g.giroaccount
                    ? data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && a.recordType == inputType)
-                   : data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year))
-                                                                    && (a.recordType == g.repayment
-                                                                    || a.recordType == g.monthlyFee
-                                                                    || a.recordType == g.interest));
-                x.total.inputAccumulation = inputAccumulation.Sum(a => a.input) +  startBalance;
+                   : data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && g.DateDiff(g.SetDate(g.GetLastDayInMonth(year, Convert.ToInt32(a.month)), Convert.ToInt32(a.month), year), s.Data().startBalance.date, false) > 0
+                                                                    && (a.recordType == g.withdraw
+                                                                    || a.recordType == g.bankFee
+                                                                    || a.recordType == g.otherFee
+                                                                    || a.recordType == g.terminationWithdraw));
+                //x.total.inputAccumulation = inputAccumulation.Sum(a => a.input) + startBalance;
+                if (inputType == g.giroaccount && g.DateDiff(g.SetDate(g.GetLastDayInMonth(year, Convert.ToInt32(x.month)), Convert.ToInt32(x.month), year), s.Data().startBalance.date, false) >= 0) {
+                    x.total.inputAccumulation = inputAccumulation.Sum(a => a.input) + startBalance + s.Data().startBalance.giroAccountInput;
+                } else {
+                    x.total.inputAccumulation = inputAccumulation.Sum(a => a.input) + startBalance;
+                }
+
+                //var input = inputType != g.giroaccount
+                //    ? data.Where(a => a.month.ToString() == x.month && a.year == year && a.recordType == inputType)
+                //    : data.Where(a => a.month.ToString() == x.month && a.year == year
+                //                                                    && (a.recordType == g.repayment
+                //                                                    || a.recordType == g.monthlyFee
+                //                                                    || a.recordType == g.userPayment
+                //                                                    || a.recordType == g.interest));
+                //x.total.input = input.Sum(a => a.input);
+
+                //var inputAccumulation = inputType != g.giroaccount
+                //   ? data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && a.recordType == inputType)
+                //   : data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year))
+                //                                                    && (a.recordType == g.repayment
+                //                                                    || a.recordType == g.monthlyFee
+                //                                                    || a.recordType == g.userPayment
+                //                                                    || a.recordType == g.interest));
+                //x.total.inputAccumulation = inputAccumulation.Sum(a => a.input) +  startBalance;
             }
 
             if (!string.IsNullOrEmpty(outputType)) {
@@ -929,27 +963,47 @@ public class Account : System.Web.Services.WebService {
                 } else {
                     var output = outputType != g.giroaccount
                         ? data.Where(a => a.month.ToString() == x.month && a.year == year && a.recordType == outputType)
-                        : data.Where(a => a.month.ToString() == x.month && a.year == year
-                                                                        && (a.recordType == g.withdraw
-                                                                        || a.recordType == g.bankFee
-                                                                        || a.recordType == g.otherFee
-                                                                        || a.recordType == g.terminationWithdraw));
+                        : data.Where(a => a.month.ToString() == x.month && a.year == year && g.DateDiff(g.SetDate(g.GetLastDayInMonth(year, Convert.ToInt32(a.month)), Convert.ToInt32(a.month), year), s.Data().startBalance.date, false) > 0
+                                                                       && (a.recordType == g.repayment
+                                                                        || a.recordType == g.monthlyFee
+                                                                        || a.recordType == g.userPayment
+                                                                        || a.recordType == g.interest));
+                    //var output = outputType != g.giroaccount
+                    //    ? data.Where(a => a.month.ToString() == x.month && a.year == year && a.recordType == outputType)
+                    //    : data.Where(a => a.month.ToString() == x.month && a.year == year
+                    //                                                    && (a.recordType == g.withdraw
+                    //                                                    || a.recordType == g.bankFee
+                    //                                                    || a.recordType == g.otherFee
+                    //                                                    || a.recordType == g.terminationWithdraw));
 
+
+                    //if (inputType == g.giroaccount && g.DateDiff(g.SetDate(g.GetLastDayInMonth(year, Convert.ToInt32(x.month)), Convert.ToInt32(x.month), year), s.Data().startBalance.date, false) >= 0) {
+                    //    x.total.output = output.Sum(a => a.input) + s.Data().startBalance.giroAccountOutput;
+                    //} else {
+                    //    x.total.output = output.Sum(a => a.input);
+                    //}
                     x.total.output = output.Sum(a => a.input);
-
                     var outputAccumulation = outputType != g.giroaccount
                        ? data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && a.recordType == outputType)
-                       : data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year))
-                                                                        && (a.recordType == g.withdraw
-                                                                        || a.recordType == g.bankFee
-                                                                        || a.recordType == g.otherFee
-                                                                        || a.recordType == g.terminationWithdraw));
+                       : data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && g.DateDiff(g.SetDate(g.GetLastDayInMonth(year, Convert.ToInt32(a.month)), Convert.ToInt32(a.month), year), s.Data().startBalance.date, false) > 0
+                                                                        && (a.recordType == g.repayment
+                                                                        || a.recordType == g.monthlyFee
+                                                                        || a.recordType == g.userPayment
+                                                                        || a.recordType == g.interest));
 
-                    x.total.outputAccumulation = outputType != g.giroaccount ? outputAccumulation.Sum(a => a.input) : outputAccumulation.Sum(a => a.input) + startBalance;
+                    //x.total.outputAccumulation = outputType != g.giroaccount ? outputAccumulation.Sum(a => a.input) : outputAccumulation.Sum(a => a.input) + startBalance;
+
+                    if (inputType == g.giroaccount && g.DateDiff(g.SetDate(g.GetLastDayInMonth(year, Convert.ToInt32(x.month)), Convert.ToInt32(x.month), year), s.Data().startBalance.date, false) >= 0) {
+                        x.total.outputAccumulation = outputAccumulation.Sum(a => a.input) + s.Data().startBalance.giroAccountOutput;
+                    } else {
+                        x.total.outputAccumulation = outputAccumulation.Sum(a => a.input);
+                    }
+
+
                 }
             }
 
-            if (x.total.input > 0 || x.total.output > 0) {
+            if (x.total.input > 0 || x.total.output > 0 || x.total.inputAccumulation > 0 || x.total.outputAccumulation > 0) {
                 if (type == g.monthlyFee.ToString()) {
                     //x.total.output = GetMonthlyFeeRequired(null, i, year);
                     //x.total.outputAccumulation = GetMonthlyFeeRequiredAccu(null, i, year);

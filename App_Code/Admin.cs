@@ -151,12 +151,6 @@ public class Admin : System.Web.Services.WebService {
                                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
 
                                                    INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-                                                   VALUES ('{14}', '{1}', '{5}', '{3}', '{10}', '{11}', 'manipulativeCosts', '{0}', 'PS')
-
-                                                   INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-                                                   VALUES ('{15}', '{1}', '{6}', '{3}', '{10}', '{11}', 'withdraw', '{0}', 'PS')
-
-                                                   INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
                                                    VALUES ('{16}', '{1}', '{12}', '{3}', '{10}', '{11}', 'monthlyFee', '', 'PS')
 
                                                    INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
@@ -180,6 +174,40 @@ public class Admin : System.Web.Services.WebService {
                                                         , withdrawId
                                                         , monthlyPaymentId
                                                         , repaidId);
+                            //sql = string.Format(@"BEGIN
+                            //                       INSERT INTO Loan (id, userId, loan, loanDate, repayment, manipulativeCosts, withdraw, dedline, isRepaid, note)
+                            //                       VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}')
+
+                            //                       INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+                            //                       VALUES ('{14}', '{1}', '{5}', '{3}', '{10}', '{11}', 'manipulativeCosts', '{0}', 'PS')
+
+                            //                       INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+                            //                       VALUES ('{15}', '{1}', '{6}', '{3}', '{10}', '{11}', 'withdraw', '{0}', 'PS')
+
+                            //                       INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+                            //                       VALUES ('{16}', '{1}', '{12}', '{3}', '{10}', '{11}', 'monthlyFee', '', 'PS')
+
+                            //                       INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+                            //                       VALUES ('{17}', '{1}', '{13}', '{3}', '{10}', '{11}', 'repayment', '{0}', 'PS')
+                            //                      END"
+                            //                            , l.id
+                            //                            , l.user.id
+                            //                            , l.loan
+                            //                            , l.loanDate
+                            //                            , u.monthlyRepayment
+                            //                            , l.manipulativeCosts
+                            //                            , l.withdraw
+                            //                            , l.dedline
+                            //                            , l.isRepaid
+                            //                            , l.note
+                            //                            , g.GetMonth(l.loanDate)
+                            //                            , g.GetYear(l.loanDate)
+                            //                            , u.total.userPaymentWithMonthlyFee
+                            //                            , l.repayment
+                            //                            , manipulativeCostsId
+                            //                            , withdrawId
+                            //                            , monthlyPaymentId
+                            //                            , repaidId);
 
                             command.CommandText = sql;
                             command.Transaction = transaction;
@@ -209,19 +237,28 @@ public class Admin : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    public string SaveStartBalance(string type, double x, DateTime date) {
+    public string SaveStartBalance(string type, double x, DateTime date, string note) {
         try {
             string date_ = g.Date(date);
-            string sql = string.Format(@"DELETE FROM Account WHERE recordType = '{0}';
-                                        INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+            string sql = string.Format(@"INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
                                         VALUES ('{1}', '', '{2}', '{3}', '{4}', '{5}', '{0}', '', '{6}');"
-                                        , type
-                                        , Guid.NewGuid().ToString()
-                                        , x
-                                        , date_
-                                        , g.GetMonth(date_)
-                                        , g.GetYear(date_)
-                                        , "PS");
+                                      , type
+                                      , Guid.NewGuid().ToString()
+                                      , x
+                                      , date_
+                                      , g.GetMonth(date_)
+                                      , g.GetYear(date_)
+                                      , note);
+            //string sql = string.Format(@"DELETE FROM Account WHERE recordType = '{0}';
+            //                            INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+            //                            VALUES ('{1}', '', '{2}', '{3}', '{4}', '{5}', '{0}', '', '{6}');"
+            //                            , type
+            //                            , Guid.NewGuid().ToString()
+            //                            , x
+            //                            , date_
+            //                            , g.GetMonth(date_)
+            //                            , g.GetYear(date_)
+            //                            , "PS");
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {

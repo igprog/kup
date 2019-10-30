@@ -37,6 +37,7 @@ namespace Igprog {
         public string entry_II = "entry_II";
         public string allUnitsTitle = "JANAF ukupno";
 
+        #region Date
         public string ReffDate(int? month, int year) {
             if(month == 13) {
                 month = 1;
@@ -81,6 +82,46 @@ namespace Igprog {
             return date_;
         }
 
+        public string Month(int month) {
+           return month < 10 ? string.Format("0{0}", month) : month.ToString();
+        }
+
+        public string GetMonth(string date) {
+            return date.Substring(5, 2);
+        }
+
+        public string GetYear(string date) {
+            return date.Substring(0, 4);
+        }
+
+        public int DateDiff(DateTime from, DateTime to, bool abs) {
+            try {
+                return Convert.ToInt32(abs == true ? Math.Abs((from - to).TotalDays) : (from - to).TotalDays);
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+
+        public int DateDiff(string from, string to, bool abs) {
+            try {
+                DateTime from_ = Convert.ToDateTime(from);
+                DateTime to2_ = Convert.ToDateTime(to);
+                return DateDiff(from_, to2_, abs);
+            } catch (Exception e) {
+                return 0;
+            }
+            
+        }
+
+        public int DateDiff(string date) {
+            try {
+                return DateDiff(Convert.ToDateTime(date), DateTime.UtcNow, true);
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+        #endregion Date
+
         public void CreateFolder(string path) {
             if (!Directory.Exists(path)) {
                 Directory.CreateDirectory(path);
@@ -103,18 +144,6 @@ namespace Igprog {
 
         public string manipulativeCostsPerc() {
             return string.Format("{0}", Math.Round(s.Data().manipulativeCostsCoeff * 100), 0);
-        }
-
-        public string Month(int month) {
-           return month < 10 ? string.Format("0{0}", month) : month.ToString();
-        }
-
-        public string GetMonth(string date) {
-            return date.Substring(5, 2);
-        }
-
-        public string GetYear(string date) {
-            return date.Substring(0, 4);
         }
 
         public double ConvertToDouble(string val) {

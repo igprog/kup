@@ -85,6 +85,34 @@
     <div class="row">
         <div class="col-sm-6 p-3">
             <div class="card shadow">
+                <div class="card-header">Početno stanje (Žiro račun)</div>
+                <div class="card-body table-responsive">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td>Dugovni promet:</td>
+                            <td><input ng-model="d.startBalance.giroAccountInput" class="form-control text-right" /></td>
+                        </tr>
+                        <tr>
+                            <td>Potražni promet:</td>
+                            <td><input ng-model="d.startBalance.giroAccountOutput" class="form-control text-right" /></td>
+                        </tr>
+                        <tr>
+                            <td>Stanje na dan:</td>
+                            <td><input ng-model="d.startBalance.date" class="form-control text-right" /></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-right">
+                                <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fa fa-save"></i> Spremi</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 p-3">
+            <div class="card shadow">
                 <div class="card-header">Postavke ispisa</div>
                 <div class="card-body table-responsive">
                     <table class="table table-borderless">
