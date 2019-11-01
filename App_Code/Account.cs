@@ -65,6 +65,7 @@ public class Account : System.Web.Services.WebService {
         public double interest;
         public double input;
         public double output;
+        public double manipulativeCosts;
 
         public List<RecapMonthlyTotal> monthlyTotalList;  // TODO
     }
@@ -733,10 +734,15 @@ public class Account : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    public string LoadTotal() {
+    public string LoadTotal(int? year) {
         try {
             db.Account();
-            string sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE a.recordType = '{0}' OR a.recordType = '{1}'", g.monthlyFee, g.userPayment);
+            string year_ = year != null && year > 0 ? string.Format("AND a.yr = {0}", year) : "";
+
+            string sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE a.recordType = '{0}' OR a.recordType = '{1}' {2}"
+                , g.monthlyFee
+                , g.userPayment
+                , year != null && year > 0 ? string.Format("AND a.yr = {0}", year) : "");
             Total x = new Total();
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
@@ -750,7 +756,7 @@ public class Account : System.Web.Services.WebService {
                 connection.Close();
             }
 
-            sql = "SELECT SUM(CAST(loan AS DECIMAL(10,2))) FROM Loan";
+            sql = string.Format("SELECT SUM(CAST(loan AS DECIMAL(10,2))) FROM Loan {0}", year != null && year > 0 ? string.Format("WHERE YEAR(CONVERT(DATETIME, loanDate)) = {0}", year) : "");
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -763,11 +769,12 @@ public class Account : System.Web.Services.WebService {
                 connection.Close();
             }
 
-            x.bankFee = GetTotalVal(g.bankFee);
-            x.interest = GetTotalVal(g.interest);
-            x.otherFee = GetTotalVal(g.otherFee);
+            x.bankFee = GetTotalVal(g.bankFee, year);
+            x.interest = GetTotalVal(g.interest, year);
+            x.otherFee = GetTotalVal(g.otherFee, year);
+            x.manipulativeCosts = GetTotalVal(g.manipulativeCosts, year);
 
-            sql = "SELECT amount, mo, yr, recordType FROM Account";
+            sql = string.Format("SELECT amount, mo, yr, recordType FROM Account {0}", year != null && year > 0 ? string.Format("WHERE yr = {0}", year) : "");
             List<Recapitulation> rr = new List<Recapitulation>();
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
@@ -806,9 +813,11 @@ public class Account : System.Web.Services.WebService {
         }
     }
 
-    private double GetTotalVal(string type) {
+    private double GetTotalVal(string type, int? year) {
         double x = 0;
-        string sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE a.recordType = '{0}'", type);
+        string sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE a.recordType = '{0}' {1}"
+            , type
+            , year != null && year > 0 ? string.Format("AND a.yr = {0}", year) : "");
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {

@@ -225,22 +225,45 @@
         total: null
     }
 
+    google.charts.load('current', { 'packages': ['bar'] });
+    google.charts.setOnLoadCallback(drawTotChart);
+
+    function drawTotChart() {
+        if (!f.defined(google.visualization)) { return false; }
+        var data = google.visualization.arrayToDataTable([
+          ['', 'Uplate: ' + f.currency($scope.d.total.userPaymentWithMonthlyFee, $scope.config.currency), 'Pozajmice: ' + f.currency($scope.d.total.activatedLoan, $scope.config.currency)],
+          [' ', $scope.d.total.userPaymentWithMonthlyFee, $scope.d.total.activatedLoan],
+        ]);
+        var options = {
+            chart: {
+                title: 'Ulozi/Pozajmice ukupno',
+            },
+            legend: {
+                position: 'top'
+            }
+        };
+
+        options.legend = 'top';
+        var chart = new google.charts.Bar(document.getElementById('tot_chart_div'));
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+    }
+
     google.charts.load("current", { packages: ["corechart"] });
     google.charts.setOnLoadCallback(drawPieChart);
     function drawPieChart() {
         if ($scope.d.total == null) { return false; }
-        if (!f.defined(google.visualization)) { return false;}
+        if (!f.defined(google.visualization)) { return false; }
         var data = google.visualization.arrayToDataTable([
-          ['Task', ''],
-          ['Ulozi: ' + f.currency($scope.d.total.userPaymentWithMonthlyFee, $scope.config.currency), $scope.d.total.userPaymentWithMonthlyFee],
-          ['Pozajmice: ' + f.currency($scope.d.total.activatedLoan, $scope.config.currency), $scope.d.total.activatedLoan],
-          ['Troškovi održavanja računa: ' + f.currency($scope.d.total.bankFee, $scope.config.currency), $scope.d.total.bankFee],
-          ['Kamate po štednji: ' + f.currency($scope.d.total.interest, $scope.config.currency), $scope.d.total.interest],
-          ['Ostali troškovi: ' + f.currency($scope.d.total.otherFee, $scope.config.currency), $scope.d.total.otherFee]
+           ['Task', ''],
+           ['Troškovi održavanja računa: ' + f.currency($scope.d.total.bankFee, $scope.config.currency), $scope.d.total.bankFee],
+           ['Kamate po štednji: ' + f.currency($scope.d.total.interest, $scope.config.currency), $scope.d.total.interest],
+           ['Ostali troškovi: ' + f.currency($scope.d.total.otherFee, $scope.config.currency), $scope.d.total.otherFee],
+           ['Manipulativni troškovi: ' + f.currency($scope.d.total.manipulativeCosts, $scope.config.currency), $scope.d.total.manipulativeCosts]
         ]);
         var options = {
-            title: 'Ukupni promet',
-            is3D: true
+            title: 'Promet ' + f.year(),
+            is3D: true,
+            sliceVisibilityThreshold: 0.00001
         };
         var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
         chart.draw(data, options);
@@ -248,7 +271,6 @@
 
     google.charts.load('current', { 'packages': ['bar'] });
     google.charts.setOnLoadCallback(drawChart);
-
     function drawChart() {
         var x = $scope.d.total.monthlyTotalList;
         if (!f.defined(google.visualization)) { return false; }
@@ -281,8 +303,9 @@
     }
 
     var loadTotal = () => {
-        f.post('Account', 'LoadTotal', {}).then((d) => {
+        f.post('Account', 'LoadTotal', { year: f.year() }).then((d) => {
             $scope.d.total = d;
+            drawTotChart();
             drawPieChart();
             drawChart();
         });
