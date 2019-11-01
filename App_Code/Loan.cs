@@ -164,9 +164,9 @@ public class Loan : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
-         
-            xx.data = xx.data.OrderBy(a => a.user.lastName).ToList();
-            xx.total = new Total();
+
+        xx.data = xx.data.OrderBy(a => a.user.lastName).ToList();
+        xx.total = new Total();
             xx.total.loan = xx.data.Sum(a => a.loan);
             xx.total.repayment = xx.data.Sum(a => a.repayment);
             xx.total.manipulativeCosts = xx.data.Sum(a => a.manipulativeCosts);
@@ -279,7 +279,7 @@ public class Loan : System.Web.Services.WebService {
         x.actualLoan = x.loan - x.manipulativeCosts;
         x.withdraw = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
         User u = new User();
-        x.restToRepayment = GetTotalLoan(x.loanDate) - GetTotalLoanRepayed(x.loanDate);
+        x.restToRepayment = GetTotalLoan(x.loanDate) - GetTotalLoanRepayed(x.loanDate);  // TOOD: provjeriti
         x.dedline = reader.GetValue(7) == DBNull.Value ? s.Data().defaultDedline : Convert.ToDouble(reader.GetString(7));
         x.isRepaid = reader.GetValue(8) == DBNull.Value ? 0 : reader.GetInt32(8);
         x.note = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);

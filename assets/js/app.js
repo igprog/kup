@@ -1143,6 +1143,7 @@
         truncateTbl: null,
         dropTbl: null,
         date: new Date(),
+        note: null,
         manipulativeCosts: null,
         manipulativeCostsNote: 'PS',
         bankFee: null,
@@ -1177,7 +1178,7 @@
         }
     }
 
-    $scope.upload = function (date) {
+    $scope.upload = function (date, note) {
         $scope.d.loading = true;
         var content = new FormData(document.getElementById("formUpload"));
         $http({
@@ -1186,7 +1187,7 @@
             headers: { 'Content-Type': undefined },
             data: content,
         }).then(function (response) {
-            f.post(service, 'ImportUsersCsv', { date: date }).then((d) => {
+            f.post(service, 'ImportUsersCsv', { date: date, note: note }).then((d) => {
                 $scope.d.loading = false;
                 alert(d);
             });

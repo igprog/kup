@@ -799,10 +799,6 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
             table.AddCell(new PdfPCell(new Phrase(string.Format("Konto: {0}", records.account), GetFont(10, Font.NORMAL))) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             doc.Add(table);
 
-            //p.Add(new Paragraph(string.Format("{0} god.", records.year), GetFont(10, Font.NORMAL)));
-            //p.Add(new Paragraph(string.Format("Konto: {0}", records.account), GetFont(10, Font.NORMAL)));
-            //doc.Add(p);
-
             table = new PdfPTable(records.type == g.giroaccount ? 6 : 5);
             table.WidthPercentage = 100f;
             if (records.type == g.giroaccount) {
@@ -815,7 +811,7 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
             table.AddCell(new PdfPCell(new Phrase("Mjesec", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
             table.AddCell(new PdfPCell(new Phrase("Sadržaj", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
             if (records.type == g.giroaccount) {
-                table.AddCell(new PdfPCell(new Phrase("Stanje", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+                table.AddCell(new PdfPCell(new Phrase("Saldo", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             }
             table.AddCell(new PdfPCell(new Phrase("Duguje", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase("Potražuje", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });

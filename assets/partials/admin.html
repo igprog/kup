@@ -47,12 +47,15 @@
             <h4 class="card-header">Import podataka (početno stanje)</h4>
             <div class="card-body">
                 <label>Korisnici</label>
-                <form id="formUpload" ng-submit="upload(d.date)" enctype="multipart/form-data" method="post">
+                <form id="formUpload" ng-submit="upload(d.date, d.note)" enctype="multipart/form-data" method="post">
                     <div class="form-group">
                         <label class="mb-2 mr-sm-2">Datum:</label>
                         <input ng-model="d.date" type="date" onkeydown="return false" class="form-control" style="width:190px" />
                     </div>
-                    
+                    <div class="form-group">
+                        <label class="mb-2 mr-sm-2">Napomena:</label>
+                        <input ng-model="d.note" class="form-control mb-2 mr-sm-2" placeholder="Napomena..." style="width:190px" />
+                    </div>
                     <div class="row">
                         <div class="col-sm-4">
                             <input ng-model="csvFileName" name="UploadedFile" id="UploadedFile" type="file" accept=".csv" class="form-control">
