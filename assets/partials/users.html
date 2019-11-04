@@ -33,7 +33,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="x in d.users" class="{{x.isActive==0?'text-muted small':''}}">
+                <tr ng-repeat="x in d.users | limitTo:d.limit track by $index" class="{{x.isActive==0?'text-muted small':''}}">
                     <td>{{x.id}}</td>
                     <td>{{x.lastName}} {{x.firstName}} <span ng-if="x.isActive==0"><em>(Neaktivan)</em></span></td>
                     <td>{{x.buisinessUnit.title}}</td>
@@ -44,6 +44,9 @@
                 </tr>
             </tbody>
         </table>
+        <div ng-if="d.users.length>=d.limit">
+            <button ng-click="readMore(d.limit)" class="btn btn-outline-primary"><i class="fa fa-arrow-circle-down"></i> Prikaži više...</button>
+        </div>
     </div>
     <json-directive data="d" debug="config.debug"></json-directive>
 </div>

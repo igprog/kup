@@ -162,7 +162,8 @@
 	        buisinessUnits: [],
 	        recordTypes: f.recordTypes(),
 	        clearView: false,
-	        total: null
+	        total: null,
+	        recordslimit: $scope.config.recordslimit
 	    }
 	    f.post('BuisinessUnit', 'Load', {}).then((d) => {
 	        data.buisinessUnits = d;
@@ -329,6 +330,7 @@
     var load = (x) => {
         if (f.defined(x.buisinessUnitCode)) {
             $scope.d.loading = true;
+            $scope.d.limit = $scope.g.recordslimit;
             f.post(service, 'Load', { buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
                 $scope.d.users = d;
                 $scope.d.year = f.year();
@@ -350,6 +352,7 @@
             year: f.year(),
             records: [],
             statusDate: new Date(),
+            limit: $scope.g.recordslimit,
             pdf: null,
             loadingPdf: false,
             showPdf: false,
@@ -361,6 +364,7 @@
         $scope.d.buisinessUnitCode = null;
         $scope.d.search = null;
         $scope.d.year = null;
+        $scope.d.limit = $scope.g.recordslimit,
         $scope.d.pdf = null;
         $scope.d.loadingPdf = false;
         $scope.d.showPdf = true;
@@ -498,6 +502,10 @@
         $scope.d.pdf = null;
     }
 
+    $scope.readMore = (x) => {
+        $scope.d.limit = $scope.d.limit + x;
+    }
+
 }])
 
 .controller('buisinessUnitCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
@@ -564,6 +572,7 @@
             year: f.year(),
             buisinessUnitCode: null,
             search: null,
+            limit: $scope.g.recordslimit,
             pdf: null,
             loadingPdf: false,
             loading: false
@@ -576,6 +585,7 @@
         $scope.d.year = f.year();
         $scope.d.buisinessUnitCode = null,
         $scope.d.search = null,
+        $scope.d.limit = $scope.g.recordslimit,
         $scope.d.pdf = null,
         $scope.d.loadingPdf = false;
         $scope.d.showPdf = true;
@@ -668,6 +678,7 @@
 
     var load = (x) => {
         $scope.d.loading = true;
+        $scope.d.limit = $scope.g.recordslimit;
         f.post(service, 'Load', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
             $scope.d.records = d;
             $scope.d.loading = false;
@@ -680,6 +691,7 @@
 
     $scope.search = (x) => {
         $scope.d.loading = true;
+        $scope.d.limit = $scope.g.recordslimit;
         f.post(service, 'Search', { search: x }).then((d) => {
             $scope.d.records = d;
             $scope.d.loading = false;
@@ -705,6 +717,10 @@
             $scope.d.pdf = f.pdfTempPath(d);
             $scope.d.loadingPdf = false;
         });
+    }
+
+    $scope.readMore = (x) => {
+        $scope.d.limit = $scope.d.limit + x;
     }
 
 }])
@@ -758,6 +774,7 @@
         year: $scope.g.year,
         buisinessUnitCode: null,
         search: null,
+        limit: $scope.g.recordslimit,
         pdf: null,
         loadingPdf: false,
         loading: false
@@ -768,6 +785,7 @@
         if (x.month == null) { x.month = $scope.g.month; }
         if (x.year == null) { x.year = $scope.g.year; }
         $scope.d.loading = true;
+        $scope.d.limit = $scope.g.recordslimit;
         f.post(service, 'GetMonthlyFee', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
             $scope.d.records = d;
             $scope.d.loading = false;
@@ -839,6 +857,10 @@
         $scope.d.pdf = null;
     }
 
+    $scope.readMore = (x) => {
+        $scope.d.limit = $scope.d.limit + x;
+    }
+
 }])
 
 .controller('repaymentCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
@@ -849,6 +871,7 @@
         year: $scope.g.year,
         buisinessUnitCode: null,
         search: null,
+        limit: $scope.g.recordslimit,
         pdf: null,
         loadingPdf: false,
         loading: false
@@ -859,6 +882,7 @@
         if (x.month == null) { x.month = $scope.g.month; }
         if (x.year == null) { x.year = $scope.g.year; }
         $scope.d.loading = true;
+        $scope.d.limit = $scope.g.recordslimit;
         f.post(service, 'GetLoanUsers', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
             $scope.d.records = d;
             $scope.d.loading = false;
@@ -901,6 +925,10 @@
 
     $scope.removePdfLink = () => {
         $scope.d.pdf = null;
+    }
+
+    $scope.readMore = (x) => {
+        $scope.d.limit = $scope.d.limit + x;
     }
 
 }])

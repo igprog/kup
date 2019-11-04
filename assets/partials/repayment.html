@@ -54,7 +54,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="x in d.records.data track by $index">
+                    <tr ng-repeat="x in d.records.data | limitTo:d.limit track by $index">
                         <td>{{x.user.id}}</td>
                         <td>{{x.user.lastName}} {{x.user.firstName}}</td>
                         <td class="text-right">{{x.repayment | number:2}}<button class="btn btn-outline-primary ml-2" ng-click="setRepayment(x, $index)"><i class="fa fa-arrow-circle-right"></i></button></td>
@@ -71,6 +71,9 @@
                     </tr>
                 </tfoot>
             </table>
+            <div ng-if="d.records.data.length>=d.limit">
+                <button ng-click="readMore(d.limit)" class="btn btn-outline-primary"><i class="fa fa-arrow-circle-down"></i> Prikaži više...</button>
+            </div>
         </div>
     </div>
     <json-directive data="d" debug="config.debug"></json-directive>

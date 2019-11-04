@@ -187,7 +187,7 @@ public class Loan : System.Web.Services.WebService {
                         ON l.userId = u.id
                         LEFT OUTER JOIN BuisinessUnit b
                         ON u.buisinessUnitCode = b.code
-                        {0}", string.IsNullOrEmpty(search) ? "" : string.Format("WHERE u.firstName  LIKE '%{0}%' OR u.lastName LIKE '%{0}%'", search));
+                        {0}", string.IsNullOrEmpty(search) ? "" : string.Format("WHERE u.id LIKE '%{0}%' OR u.firstName LIKE N'{0}%' OR u.lastName LIKE N'{0}%'", search));
             Loans xx = new Loans();
             xx.data = new List<NewLoan>();
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
