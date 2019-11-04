@@ -228,23 +228,17 @@
 
     google.charts.load('current', { 'packages': ['bar'] });
     google.charts.setOnLoadCallback(drawTotChart);
-
     function drawTotChart() {
         if (!f.defined(google.visualization)) { return false; }
         var data = google.visualization.arrayToDataTable([
           ['', 'Uplate: ' + f.currency($scope.d.total.userPaymentWithMonthlyFee, $scope.config.currency), 'Pozajmice: ' + f.currency($scope.d.total.activatedLoan, $scope.config.currency)],
           [' ', $scope.d.total.userPaymentWithMonthlyFee, $scope.d.total.activatedLoan],
         ]);
+
         var options = {
-            chart: {
-                title: 'Ulozi/Pozajmice ukupno',
-            },
-            legend: {
-                position: 'top'
-            }
+            title: 'Ulozi/Pozajmice ukupno'
         };
 
-        options.legend = 'top';
         var chart = new google.charts.Bar(document.getElementById('tot_chart_div'));
         chart.draw(data, google.charts.Bar.convertOptions(options));
     }
@@ -264,7 +258,11 @@
         var options = {
             title: 'Promet ' + f.year(),
             is3D: true,
-            sliceVisibilityThreshold: 0.00001
+            sliceVisibilityThreshold: 0.00001,
+            chartArea: {
+                left: 30,
+                width: '100%',
+            }
         };
         var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
         chart.draw(data, options);
