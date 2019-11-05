@@ -5,7 +5,7 @@
                 <div class="form-group">
                     <label for="user" class="mb-2 mr-sm-2">Korisnik:</label>
                     <select ng-model="d.user.id" class="form-control mb-2 mr-sm-2" name="user">
-                        <option ng-repeat="x in d.users" value="{{x.id}}">{{x.id}} - {{x.lastName}} {{x.firstName}}</option>
+                        <option ng-repeat="x in d.users" value="{{x.id}}">{{x.lastName}} {{x.firstName}} ({{x.id}})</option>
                     </select>
                     <label for="year" class="mb-2 mr-sm-2">Godina:</label>
                     <select ng-model="d.year" class="form-control mb-2 mr-sm-2">

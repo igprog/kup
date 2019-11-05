@@ -64,7 +64,7 @@
                     <!--<td class="text-right">{{x.actualLoan | number:2}}</td>-->
                     <td class="text-right">{{x.restToRepayment | number:2}}</td>
                     <td class="text-right">{{x.withdraw | number:2}}</td>
-                    <td><button class="btn btn-outline-primary" title="Pozajmica" ng-click="get(x.id, null)"><i class="fas fa-info"></i></button></td>
+                    <td class="text-right"><button class="btn btn-outline-primary" title="Pozajmica" ng-click="get(x.id, null)"><i class="fas fa-info"></i></button></td>
                 </tr>
             </tbody>
             <tfoot ng-if="d.records.data.length>0" class="thead-light">

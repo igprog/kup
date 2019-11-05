@@ -61,7 +61,7 @@
                         <td class="text-right"><input ng-model="x.amount" class="form-control text-right" allow-only-numbers /></td>
                         <td class="text-right">{{x.restToRepayment | number:2}}</td>
                         <td><input ng-model="x.note" class="form-control" /></td>
-                        <td><button class="btn btn-outline-primary" ng-click="save(x, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button></td>
+                        <td class="text-right"><button class="btn btn-outline-primary" ng-click="save(x, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button></td>
                 </tbody>
                 <tfoot ng-if="d.records.data.length>0" class="thead-light">
                     <tr class="text-right">

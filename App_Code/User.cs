@@ -341,7 +341,14 @@ public class User : System.Web.Services.WebService {
         return xx;
     }
 
-    public List<NewUser> GetLoanUsers(string buisinessUnitCode, string search) {
+    public List<NewUser> GetMonthlyFeeUsers(string buisinessUnitCode, string search, bool activeUsers, string date) {
+        List<NewUser> xx = GetUsers(buisinessUnitCode, search, activeUsers);
+        xx = xx.Where(a => g.DateDiff(a.accessDate, date, false) <= 31).ToList();
+        return xx;
+    }
+
+
+    public List<NewUser> GetLoanUsers(string buisinessUnitCode, string search, string date) {
         db.Users();
         string sql = string.Format(@"{0}
                         LEFT OUTER JOIN Loan l on u.id = l.userId
@@ -366,6 +373,7 @@ public class User : System.Web.Services.WebService {
             }
             connection.Close();
         }
+        xx = xx.Where(a => g.DateDiff(a.accessDate, date, false) <= 31).ToList();
         return xx;
     }
 

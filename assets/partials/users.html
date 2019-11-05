@@ -37,7 +37,7 @@
                     <td>{{x.id}}</td>
                     <td>{{x.lastName}} {{x.firstName}} <span ng-if="x.isActive==0"><em>(Neaktivan)</em></span></td>
                     <td>{{x.buisinessUnit.title}}</td>
-                    <td>
+                    <td class="text-right">
                         <button class="btn btn-outline-primary" title="Korisnički Profil" ng-click="get('user', 'Korisnički Profil', x.id, null)"><i class="fas fa-user"></i></button>
                         <button class="btn btn-outline-danger" title="Kartica Korisnika" ng-click="get('card', 'Kartica Korisnika', x.id, d.year)"><i class="fas fa-id-card"></i></button>
                     </td>

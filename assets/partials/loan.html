@@ -21,7 +21,7 @@
                 <div class="form-group">
                     <label for="userId">Korisnik:</label>
                     <select ng-model="d.loan.user.id" class="form-control" name="userId" ng-click="getUser(d.loan.user.id)">
-                        <option ng-repeat="x in d.users" value="{{x.id}}">{{x.id}} - {{x.firstName}} {{x.lastName}}</option>
+                        <option ng-repeat="x in d.users" value="{{x.id}}">{{x.lastName}} {{x.firstName}} ({{x.id}})</option>
                     </select>
                 </div>
                 <div>
