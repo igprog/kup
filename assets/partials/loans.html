@@ -55,7 +55,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="x in d.records.data | limitTo:d.limit track by $index" ng-click="get(x.id, null)">
+                <tr ng-repeat="x in d.records.data | limitTo:d.limit track by $index" ng-click="get(x.id, null)" style="cursor:pointer">
                     <td>{{x.user.id}}</td>
                     <td>{{x.user.lastName}} {{x.user.firstName}}</td>
                     <td>{{x.loanDate}}</td>

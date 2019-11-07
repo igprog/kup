@@ -122,7 +122,7 @@
             ]
         },
         currency: (x, currency) => {
-            return parseInt(x).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ' + currency;
+            return x.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ' + currency;
         }
     }
 }])
@@ -316,6 +316,11 @@
 .controller('userCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'User';
     var statusChange = false;
+    $scope.newUser = false;
+    if ($scope.g.currTpl == './assets/partials/newuser.html') {
+        $scope.newUser = true;
+    }
+
     var init = () => {
         f.post('User', 'Init', {}).then((d) => {
             $scope.d.user = d;
@@ -404,8 +409,9 @@
             }
             return false;
         }
-        f.post(service, 'Save', { x: x }).then((d) => {
+        f.post(service, 'Save', { x: x, newUser: $scope.newUser }).then((d) => {
             alert(d.msg);
+            $scope.newUser = !d.status;
             $scope.d.user.accessDate = new Date($scope.d.user.accessDate);
             $scope.d.user.birthDate = new Date($scope.d.user.birthDate);
             $scope.d.showPdf = true;

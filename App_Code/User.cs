@@ -88,15 +88,20 @@ public class User : System.Web.Services.WebService {
         //x.activeLoanId = null;
         x.records = new List<Account.NewAccount>();
         x.total = new Account.Total();
-        return JsonConvert.SerializeObject(x, Formatting.Indented);
+        return JsonConvert.SerializeObject(x, Formatting.None);
     }
 
     [WebMethod]
-    public string Save(NewUser x) {
+    public string Save(NewUser x, bool newUser) {
         try {
             Response r = new Response();
             db.Users();
-            r = CheckUser(x);
+            if (newUser) {
+                r = CheckUser(x);
+            } else {
+                r.status = true;
+                r.user = new NewUser();
+            }
             if (r.status == true) {
                 string sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Users WITH (updlock,serializable) WHERE id = '{0}')
@@ -119,9 +124,9 @@ public class User : System.Web.Services.WebService {
                 r.status = true;
                 r.msg = "Spremljeno";
             }
-            return JsonConvert.SerializeObject(r, Formatting.Indented);
+            return JsonConvert.SerializeObject(r, Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.None);
         }
     }
 
@@ -183,9 +188,9 @@ public class User : System.Web.Services.WebService {
             if(x.isActive == 0) {
                 SaveTerminationWithdraw(x);
             }
-            return JsonConvert.SerializeObject("Spremljeno", Formatting.Indented);
+            return JsonConvert.SerializeObject("Spremljeno", Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.None);
         }
     }
 
@@ -206,9 +211,9 @@ public class User : System.Web.Services.WebService {
     [WebMethod]
     public string Load(string buisinessUnitCode, string search) {
         try {
-            return JsonConvert.SerializeObject(GetUsers(buisinessUnitCode, search, false), Formatting.Indented);
+            return JsonConvert.SerializeObject(GetUsers(buisinessUnitCode, search, false), Formatting.None);
         }catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
 
@@ -249,9 +254,9 @@ public class User : System.Web.Services.WebService {
             }
             //TODO: Totals:
 
-            return JsonConvert.SerializeObject(x, Formatting.Indented);
+            return JsonConvert.SerializeObject(x, Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.None);
         }
     }
 
@@ -267,9 +272,9 @@ public class User : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
-            return JsonConvert.SerializeObject("Korisnik izbrisan", Formatting.Indented);
+            return JsonConvert.SerializeObject("Korisnik izbrisan", Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.None);
         }
     }
 
@@ -287,9 +292,9 @@ public class User : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
-            return JsonConvert.SerializeObject("Korisnik izbrisan", Formatting.Indented);
+            return JsonConvert.SerializeObject("Korisnik izbrisan", Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.None);
         }
     }
 

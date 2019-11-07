@@ -23,7 +23,7 @@
                         </div>
                         <div class="form-group">
                             <label for="id">Matični broj:</label>
-                            <input ng-model="d.user.id" type="text" class="form-control" name="id" required>
+                            <input ng-disabled="!newUser" ng-model="d.user.id" type="text" class="form-control" name="id" required>
                         </div>
                         <div class="form-group">
                             <label for="lastName">Prezime:</label>

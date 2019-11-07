@@ -150,7 +150,7 @@ public class Account : System.Web.Services.WebService {
         x.repaid = 0;
         x.restToRepayment = 0;
         x.totalObligation = 0;
-        return JsonConvert.SerializeObject(x, Formatting.Indented);
+        return JsonConvert.SerializeObject(x, Formatting.None);
     }
 
     [WebMethod]
@@ -158,9 +158,9 @@ public class Account : System.Web.Services.WebService {
         try {
             x.recordType = g.monthlyFee;
             x.amount = x.monthlyFee;
-            return JsonConvert.SerializeObject(Save(x), Formatting.Indented);
+            return JsonConvert.SerializeObject(Save(x), Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.None);
         }
     }
 
@@ -177,9 +177,9 @@ public class Account : System.Web.Services.WebService {
             x.month = y.month;
             x.year = y.year;
             x.note = y.note;
-            return JsonConvert.SerializeObject(Save(x), Formatting.Indented);
+            return JsonConvert.SerializeObject(Save(x), Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.None);
         }
     }
 
@@ -187,27 +187,27 @@ public class Account : System.Web.Services.WebService {
     public string SaveRepayment(NewAccount x) {
         try {
             x.recordType = g.repayment;
-            return JsonConvert.SerializeObject(Save(x), Formatting.Indented);
+            return JsonConvert.SerializeObject(Save(x), Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.None);
         }
     }
 
     [WebMethod]
     public string SaveOtherFee(NewAccount x) {
         try {
-            return JsonConvert.SerializeObject(Save(x), Formatting.Indented);
+            return JsonConvert.SerializeObject(Save(x), Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.None);
         }
     }
 
     [WebMethod]
     public string Load(int year, string type) {
         try {
-            return JsonConvert.SerializeObject(LoadData(year, type), Formatting.Indented);
+            return JsonConvert.SerializeObject(LoadData(year, type), Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
 
@@ -272,9 +272,9 @@ public class Account : System.Web.Services.WebService {
             xx.total.userPaymentWithMonthlyFee = xx.total.monthlyFee + xx.total.userPayment;
             xx.total.repayment = xx.data.Sum(a => a.repayment);
             xx.total.totalObligation = xx.data.Sum(a => a.totalObligation);
-            return JsonConvert.SerializeObject(xx, Formatting.Indented);
+            return JsonConvert.SerializeObject(xx, Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
 
@@ -317,9 +317,9 @@ public class Account : System.Web.Services.WebService {
           //  xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
            // xx.total.repayment = xx.data.Sum(a => a.repayment);
           //  xx.total.totalObligation = xx.data.Sum(a => a.totalObligation);
-            return JsonConvert.SerializeObject(xx, Formatting.Indented);
+            return JsonConvert.SerializeObject(xx, Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
 
@@ -377,9 +377,9 @@ public class Account : System.Web.Services.WebService {
             xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
             xx.total.repayment = xx.data.Sum(a => a.repayment);
             xx.total.totalObligation = xx.data.Sum(a => a.totalObligation);
-            return JsonConvert.SerializeObject(xx, Formatting.Indented);
+            return JsonConvert.SerializeObject(xx, Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
 
@@ -394,9 +394,9 @@ public class Account : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
-            return JsonConvert.SerializeObject("Obrisano", Formatting.Indented);
+            return JsonConvert.SerializeObject("Obrisano", Formatting.None);
         }catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
 
@@ -431,9 +431,9 @@ public class Account : System.Web.Services.WebService {
                 et.total.input = et.data.Sum(a => a.input);
                 et.total.output = et.data.Sum(a => a.output);
             }
-            return JsonConvert.SerializeObject(et, Formatting.Indented);
+            return JsonConvert.SerializeObject(et, Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
 
@@ -593,9 +593,9 @@ public class Account : System.Web.Services.WebService {
             et.total.input = et.data.Sum(a => a.input);
             et.total.output = et.data.Sum(a => a.output);
 
-            return JsonConvert.SerializeObject(et, Formatting.Indented);
+            return JsonConvert.SerializeObject(et, Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
     /***** Temeljnica Bilanca *****/
@@ -645,9 +645,9 @@ public class Account : System.Web.Services.WebService {
                 xxx.total.output = GetYearlyTotal(xxx.data, "output");  // xxx.data.Sum(a => a.total.output);
                 xxx.total.accountBalance = GetYearlyTotal(xxx.data, "accountBalance");
             }
-            return JsonConvert.SerializeObject(xxx, Formatting.Indented);
+            return JsonConvert.SerializeObject(xxx, Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
 
@@ -699,9 +699,9 @@ public class Account : System.Web.Services.WebService {
             xx.total.input = GetYearlyTotal(xx.data, "input");
             xx.total.output = GetYearlyTotal(xx.data, "output");
 
-            return JsonConvert.SerializeObject(xx, Formatting.Indented);
+            return JsonConvert.SerializeObject(xx, Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
 
@@ -807,9 +807,9 @@ public class Account : System.Web.Services.WebService {
             }
             x.input = x.monthlyTotalList.Sum(a => a.total.input);
             x.output = x.monthlyTotalList.Sum(a => a.total.output);
-            return JsonConvert.SerializeObject(x, Formatting.Indented);
+            return JsonConvert.SerializeObject(x, Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
 
