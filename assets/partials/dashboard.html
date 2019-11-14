@@ -1,7 +1,7 @@
 ﻿ <div ng-controller="dashboardCtrl" class="container-fluid">
      <div class="row h-100 justify-content-center align-items-center">
         <div ng-if="x.dashboard!==undefined" ng-repeat="x in config.menu" class="col-lg-3 p-4">
-            <div class="same-height card btn btn-outline-{{x.dashboard.class}} shadow" ng-click="toggleTpl(x.tpl, x.title)">
+            <div class="same-height card btn btn-outline-{{x.dashboard.class}} shadow cursor" ng-click="toggleTpl(x.tpl, x.title)">
                 <div class="card-body text-center">
                     <div>
                         <i class="fas fa-{{x.ico}} fa-3x"></i>

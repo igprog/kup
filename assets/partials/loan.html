@@ -1,7 +1,7 @@
 ﻿<div ng-controller="loanCtrl">
     <div class="row">
         <div class="col-sm-6">
-            <button ng-if="d.loan.id!=null" class="btn btn-outline-success" ng-click="init()" title="Nova pozajmica"><i class="fas fa-file"></i> Nova</button>
+            <button class="btn btn-outline-success" ng-click="init()" title="Nova pozajmica"><i class="fas fa-file"></i> Nova</button>
         </div>
         <div class="col-sm-6 text-right">
             <button ng-show="!d.pdf && !g.clearView" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d)" title="PDF">

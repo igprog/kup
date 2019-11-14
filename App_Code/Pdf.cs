@@ -639,7 +639,7 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
     [WebMethod]
     public string Suspension(int month, int year, string buisinessUnitCode, Account.Accounts records) {
         try {
-            PrintDoc pd = PreparePrintDoc(Orientation());
+            PrintDoc pd = PreparePrintDoc(false);
             Document doc = pd.doc;
             doc.Open();
             AppendHeader(doc);

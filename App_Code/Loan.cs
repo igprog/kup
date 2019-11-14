@@ -134,7 +134,7 @@ public class Loan : System.Web.Services.WebService {
                 connection.Close();
             }
 
-            return JsonConvert.SerializeObject("Spremljeno", Formatting.Indented);
+            return JsonConvert.SerializeObject(x, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
         }

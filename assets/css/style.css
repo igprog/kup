@@ -72,3 +72,7 @@
 .same-height {
     height:140px; object-fit:cover; object-position:top center;
 }
+
+.cursor {
+    cursor: pointer;
+}

@@ -41,6 +41,7 @@ public class Account : System.Web.Services.WebService {
         public double totalObligation;
         public double repaid;
         public double lastMonthObligation;
+        public bool changed;
         public List<UserPayment> userPayment;
         public double userPaymentTotal;
         public string lastDayInMonth;
@@ -55,6 +56,7 @@ public class Account : System.Web.Services.WebService {
         public double userPaymentWithMonthlyFee;
         public double userPaymentWithMonthlyFeeTotal;
         public double repayment;
+        public double restToRepayment;
         public double totalObligation;
         public double terminationWithdraw;
         public double activatedLoan;
@@ -315,7 +317,8 @@ public class Account : System.Web.Services.WebService {
             }
             xx.total = new Total();
           //  xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
-           // xx.total.repayment = xx.data.Sum(a => a.repayment);
+            xx.total.repayment = xx.data.Sum(a => a.amount);
+            xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
           //  xx.total.totalObligation = xx.data.Sum(a => a.totalObligation);
             return JsonConvert.SerializeObject(xx, Formatting.None);
         } catch (Exception e) {
@@ -324,7 +327,7 @@ public class Account : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    public string GetMonthlyRecords(int month, int year, string buisinessUnitCode, string search) {
+    public string GetMonthlyRecords(int month, int year, string buisinessUnitCode, string search, bool changed) {
         try {
             User u = new User();
             List<User.NewUser> users = u.GetUsers(buisinessUnitCode, search, false);
@@ -361,17 +364,25 @@ public class Account : System.Web.Services.WebService {
                 // ***** Check last month obligation *****
                 NewAccount lastMonth = new NewAccount();
                 lastMonth = GetRecord(user.id, month == 1 ? 12 : month - 1, month == 1 ? year - 1 : year, null);
-                if(!string.IsNullOrEmpty(lastMonth.id)) {
+                if (!string.IsNullOrEmpty(lastMonth.id)) {
                     lastMonth = CheckLoan(lastMonth, user.id);
                     lastMonth = CheckMonthlyFee(lastMonth, user.id, g.monthlyFee);
                     x.lastMonthObligation = lastMonth.monthlyFee + lastMonth.repayment;
                 } else {
                     x.lastMonthObligation = 0;
                 }
+                if (x.totalObligation != x.lastMonthObligation) {
+                    x.changed = true;
+                } else {
+                    x.changed = false;
+                }
                 //****************************************
 
                 x.user = user;
                 xx.data.Add(x);
+            }
+            if (changed) {
+                xx.data = xx.data.Where(a => a.changed == true).ToList();
             }
             xx.total = new Total();
             xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
@@ -1194,7 +1205,6 @@ public class Account : System.Web.Services.WebService {
         try {
             db.Account();
             //  double lastRepayment = GetRecord(x.user.id, x.month, x.year).repayment;  // ***** in case of update repaiment  *****
-
             string sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Account WITH (updlock,serializable) WHERE id = '{0}')
                                                 BEGIN
@@ -1312,6 +1322,9 @@ public class Account : System.Web.Services.WebService {
                         x.repayment = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
                         x.repaid = Repaid(x);
                         x.restToRepayment = x.loan - x.repaid;
+                        if (x.restToRepayment < x.repayment && x.repayment > 0) {
+                            x.repayment = x.restToRepayment;
+                        }
                         x.totalObligation = x.monthlyFee + x.repayment;
                     }
                 }

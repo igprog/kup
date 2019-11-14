@@ -26,7 +26,13 @@
             <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
         </div>
     </div>
-    <div ng-if="d.records.data.length>0">
+    <div class="ml-4">
+        <label class="form-check-label cursor" for="changed">
+            <input ng-model="d.changed" type="checkbox" class="form-check-input" id="changed" name="changed" ng-click="getMonthlyRecords(d)">Prikaži samo promjene u odnosu na prethodni mjesec
+        </label>
+    </div>
+    <loading-directive loadingtitle="'Učitavanje...'" value="d.loading" size="5"></loading-directive>
+    <div ng-if="d.records.data.length>0&&!d.loading" class="mt-3">
         <div ng-if="d.buisinessUnitCode!==null && d.buisinessUnitCode!==''">
             <em class="small">* Obustava na plaći različita od prethodnog mjeseca</em>
         </div>
@@ -44,13 +50,20 @@
                     </tr>
                 </thead>
                 <tbody ng-hide="d.buisinessUnitCode==null || d.buisinessUnitCode==''">
-                    <tr ng-repeat="x in d.records.data track by $index" class="{{x.totalObligation !== x.lastMonthObligation ? 'font-weight-bold' : ''}}">
-                        <td><span ng-show="x.totalObligation !== x.lastMonthObligation">* </span>{{x.user.id}}</td>
+                    <tr ng-repeat="x in d.records.data track by $index" class="{{x.changed ? 'font-weight-bold' : ''}}">
+                        <td><span ng-show="x.changed">* </span>{{x.user.id}}</td>
                         <td>{{x.user.lastName}} {{x.user.firstName}}</td>
                         <td class="text-right">{{x.monthlyFee | number:2}}</td>
                         <td class="text-right">{{x.repayment | number:2}}</td>
                         <td class="text-right">{{x.totalObligation | number:2}}</td>
                     </tr>
+                    <!--<tr ng-repeat="x in d.records.data track by $index" class="{{x.totalObligation !== x.lastMonthObligation ? 'font-weight-bold' : ''}}">
+                        <td><span ng-show="x.totalObligation !== x.lastMonthObligation">* </span>{{x.user.id}}</td>
+                        <td>{{x.user.lastName}} {{x.user.firstName}}</td>
+                        <td class="text-right">{{x.monthlyFee | number:2}}</td>
+                        <td class="text-right">{{x.repayment | number:2}}</td>
+                        <td class="text-right">{{x.totalObligation | number:2}}</td>
+                    </tr>-->
                 </tbody>
                 <tfoot ng-if="d.records.data.length>0" class="thead-light">
                     <tr class="text-right">

@@ -43,7 +43,9 @@ public class User : System.Web.Services.WebService {
         public double monthlyFee;
         public double restToRepayment;
         public double totalMebershipFees;
-        public double totalMebershipFeesRequired;
+        public double totalUserPayment;
+        public double totalMebershipFeesWithUserPayment;
+        //public double totalMebershipFeesRequired;
         public double terminationWithdraw;
         public double monthlyRepayment;
 
@@ -82,8 +84,11 @@ public class User : System.Web.Services.WebService {
         x.monthlyFee = s.Data().monthlyFee;
         x.restToRepayment = 0;
         x.totalMebershipFees = 0;
-        x.totalMebershipFeesRequired = 0;
+        x.totalUserPayment = 0;
+        x.totalMebershipFeesWithUserPayment = 0;
+        //x.totalMebershipFeesRequired = 0;
         x.terminationWithdraw = 0;
+        x.monthlyRepayment = 0;
         //x.statusHistory = new List<UserStatus>();
         //x.activeLoanId = null;
         x.records = new List<Account.NewAccount>();
@@ -236,9 +241,11 @@ public class User : System.Web.Services.WebService {
             }
             x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment);
             x.totalMebershipFees = GetAmount(id, g.monthlyFee);
+            x.totalUserPayment = GetAmount(id, g.userPayment);
+            x.totalMebershipFeesWithUserPayment = x.totalMebershipFees + x.totalUserPayment;
             DateTime now = DateTime.UtcNow;
-            x.totalMebershipFeesRequired = a.GetMonthlyFeeRequiredAccu(x.id, now.Month, now.Year);  //TODO: provjeriti dali to treba???
-            x.terminationWithdraw = x.totalMebershipFees - x.restToRepayment;  //  - (x.totalMebershipFeesRequired - x.totalMebershipFees); // TODO: Provjeriti dali treba totalMebershipFeesRequired
+            //x.totalMebershipFeesRequired = a.GetMonthlyFeeRequiredAccu(x.id, now.Month, now.Year);  //TODO: provjeriti dali to treba???
+            x.terminationWithdraw = x.totalMebershipFeesWithUserPayment - x.restToRepayment;  //  - (x.totalMebershipFeesRequired - x.totalMebershipFees); // TODO: Provjeriti dali treba totalMebershipFeesRequired
             //x.activeLoanId = GetActiveLoanId(id);
             if (year != null) {
                 x.records = a.GetRecords(x.id, year);
@@ -385,7 +392,7 @@ public class User : System.Web.Services.WebService {
      public double GetAmount(string id, string type) {
         db.Account();
         double x = 0;
-        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, amount)) FROM Account WHERE userId = '{0}' AND recordType = '{1}'", id, type);
+        string sql = string.Format(@"SELECT SUM(CONVERT(decimal(10,2), amount)) FROM Account WHERE userId = '{0}' AND recordType = '{1}'", id, type);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -421,7 +428,7 @@ public class User : System.Web.Services.WebService {
     public double GetLoanAmount(string id) {
         db.Loan();
         double x = 0;
-        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, loan)) FROM Loan WHERE userId = '{0}'", id);
+        string sql = string.Format(@"SELECT SUM(CONVERT(decimal(10,2), loan)) FROM Loan WHERE userId = '{0}'", id);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {

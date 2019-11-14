@@ -1,7 +1,7 @@
 ﻿<div ng-controller="userCtrl">
     <div class="row">
         <div class="col-sm-6">
-            <button ng-if="d.user.id!=null" class="btn btn-outline-success" ng-click="init()" title="Novi korisnik"><i class="fas fa-user-plus"></i> Novi korisnik</button>
+            <button class="btn btn-outline-success" ng-click="init()" title="Novi korisnik"><i class="fas fa-user-plus"></i> Novi korisnik</button>
         </div>
         <div class="col-sm-6 text-right">
             <div ng-if="d.showPdf" class="text-right">
@@ -69,7 +69,7 @@
         <div class="col-sm-6">
             <div ng-if="d.user.id!==null" class="card shadow">
                 <div class="card-body">
-                    <div>Ukupno uplaćeno uloga: {{d.user.totalMebershipFees | number:2}} {{config.currency}}</div>
+                    <div>Ukupno uplaćeno uloga: {{d.user.totalMebershipFeesWithUserPayment | number:2}} {{config.currency}}</div>
                     <div>Ukupno neotplaćeno pozajmica: <label class="{{d.user.restToRepayment>0?'text-danger':''}}">{{d.user.restToRepayment | number:2}} {{config.currency}}</label></div>
                     <div class="row">
                         <div class="col-sm-6 pt-2">

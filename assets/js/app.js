@@ -605,11 +605,9 @@
 
     $scope.calculate = (x) => {
         if (x.loan > 0) {
-            $scope.d.loan.manipulativeCosts = (x.loan * x.manipulativeCostsCoeff).toFixed(2);
-            $scope.d.loan.repayment = (x.loan / x.dedline).toFixed(2);
-            //$scope.d.loan.actualLoan = x.loan - $scope.d.loan.manipulativeCosts;
+            $scope.d.loan.manipulativeCosts = x.loan * x.manipulativeCostsCoeff;
+            $scope.d.loan.repayment = (x.loan / x.dedline).toFixed(0);
             $scope.d.loan.withdraw = $scope.d.loan.loan - $scope.d.loan.user.restToRepayment - $scope.d.loan.manipulativeCosts;
-            //$scope.d.loan.user.activeLoanId = $scope.d.user.activeLoanId;
         }
     }
 
@@ -644,8 +642,8 @@
         }
         x.loan.restToRepayment = x.loan.user.restToRepayment;
         f.post(service, 'Save', { x: x.loan }).then((d) => {
+            $scope.d.loan = d;
             $scope.d.loan.loanDate = new Date($scope.d.loan.loanDate);
-            alert(d);
         });
     }
 
@@ -653,6 +651,7 @@
         if (confirm('Briši pozajmicu?')) {
             f.post('Loan', 'Delete', { id: x.id }).then((d) => {
                 alert(d);
+                init();
             });
         }
     }
@@ -732,14 +731,18 @@
             year: $scope.g.year,
             buisinessUnitCode: null,
             search: null,
+            changed: false,
             pdf: null,
-            loadingPdf: false
+            loadingPdf: false,
+            loading: false
         }
         $scope.d = data;
 
         var getMonthlyRecords = (x) => {
-            f.post(service, 'GetMonthlyRecords', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
+            $scope.d.loading = true;
+            f.post(service, 'GetMonthlyRecords', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search, changed: x.changed }).then((d) => {
                 $scope.d.records = d;
+                $scope.d.loading = false;
             });
         }
 
