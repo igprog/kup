@@ -1,9 +1,16 @@
 ﻿<div ng-controller="userCtrl">
-    <div ng-if="d.showPdf" class="text-right">
-        <button ng-show="!d.pdf && !g.clearView" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d, 'NewUser')">
-            <loading-directive title="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf" pdf="true"></loading-directive>
-        </button>
-        <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
+    <div class="row">
+        <div class="col-sm-6">
+            <button ng-if="d.user.id!=null" class="btn btn-outline-success" ng-click="init()" title="Novi korisnik"><i class="fas fa-user-plus"></i> Novi korisnik</button>
+        </div>
+        <div class="col-sm-6 text-right">
+            <div ng-if="d.showPdf" class="text-right">
+                <button ng-show="!d.pdf && !g.clearView" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d, 'NewUser')">
+                    <loading-directive btntitle="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf" pdf="true"></loading-directive>
+                </button>
+                <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
+            </div>
+        </div>
     </div>
     <div class="row mt-3">
         <div class="col-sm-6">
@@ -62,7 +69,7 @@
         <div class="col-sm-6">
             <div ng-if="d.user.id!==null" class="card shadow">
                 <div class="card-body">
-                    <div>Ukupno uplaćeno uloga: {{d.user.totalMebershipFees | number:2}} {{config.currency}} <label ng-if="d.user.totalMebershipFeesRequired > d.user.totalMebershipFees" class="text-danger">(Dug: {{d.user.totalMebershipFeesRequired | number:2}} {{config.currency}})</label></div>
+                    <div>Ukupno uplaćeno uloga: {{d.user.totalMebershipFees | number:2}} {{config.currency}}</div>
                     <div>Ukupno neotplaćeno pozajmica: <label class="{{d.user.restToRepayment>0?'text-danger':''}}">{{d.user.restToRepayment | number:2}} {{config.currency}}</label></div>
                     <div class="row">
                         <div class="col-sm-6 pt-2">

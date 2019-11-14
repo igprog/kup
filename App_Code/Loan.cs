@@ -80,6 +80,16 @@ public class Loan : System.Web.Services.WebService {
     }
 
     [WebMethod]
+    public string Load(int? month, int year, string buisinessUnitCode, string search) {
+        try {
+            Loans xx = LoadData(month, year, buisinessUnitCode, search);
+            return JsonConvert.SerializeObject(xx, Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+        }
+    }
+
+    [WebMethod]
     public string Save(NewLoan x) {
         try {
             db.Loan();
@@ -131,97 +141,6 @@ public class Loan : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    public string Load(int? month, int year, string buisinessUnitCode) {
-        try {
-            Loans xx = LoadData(month, year, buisinessUnitCode);
-            return JsonConvert.SerializeObject(xx, Formatting.Indented);
-        } catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
-        }
-    }
-
-    public Loans LoadData(int? month, int year, string buisinessUnitCode) {
-        db.Loan();
-            string sql = string.Format(@"SELECT l.id, l.userId, l.loan, l.loanDate, l.repayment, l.manipulativeCosts, l.withdraw, l.dedline, l.isRepaid, l.note, u.firstName, u.lastName, b.code, b.title FROM Loan l
-                        LEFT OUTER JOIN Users u
-                        ON l.userId = u.id
-                        LEFT OUTER JOIN BuisinessUnit b
-                        ON u.buisinessUnitCode = b.code
-                        WHERE {0} {1}"
-                            , string.Format("CONVERT(datetime, l.loanDate) >= '{0}' AND CONVERT(datetime, l.loanDate) < '{1}'", g.ReffDate(month == null ? 1 : month, year), g.ReffDate(month == null ? 12 : month + 1, year))
-                            , string.IsNullOrEmpty(buisinessUnitCode) ? "" : string.Format("AND u.buisinessUnitCode = '{0}'", buisinessUnitCode));
-            Loans xx = new Loans();
-            xx.data = new List<NewLoan>();
-            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(sql, connection)) {
-                    using (SqlDataReader reader = command.ExecuteReader()) {
-                        while (reader.Read()) {
-                            NewLoan x = ReadData(reader);
-                            xx.data.Add(x);
-                        }
-                    }
-                }
-                connection.Close();
-            }
-
-        xx.data = xx.data.OrderBy(a => a.user.lastName).ToList();
-        xx.total = new Total();
-            xx.total.loan = xx.data.Sum(a => a.loan);
-            xx.total.repayment = xx.data.Sum(a => a.repayment);
-            xx.total.manipulativeCosts = xx.data.Sum(a => a.manipulativeCosts);
-            xx.total.actualLoan = xx.data.Sum(a => a.actualLoan);
-            xx.total.withdraw = xx.data.Sum(a => a.withdraw);
-            xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
-            xx.monthlyTotal = new List<MonthlyTotal>();
-            xx.monthlyTotal = GetMonthlyTotal(xx.data);
-        return xx;
-    }
-
-    [WebMethod]
-    public string Search(string search) {
-        try {
-            db.Loan();
-            string sql = string.Format(@"SELECT l.id, l.userId, l.loan, l.loanDate, l.repayment, l.manipulativeCosts, l.withdraw, l.dedline, l.isRepaid, l.note, u.firstName, u.lastName, b.code, b.title FROM Loan l
-                        LEFT OUTER JOIN Users u
-                        ON l.userId = u.id
-                        LEFT OUTER JOIN BuisinessUnit b
-                        ON u.buisinessUnitCode = b.code
-                        {0}", string.IsNullOrEmpty(search) ? "" : string.Format("WHERE u.id LIKE '%{0}%' OR u.firstName LIKE N'{0}%' OR u.lastName LIKE N'{0}%'", search));
-            Loans xx = new Loans();
-            xx.data = new List<NewLoan>();
-            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(sql, connection)) {
-                    using (SqlDataReader reader = command.ExecuteReader()) {
-                        while (reader.Read()) {
-                            NewLoan x = ReadData(reader);
-                            xx.data.Add(x);
-                        }
-                    }
-                }
-                connection.Close();
-            }
-
-            xx.data = xx.data.OrderBy(a => a.user.lastName).ToList();
-            xx.total = new Total();
-            xx.total.loan = xx.data.Sum(a => a.loan);
-            xx.total.repayment = xx.data.Sum(a => a.repayment);
-            xx.total.manipulativeCosts = xx.data.Sum(a => a.manipulativeCosts);
-            //xx.total.actualLoan = xx.data.Sum(a => a.actualLoan);
-            xx.total.withdraw = xx.data.Sum(a => a.withdraw);
-            xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
-
-            xx.monthlyTotal = new List<MonthlyTotal>();
-            xx.monthlyTotal = GetMonthlyTotal(xx.data);
-
-            return JsonConvert.SerializeObject(xx, Formatting.Indented);
-        } catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
-        }
-    }
-
-    [WebMethod]
     public string Get(string id) {
         try {
             db.Loan();
@@ -266,6 +185,45 @@ public class Loan : System.Web.Services.WebService {
         }
     }
 
+    public Loans LoadData(int? month, int year, string buisinessUnitCode, string search) {
+        db.Loan();
+            string sql = string.Format(@"SELECT l.id, l.userId, l.loan, l.loanDate, l.repayment, l.manipulativeCosts, l.withdraw, l.dedline, l.isRepaid, l.note, u.firstName, u.lastName, b.code, b.title FROM Loan l
+                        LEFT OUTER JOIN Users u
+                        ON l.userId = u.id
+                        LEFT OUTER JOIN BuisinessUnit b
+                        ON u.buisinessUnitCode = b.code
+                        WHERE {0} {1} {2}"
+                            , string.Format("CONVERT(datetime, l.loanDate) >= '{0}' AND CONVERT(datetime, l.loanDate) < '{1}'", g.ReffDate(month == null ? 1 : month, year), g.ReffDate(month == null ? 12 : month + 1, year))
+                            , string.IsNullOrEmpty(buisinessUnitCode) ? "" : string.Format("AND u.buisinessUnitCode = '{0}'", buisinessUnitCode)
+                            , string.IsNullOrEmpty(search) ? "" : string.Format("AND u.id LIKE '%{0}%' OR u.firstName LIKE N'{0}%' OR u.lastName LIKE N'{0}%'", search));
+            Loans xx = new Loans();
+            xx.data = new List<NewLoan>();
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            NewLoan x = ReadData(reader);
+                            xx.data.Add(x);
+                        }
+                    }
+                }
+                connection.Close();
+            }
+
+        xx.data = xx.data.OrderBy(a => a.user.lastName).ToList();
+        xx.total = new Total();
+        xx.total.loan = xx.data.Sum(a => a.loan);
+        xx.total.repayment = xx.data.Sum(a => a.repayment);
+        xx.total.manipulativeCosts = xx.data.Sum(a => a.manipulativeCosts);
+        xx.total.actualLoan = xx.data.Sum(a => a.actualLoan);
+        xx.total.withdraw = xx.data.Sum(a => a.withdraw);
+        xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
+        xx.monthlyTotal = new List<MonthlyTotal>();
+        xx.monthlyTotal = GetMonthlyTotal(xx.data);
+        return xx;
+    }
+
     NewLoan ReadData(SqlDataReader reader) {
         NewLoan x = new NewLoan();
         x.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
@@ -279,7 +237,8 @@ public class Loan : System.Web.Services.WebService {
         x.actualLoan = x.loan - x.manipulativeCosts;
         x.withdraw = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
         User u = new User();
-        x.restToRepayment = GetTotalLoan(x.loanDate) - GetTotalLoanRepayed(x.loanDate);  // TOOD: provjeriti
+        //x.restToRepayment = GetTotalLoan(x.loanDate) - GetTotalLoanRepayed(x.loanDate);  // TOOD: provjeriti
+        x.restToRepayment = GetTotalLoan(x) - GetTotalLoanRepayed(x);  // TOOD: provjeriti
         x.dedline = reader.GetValue(7) == DBNull.Value ? s.Data().defaultDedline : Convert.ToDouble(reader.GetString(7));
         x.isRepaid = reader.GetValue(8) == DBNull.Value ? 0 : reader.GetInt32(8);
         x.note = reader.GetValue(9) == DBNull.Value ? null : reader.GetString(9);
@@ -303,7 +262,7 @@ public class Loan : System.Web.Services.WebService {
             x.total.manipulativeCosts = aa.Sum(a => a.manipulativeCosts);
             x.total.actualLoan = aa.Sum(a => a.actualLoan);
             x.total.withdraw = aa.Sum(a => a.withdraw);
-            x.total.restToRepayment = aa.Sum(a => a.restToRepayment);
+            x.total.restToRepayment = aa.Sum(a => a.loan) - aa.Sum(a => a.repayment); // aa.Sum(a => a.restToRepayment);
             xx.Add(x);
         }
         return xx;
@@ -387,40 +346,77 @@ public class Loan : System.Web.Services.WebService {
 
     }
 
-     public double GetTotalLoan(string loanDate) {
-        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, l.loan)) FROM Loan l WHERE CONVERT(datetime, l.loanDate) < CONVERT(datetime, '{0}') ", loanDate);
-        double x = 0;
+
+     public double GetTotalLoan(NewLoan x) {
+        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, l.loan)) FROM Loan l WHERE CONVERT(datetime, l.loanDate) <= CONVERT(datetime, '{0}') AND l.userId = '{1}'"
+                                , x.loanDate, x.user.id);
+        double amount = 0;
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
                     while (reader.Read()) {
-                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                        amount = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
                     }
                 }
             }
             connection.Close();
         }
-        return x;
+        return amount;
     }
 
-    public double GetTotalLoanRepayed(string loanDate) {
-        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, a.amount)) FROM Account a
-                                    LEFT OUTER JOIN Loan l ON l.id = a.loanId
-                                    WHERE CONVERT(datetime, l.loanDate) < CONVERT(datetime, '{0}') AND a.recordType = '{1}'", loanDate, g.repayment);
-        double x = 0;
+    public double GetTotalLoanRepayed(NewLoan x) {
+        string sql = string.Format(@"SELECT SUM(CONVERT(decimal, a.amount)) FROM Account a LEFT OUTER JOIN Loan l ON l.id = a.loanId
+                                    WHERE CONVERT(datetime, l.loanDate) <= CONVERT(datetime, '{0}') AND (a.recordType = '{1}' OR a.recordType = '{2}') AND a.userId = '{3}'"
+                                    , x.loanDate, g.repayment, g.loan, x.user.id);
+        double amount = 0;
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
                     while (reader.Read()) {
-                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                        amount = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
                     }
                 }
             }
             connection.Close();
         }
-        return x;
+        return amount;
     }
+    // public double GetTotalLoan(string loanDate) {
+    //    string sql = string.Format(@"SELECT SUM(CONVERT(decimal, l.loan)) FROM Loan l WHERE CONVERT(datetime, l.loanDate) < CONVERT(datetime, '{0}') ", loanDate);
+    //    double x = 0;
+    //    using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+    //        connection.Open();
+    //        using (SqlCommand command = new SqlCommand(sql, connection)) {
+    //            using (SqlDataReader reader = command.ExecuteReader()) {
+    //                while (reader.Read()) {
+    //                    x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+    //                }
+    //            }
+    //        }
+    //        connection.Close();
+    //    }
+    //    return x;
+    //}
+
+    //public double GetTotalLoanRepayed(string loanDate) {
+    //    string sql = string.Format(@"SELECT SUM(CONVERT(decimal, a.amount)) FROM Account a
+    //                                LEFT OUTER JOIN Loan l ON l.id = a.loanId
+    //                                WHERE CONVERT(datetime, l.loanDate) < CONVERT(datetime, '{0}') AND a.recordType = '{1}'", loanDate, g.repayment);
+    //    double x = 0;
+    //    using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+    //        connection.Open();
+    //        using (SqlCommand command = new SqlCommand(sql, connection)) {
+    //            using (SqlDataReader reader = command.ExecuteReader()) {
+    //                while (reader.Read()) {
+    //                    x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+    //                }
+    //            }
+    //        }
+    //        connection.Close();
+    //    }
+    //    return x;
+    //}
 
 }

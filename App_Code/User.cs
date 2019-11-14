@@ -92,6 +92,15 @@ public class User : System.Web.Services.WebService {
     }
 
     [WebMethod]
+    public string Load(string buisinessUnitCode, string search) {
+        try {
+            return JsonConvert.SerializeObject(GetUsers(buisinessUnitCode, search, false), Formatting.None);
+        }catch (Exception e) {
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
+        }
+    }
+
+    [WebMethod]
     public string Save(NewUser x, bool newUser) {
         try {
             Response r = new Response();
@@ -205,15 +214,6 @@ public class User : System.Web.Services.WebService {
                 command.ExecuteNonQuery();
             }
             connection.Close();
-        }
-    }
-
-    [WebMethod]
-    public string Load(string buisinessUnitCode, string search) {
-        try {
-            return JsonConvert.SerializeObject(GetUsers(buisinessUnitCode, search, false), Formatting.None);
-        }catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
 

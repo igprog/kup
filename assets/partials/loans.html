@@ -21,7 +21,7 @@
         </div>
         <div class="col-sm-2 text-right">
             <button ng-show="!d.pdf" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="printLoans(d)">
-                <loading-directive title="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf" pdf="true"></loading-directive>
+                <loading-directive btntitle="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf" pdf="true"></loading-directive>
             </button>
             <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
         </div>
@@ -32,7 +32,7 @@
                 <div class="input-group mb-3">
                     <input ng-model="d.search" type="text" class="form-control" placeholder="Pretraži...">
                     <div class="input-group-append">
-                        <button class="btn btn-outline-primary" type="submit" ng-click="search(d.search)"><i class="fa fa-search"></i></button>
+                        <button class="btn btn-outline-primary" type="submit" ng-click="load(d)"><i class="fa fa-search"></i></button>
                     </div>
                 </div>
             </form>

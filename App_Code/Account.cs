@@ -458,7 +458,7 @@ public class Account : System.Web.Services.WebService {
         x.note = "Pozajmice";
         Loan l = new Loan();
         x.output = l.GetLoansTotal(month, year);
-        Loan.Loans loans = l.LoadData(month, year, null);
+        Loan.Loans loans = l.LoadData(month, year, null, null);
         //x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input) + loans.total.restToRepayment; TODO: ?? restToRepayment dali to treba
         x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input);
         x.account = GetAccountNo(g.loan);
@@ -1296,12 +1296,12 @@ public class Account : System.Web.Services.WebService {
     public NewAccount CheckLoan(NewAccount x, string userId) {
         string sql = string.Format(@"
                     SELECT l.id, l.loan, l.repayment FROM Loan l
-                    WHERE l.userId = '{0}' AND (CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-01' AS datetime)) {3}"
+                    WHERE l.userId = '{0}' AND (CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)) {4}"
             , userId
             , x.year
             , g.Month(Convert.ToInt32(x.month))
+            , g.GetLastDayInMonth(x.year, Convert.ToInt32(x.month))
             , !string.IsNullOrEmpty(x.loanId) ? string.Format(" AND l.id = '{0}'", x.loanId) : "");
-
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -1310,8 +1310,8 @@ public class Account : System.Web.Services.WebService {
                         x.loanId = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
                         x.loan = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
                         x.repayment = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
-                        x.repaid = Repaid(x); // reader.GetValue(3) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(3));
-                        x.restToRepayment = x.loan - x.repaid; // RestToRepayment(x.loanId); // reader.GetValue(4) == DBNull.Value ? x.loan : Convert.ToDouble(reader.GetString(4));
+                        x.repaid = Repaid(x);
+                        x.restToRepayment = x.loan - x.repaid;
                         x.totalObligation = x.monthlyFee + x.repayment;
                     }
                 }

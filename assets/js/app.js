@@ -329,6 +329,9 @@
             }
         });
     }
+    $scope.init = () => {
+        init();
+    }
 
     var load = (x) => {
         if (f.defined(x.buisinessUnitCode)) {
@@ -566,6 +569,9 @@
             loadUsers(null, null);
         });
     }
+    $scope.init = () => {
+        init();
+    }
 
     if ($scope.g.currTpl == './assets/partials/newloan.html') {
         var data = {
@@ -631,7 +637,6 @@
     }
 
     $scope.save = (x) => {
-        //x.loan.loanDate = document.getElementById('loanDate').innerText; // f.setDate(date);
         x.loan.loanDate = f.setDate(x.loan.loanDate);
         if (!validate(x.loan)) {
             $scope.d.loan.loanDate = new Date($scope.d.loan.loanDate);
@@ -661,7 +666,6 @@
     }
 
     $scope.print = (x) => {
-        //x.loan.loanDate = document.getElementById('loanDate').innerText;
         x.loan.loanDate = f.setDate(x.loan.loanDate);
         if (!validate(x.loan)) {
             $scope.d.loan.loanDate = new Date($scope.d.loan.loanDate);
@@ -683,7 +687,7 @@
     var load = (x) => {
         $scope.d.loading = true;
         $scope.d.limit = $scope.g.recordslimit;
-        f.post(service, 'Load', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode }).then((d) => {
+        f.post(service, 'Load', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
             $scope.d.records = d;
             $scope.d.loading = false;
         });
@@ -691,15 +695,6 @@
 
     $scope.load = (x) => {
         load(x);
-    }
-
-    $scope.search = (x) => {
-        $scope.d.loading = true;
-        $scope.d.limit = $scope.g.recordslimit;
-        f.post(service, 'Search', { search: x }).then((d) => {
-            $scope.d.records = d;
-            $scope.d.loading = false;
-        });
     }
 
     $scope.get = (id) => {
@@ -1279,7 +1274,7 @@
     return {
         restrict: 'E',
         scope: {
-            title: '=',
+            btntitle: '=',
             loadingtitle: '=',
             value: '=',
             pdf: '=',
@@ -1351,76 +1346,6 @@
         }
     }
 })
-
-
-    /*
-.directive('dateDirective', () => {
-    return {
-        restrict: 'E',
-        scope: {
-            fromyear: '=',
-            id: '=',
-            date: '=',
-            todaybtn: '='
-        },
-        templateUrl: './assets/partials/directive/date.html',
-        controller: 'dateCtrl'
-    };
-})
-.controller('dateCtrl', ['$scope', 'f', ($scope, f) => {
-
-    var getYears = () => {
-        return f.years(f.defined($scope.fromyear) ? $scope.fromyear : new Date().getFullYear());
-    }
-
-    var format = (x) => {
-        return (x < 10 ? '0' + x : x);
-    }
-
-    var d = {
-        day: f.day(),
-        mo: f.month(),
-        yr: f.year(),
-        days: f.days(),
-        months: f.months(),
-        years: getYears(),
-        alert: null
-    }
-    $scope.d = d;
-
-    $scope.getDate = (id) => {
-        if (f.defined($scope.d.yr) && f.defined($scope.d.mo) && f.defined($scope.d.day)) {
-            var date = $scope.d.yr + '-' + format($scope.d.mo) + '-' + format($scope.d.day);
-            document.getElementById(id).innerText = $scope.d.yr + '-' + format($scope.d.mo) + '-' + format($scope.d.day);
-            if (!f.isValidDate(date)) {
-                $scope.d.alert = 'Datum nije ispravan!';
-            } else {
-                $scope.d.alert = null;
-            }
-        }
-    }
-
-    $scope.today = (id) => {
-        $scope.d.day = f.day();
-        $scope.d.mo = f.month();
-        $scope.d.yr = f.year();
-        document.getElementById(id).innerText = $scope.d.yr + '-' + format($scope.d.mo) + '-' + format($scope.d.day);
-    }
-
-
-    //TODO
-    //$scope.getDay = (id) => {
-    //    console.log(f.days().find(a => a.id === id).title);
-    //    return f.days().find(a => a.id === id);
-    //}
-    //$scope.getMonth = (id) => {
-    //    console.log(f.months().find(a => a.id === id).title);
-    //    return f.months().find(a => a.id === id);
-    //}
-
-}])
-*/
-
 /********** Directives **********/
 
 ;

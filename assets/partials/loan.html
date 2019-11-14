@@ -1,62 +1,61 @@
 ﻿<div ng-controller="loanCtrl">
     <div class="row">
         <div class="col-sm-6">
-            <div class="form-group">
-                <label for="loanDate">Datum:</label>
-                <input ng-model="d.loan.loanDate" type="date" onkeydown="return false" class="form-control" style="width:190px" />
-                <!--<date-directive id="'loanDate'"></date-directive>-->
-            </div>
+            <button ng-if="d.loan.id!=null" class="btn btn-outline-success" ng-click="init()" title="Nova pozajmica"><i class="fas fa-file"></i> Nova</button>
         </div>
         <div class="col-sm-6 text-right">
-            <button ng-show="!d.pdf && !g.clearView" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d)">
-                <loading-directive title="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf" pdf="true"></loading-directive>
+            <button ng-show="!d.pdf && !g.clearView" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d)" title="PDF">
+                <loading-directive btntitle="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf" pdf="true"></loading-directive>
             </button>
-            <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
+            <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()" title="PDF"><i class="fas fa-download"></i> Preuzmi PDF</a>
         </div>
-        <hr />
     </div>
-    <div class="row">
+    <div class="row  mt-3">
         <div class="col-sm-6">
-            <form>
-                <div class="form-group">
-                    <label for="userId">Korisnik:</label>
-                    <select ng-model="d.loan.user.id" class="form-control" name="userId" ng-click="getUser(d.loan.user.id)">
-                        <option ng-repeat="x in d.users" value="{{x.id}}">{{x.lastName}} {{x.firstName}} ({{x.id}})</option>
-                    </select>
+            <div class="car shadow">
+                <div class="card-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="loanDate">Datum:</label>
+                            <input ng-model="d.loan.loanDate" type="date" onkeydown="return false" class="form-control" style="width:190px" />
+                        </div>
+                        <div class="form-group">
+                            <label for="userId">Korisnik:</label>
+                            <select ng-model="d.loan.user.id" class="form-control" name="userId" ng-click="getUser(d.loan.user.id)">
+                                <option ng-repeat="x in d.users" value="{{x.id}}">{{x.lastName}} {{x.firstName}} ({{x.id}})</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="restToRepayment">Dug: {{d.loan.user.restToRepayment | number:2}} kn</label>
+                        </div>
+                        <hr />
+                        <div class="form-group">
+                            <label for="loan">Pozajmica:</label>
+                            <input ng-model="d.loan.loan" type="text" class="form-control" name="loan" ng-change="calculate(d.loan)" allow-only-numbers>
+                        </div>
+                        <div class="form-group">
+                            <label for="dedline">Rok otplate (mj):</label>
+                            <input ng-model="d.loan.dedline" type="text" class="form-control" name="dedline" ng-change="calculate(d.loan)" allow-only-numbers>
+                        </div>
+                        <div class="form-group">
+                            <label for="repayment">Mjesečna rata:</label>
+                            <input ng-model="d.loan.repayment" type="text" class="form-control" name="repayment" ng-change="calculateDedline(d.loan)" allow-only-numbers>
+                        </div>
+                        <div class="form-group">
+                            <label for="manipulativeCosts">Manipulativni troškovi ({{d.loan.manipulativeCostsCoeff * 100}}%):</label>
+                            <input ng-model="d.loan.manipulativeCosts" type="text" class="form-control" name="manipulativeCosts" ng-change="calculate(d.loan)" allow-only-numbers>
+                        </div>
+                        <div class="form-group">
+                            <label for="withdraw">Za isplatu:</label>
+                            <input ng-model="d.loan.withdraw" type="text" class="form-control" name="withdraw" ng-change="calculate(d.loan)" allow-only-numbers>
+                        </div>
+                        <div class="text-right">
+                            <button class="btn btn-outline-danger" ng-click="remove(d.loan)" title="Briši"><i class="fas fa-trash-alt"></i> Briši</button>
+                            <button type="submit" class="btn btn-outline-primary" ng-click="save(d)" title="Spremi"><i class="fas fa-save"></i> Spremi</button>
+                        </div>
+                    </form>
                 </div>
-                <div>
-                    <label for="restToRepayment">Dug: {{d.loan.user.restToRepayment | number:2}} kn</label>
-                </div>
-                <hr />
-                <div class="form-group">
-                    <label for="loan">Pozajmica:</label>
-                    <input ng-model="d.loan.loan" type="text" class="form-control" name="loan" ng-change="calculate(d.loan)" allow-only-numbers>
-                </div>
-                <div class="form-group">
-                    <label for="dedline">Rok otplate (mj):</label>
-                    <input ng-model="d.loan.dedline" type="text" class="form-control" name="dedline" ng-change="calculate(d.loan)" allow-only-numbers>
-                </div>
-                <div class="form-group">
-                    <label for="repayment">Mjesečna rata:</label>
-                    <input ng-model="d.loan.repayment" type="text" class="form-control" name="repayment" ng-change="calculateDedline(d.loan)" allow-only-numbers>
-                </div>
-                <div class="form-group">
-                    <label for="manipulativeCosts">Manipulativni troškovi ({{d.loan.manipulativeCostsCoeff * 100}}%):</label>
-                    <input ng-model="d.loan.manipulativeCosts" type="text" class="form-control" name="manipulativeCosts" ng-change="calculate(d.loan)" allow-only-numbers>
-                </div>
-                <!--<div class="form-group">
-                    <label for="actualLoan">Pozajmica:</label>
-                    <input ng-model="d.loan.actualLoan" type="text" class="form-control" name="actualLoan" ng-change="calculate(d.loan)" allow-only-numbers>
-                </div>-->
-                <div class="form-group">
-                    <label for="withdraw">Za isplatu:</label>
-                    <input ng-model="d.loan.withdraw" type="text" class="form-control" name="withdraw" ng-change="calculate(d.loan)" allow-only-numbers>
-                </div>
-                <div class="text-right">
-                    <button class="btn btn-outline-danger" ng-click="remove(d.loan)" title="Briši"><i class="fas fa-trash-alt"></i> Briši</button>
-                    <button type="submit" class="btn btn-outline-primary" ng-click="save(d)" title="Spremi"><i class="fas fa-save"></i> Spremi</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
     <json-directive data="d" debug="config.debug"></json-directive>

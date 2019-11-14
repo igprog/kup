@@ -11,7 +11,7 @@
         </div>
         <div class="col-sm-2 text-right">
             <button ng-show="!d.pdf && d.records.data.length>0 && !g.clearView" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d)">
-                <loading-directive title="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf" pdf="true"></loading-directive>
+                <loading-directive btntitle="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf" pdf="true"></loading-directive>
             </button>
             <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
         </div>
