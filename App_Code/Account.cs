@@ -381,13 +381,13 @@ public class Account : System.Web.Services.WebService {
                 x.user = user;
                 xx.data.Add(x);
             }
-            if (changed) {
-                xx.data = xx.data.Where(a => a.changed == true).ToList();
-            }
             xx.total = new Total();
             xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
             xx.total.repayment = xx.data.Sum(a => a.repayment);
             xx.total.totalObligation = xx.data.Sum(a => a.totalObligation);
+            if (changed) {
+                xx.data = xx.data.Where(a => a.changed == true).ToList();
+            }
             return JsonConvert.SerializeObject(xx, Formatting.None);
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.None);

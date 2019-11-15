@@ -790,6 +790,11 @@
         $scope.d.limit = $scope.g.recordslimit;
         f.post(service, 'GetMonthlyFee', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
             $scope.d.records = d;
+            angular.forEach(d.data, function (value1, key1) {
+                angular.forEach(value1.userPayment, function (value2, key2) {
+                    $scope.d.records.data[key1].userPayment[key2].recordDate = new Date(value2.recordDate);
+                });
+            });
             $scope.d.loading = false;
         });
     }
@@ -817,9 +822,9 @@
         x.userPayment.push({
             id: null,
             userId: x.user.id,
-            recordDate: f.setDate(new Date()),
+            recordDate: new Date(),
             amount: null,
-            note: null
+            note: 'Uplata korisnika'
         });
     }
 
@@ -830,6 +835,7 @@
         }
         y.month = d.month;
         y.year = d.year;
+        y.recordDate = f.setDate(y.recordDate);
         f.post('Account', 'SaveUserPayment', { userId: x.user.id, y: y }).then((d) => {
             getMonthlyRecords($scope.d);
         });
