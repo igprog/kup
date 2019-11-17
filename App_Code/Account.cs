@@ -36,6 +36,7 @@ public class Account : System.Web.Services.WebService {
         public double loan;
         public string loanDate;
         public double repayment;
+        public double lastRepayment;
         public string repaymentDate;
         public double restToRepayment;
         public double totalObligation;
@@ -312,6 +313,7 @@ public class Account : System.Web.Services.WebService {
                     //x = CheckLoan(x, user.id, month, year);  //TODO
                 }
                 x = CheckLoan(x, user.id);  //TODO
+                //x = CheckLastRepayment(x, user.id);  //TODO???
                 x.user = user;
                 xx.data.Add(x);
             }
@@ -1304,25 +1306,25 @@ public class Account : System.Web.Services.WebService {
     }
 
     public NewAccount CheckLoan(NewAccount x, string userId) {
+        //   string sql = string.Format(@"
+        //               SELECT l.id, l.loan, l.repayment, a.amount FROM Loan l
+        //               LEFT OUTER JOIN Account a
+        //ON l.id = a.loanId AND a.mo = {5} AND a.yr = {6}
+        //               WHERE l.userId = {0} AND (CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)) {4}"
+        //               , userId
+        //               , x.year
+        //               , g.Month(Convert.ToInt32(x.month))
+        //               , g.GetLastDayInMonth(x.year, Convert.ToInt32(x.month))
+        //               , !string.IsNullOrEmpty(x.loanId) ? string.Format(" AND l.id = '{0}'", x.loanId) : ""
+        //               , x.month, x.year);
         string sql = string.Format(@"
-                    SELECT l.id, l.loan, a.amount FROM Loan l
-                    LEFT OUTER JOIN Account a
-					ON l.id = a.loanId AND a.mo = {5} AND a.yr = {6}
-                    WHERE l.userId = {0} AND (CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)) {4}"
+                    SELECT l.id, l.loan, l.repayment FROM Loan l
+                    WHERE l.userId = '{0}' AND (CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)) {4}"
                     , userId
                     , x.year
                     , g.Month(Convert.ToInt32(x.month))
                     , g.GetLastDayInMonth(x.year, Convert.ToInt32(x.month))
-                    , !string.IsNullOrEmpty(x.loanId) ? string.Format(" AND l.id = '{0}'", x.loanId) : ""
-                    , x.month, x.year);
-        //string sql = string.Format(@"
-        //            SELECT l.id, l.loan, l.repayment FROM Loan l
-        //            WHERE l.userId = '{0}' AND (CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)) {4}"
-        //            , userId
-        //            , x.year
-        //            , g.Month(Convert.ToInt32(x.month))
-        //            , g.GetLastDayInMonth(x.year, Convert.ToInt32(x.month))
-        //            , !string.IsNullOrEmpty(x.loanId) ? string.Format(" AND l.id = '{0}'", x.loanId) : "");
+                    , !string.IsNullOrEmpty(x.loanId) ? string.Format(" AND l.id = '{0}'", x.loanId) : "");
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -1331,6 +1333,10 @@ public class Account : System.Web.Services.WebService {
                         x.loanId = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
                         x.loan = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
                         x.repayment = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
+                        //x.lastRepayment = reader.GetValue(3) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(3));
+                        //if (x.lastRepayment > 0) {
+                        //    x.repayment = x.lastRepayment;
+                        //}
                         x.repaid = Repaid(x);
                         x.restToRepayment = x.loan - x.repaid;
                         if (x.restToRepayment > 0 && x.restToRepayment < x.repayment && x.repayment > 0) {
@@ -1341,6 +1347,28 @@ public class Account : System.Web.Services.WebService {
                 }
             }
             connection.Close();
+        }
+        return x;
+    }
+
+    public NewAccount CheckLastRepayment(NewAccount x, string userId) {
+        double val = 0;
+        string sql = string.Format(@"
+                       SELECT a.amount FROM Account a WHERE a.userId = '{1}' AND a.mo = {1} AND a.yr = {2} AND recordType = '{3}'"
+                    , userId , x.month , x.year, g.repayment);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        val = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        if (val > 0) {
+            x.repayment = val;
         }
         return x;
     }
