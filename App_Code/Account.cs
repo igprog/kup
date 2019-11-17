@@ -1333,10 +1333,6 @@ public class Account : System.Web.Services.WebService {
                         x.loanId = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
                         x.loan = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
                         x.repayment = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
-                        //x.lastRepayment = reader.GetValue(3) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(3));
-                        //if (x.lastRepayment > 0) {
-                        //    x.repayment = x.lastRepayment;
-                        //}
                         x.repaid = Repaid(x);
                         x.restToRepayment = x.loan - x.repaid;
                         if (x.restToRepayment > 0 && x.restToRepayment < x.repayment && x.repayment > 0) {

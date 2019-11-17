@@ -70,6 +70,7 @@
             <div ng-if="d.user.id!==null" class="card shadow">
                 <div class="card-body">
                     <div>Ukupno uplaćeno uloga: {{d.user.totalMebershipFeesWithUserPayment | number:2}} {{config.currency}}</div>
+                    <div>Ukupno isplaćeno uloga: {{d.user.totalWithdrawn | number:2}} {{config.currency}}</div>
                     <div>Ukupno neotplaćeno pozajmica: <label class="{{d.user.restToRepayment>0?'text-danger':''}}">{{d.user.restToRepayment | number:2}} {{config.currency}}</label></div>
                     <div class="row">
                         <div class="col-sm-6 pt-2">
@@ -86,7 +87,7 @@
                         <div ng-if="d.user.isActive==0" class="col-sm-12 pt-2">
                             <label for="terminationWithdraw">Isplata kod isčlanjenja <em>(uplaćeni ulog - neotplaćena pozajmica)</em>:</label>
                             <div class="input-group">
-                                <input ng-model="d.user.terminationWithdraw" type="text" class="form-control" name="terminationWithdraw" readonly allow-only-numbers>
+                                <input ng-model="d.user.terminationWithdraw" type="text" class="form-control" name="terminationWithdraw" allow-only-numbers readonly>
                                 <div class="input-group-append">
                                     <span class="input-group-text">{{config.currency}}</span>
                                 </div>

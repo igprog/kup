@@ -45,8 +45,9 @@ public class User : System.Web.Services.WebService {
         public double totalMebershipFees;
         public double totalUserPayment;
         public double totalMebershipFeesWithUserPayment;
+        public double totalWithdrawn;  // ukupno povućeno kod isčlanjenja
         //public double totalMebershipFeesRequired;
-        public double terminationWithdraw;
+        public double terminationWithdraw;  // iznos preostao za povući kod isčlanjenja
         public double monthlyRepayment;
 
         //public List<UserStatus> statusHistory;
@@ -86,6 +87,7 @@ public class User : System.Web.Services.WebService {
         x.totalMebershipFees = 0;
         x.totalUserPayment = 0;
         x.totalMebershipFeesWithUserPayment = 0;
+        x.totalWithdrawn = 0;
         //x.totalMebershipFeesRequired = 0;
         x.terminationWithdraw = 0;
         x.monthlyRepayment = 0;
@@ -242,10 +244,11 @@ public class User : System.Web.Services.WebService {
             x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment);
             x.totalMebershipFees = GetAmount(id, g.monthlyFee);
             x.totalUserPayment = GetAmount(id, g.userPayment);
+            x.totalWithdrawn = GetAmount(id, g.terminationWithdraw);
             x.totalMebershipFeesWithUserPayment = x.totalMebershipFees + x.totalUserPayment;
             DateTime now = DateTime.UtcNow;
             //x.totalMebershipFeesRequired = a.GetMonthlyFeeRequiredAccu(x.id, now.Month, now.Year);  //TODO: provjeriti dali to treba???
-            x.terminationWithdraw = x.totalMebershipFeesWithUserPayment - x.restToRepayment;  //  - (x.totalMebershipFeesRequired - x.totalMebershipFees); // TODO: Provjeriti dali treba totalMebershipFeesRequired
+            x.terminationWithdraw = x.totalMebershipFeesWithUserPayment - x.restToRepayment - x.totalWithdrawn;  //  - (x.totalMebershipFeesRequired - x.totalMebershipFees); // TODO: Provjeriti dali treba totalMebershipFeesRequired
             //x.activeLoanId = GetActiveLoanId(id);
             if (year != null) {
                 x.records = a.GetRecords(x.id, year);
