@@ -725,7 +725,6 @@
 
 .controller('monthlyPaymentCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
     var service = 'Account';
-
     var data = {
         loan: {},
         records: {},

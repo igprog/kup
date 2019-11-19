@@ -847,13 +847,6 @@ public class Account : System.Web.Services.WebService {
             x.terminationWithdraw = GetMonthlyPayment(month, year, g.terminationWithdraw);
             x.bankFee = GetMonthlyPayment(month, year, g.bankFee);
             x.otherFee = GetMonthlyPayment(month, year, g.otherFee);
-            //TODO:
-            //x.terminationWithdraw = GetMonthlyPayment(month, year, g.terminationWithdraw)
-            //1. Load TerminationWithdraw(month, year)
-            //2. Loan BankFee()
-            //Staviti sve u jednu metodu
-
-
             return JsonConvert.SerializeObject(x, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
@@ -861,17 +854,31 @@ public class Account : System.Web.Services.WebService {
     }
 
     public List<Fee> GetMonthlyPayment(int? month, int year, string recordType) {
-        //TODO: za terminationWithdraw staviti lefto outer join Users
         List<Fee> xx = new List<Fee>();
-        string sql = string.Format(@"SELECT note, amount FROM Account WHERE mo = '{0}' AND yr = '{1}' AND recordType = '{2}'", month , year , recordType);
+        string sql, firstName, lastName, note = null;
+        if (recordType == g.terminationWithdraw) {
+            sql = string.Format(@"SELECT u.firstName, u.lastName, a.note, a.amount FROM Account a
+                                LEFT OUTER JOIN Users u ON a.userId = u.id
+                                WHERE a.mo = '{0}' AND a.yr = '{1}' AND a.recordType = '{2}'", month, year, recordType);
+        } else {
+            sql = string.Format(@"SELECT amount, note FROM Account WHERE mo = '{0}' AND yr = '{1}' AND recordType = '{2}'", month, year, recordType);
+        }
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
                     while (reader.Read()) {
                         Fee x = new Fee();
-                        x.title = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
-                        x.val = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
+                        if (recordType == g.terminationWithdraw) {
+                            x.val = reader.GetValue(3) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(3));
+                            firstName = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
+                            lastName = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
+                            note = reader.GetValue(2) == DBNull.Value ? null : reader.GetString(2);
+                            x.title = string.Format("{0} {1}", lastName, firstName);
+                        } else {
+                            x.val = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
+                            x.title = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
+                        }
                         xx.Add(x);
                     }
                 }
