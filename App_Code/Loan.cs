@@ -31,6 +31,7 @@ public class Loan : System.Web.Services.WebService {
         public double manipulativeCosts;
         public double actualLoan;  // pozajmica - manipulativni troskovi
         public double withdraw;  // za isplatu (pozajmica - neotplacena pozajmica)
+        public double lastLoanToRepaid; // neotplacena stara pozajmica kod preuzimanja nove pozajmice
         public double dedline;
         public double restToRepayment;  //TODO
         public int isRepaid;
@@ -46,6 +47,7 @@ public class Loan : System.Web.Services.WebService {
         public double actualLoan;
         public double withdraw;
         public double restToRepayment;
+        public double lastLoanToRepaid;
     }
 
     public class MonthlyTotal {
@@ -236,8 +238,8 @@ public class Loan : System.Web.Services.WebService {
         x.manipulativeCostsCoeff = s.Data().manipulativeCostsCoeff;
         x.actualLoan = x.loan - x.manipulativeCosts;
         x.withdraw = reader.GetValue(6) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(6));
+        x.lastLoanToRepaid = x.actualLoan - x.withdraw;
         User u = new User();
-        //x.restToRepayment = GetTotalLoan(x.loanDate) - GetTotalLoanRepayed(x.loanDate);  // TOOD: provjeriti
         x.restToRepayment = GetTotalLoan(x) - GetTotalLoanRepayed(x);  // TOOD: provjeriti
         x.dedline = reader.GetValue(7) == DBNull.Value ? s.Data().defaultDedline : Convert.ToDouble(reader.GetString(7));
         x.isRepaid = reader.GetValue(8) == DBNull.Value ? 0 : reader.GetInt32(8);
@@ -262,6 +264,7 @@ public class Loan : System.Web.Services.WebService {
             x.total.manipulativeCosts = aa.Sum(a => a.manipulativeCosts);
             x.total.actualLoan = aa.Sum(a => a.actualLoan);
             x.total.withdraw = aa.Sum(a => a.withdraw);
+            x.total.lastLoanToRepaid = aa.Sum(a => a.lastLoanToRepaid);
             x.total.restToRepayment = aa.Sum(a => a.loan) - aa.Sum(a => a.repayment); // aa.Sum(a => a.restToRepayment);
             xx.Add(x);
         }

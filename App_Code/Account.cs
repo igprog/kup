@@ -831,6 +831,8 @@ public class Account : System.Web.Services.WebService {
         public List<Fee> terminationWithdraw;  //TODO: napraviti listu (dodati ulog, duguje, za isplatu)
         public List<Fee> otherFee;
         public List<Fee> bankFee;
+        public double total;
+
     }
 
     public class Fee {
@@ -847,6 +849,7 @@ public class Account : System.Web.Services.WebService {
             x.terminationWithdraw = GetMonthlyPayment(month, year, g.terminationWithdraw);
             x.bankFee = GetMonthlyPayment(month, year, g.bankFee);
             x.otherFee = GetMonthlyPayment(month, year, g.otherFee);
+            x.total = x.loans.total.withdraw + x.terminationWithdraw.Sum(a => a.val) + x.bankFee.Sum(a => a.val);
             return JsonConvert.SerializeObject(x, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
