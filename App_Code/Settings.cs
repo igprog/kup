@@ -27,6 +27,7 @@ public class Settings : System.Web.Services.WebService {
         public Account.AccountNo account;
         public StartBalance startBalance;
         public PrintSettings printSettings;
+        public string backupFolder;
     }
 
     public class StartBalance {

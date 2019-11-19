@@ -338,14 +338,15 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
                     if (x.recordType == g.repayment) {
                         cell6Val = string.Format("{0:N}", x.restToRepayment);
                     } else if (x.recordType == g.withdraw) {
-                        cell6Val = string.Format("{0:N}", x.amount);
+                        //cell6Val = string.Format("{0:N}", x.amount);
+                        cell6Val = string.Format("{0:N}", x.activatedLoan);
                     } else {
                         cell6Val = "";
                     }
                     PdfPCell cell6 = new PdfPCell(new Phrase(cell6Val, GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                     cell6.Border = 0;
                     table.AddCell(cell6);
-                    PdfPCell cell7 = new PdfPCell(new Phrase(x.recordType == g.repayment || x.recordType == g.manipulativeCosts ? string.Format("{0:N}", x.amount) : "", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                    PdfPCell cell7 = new PdfPCell(new Phrase(x.recordType == g.repayment || x.recordType == g.manipulativeCosts || x.recordType == g.loan ? string.Format("{0:N}", x.amount) : "", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                     cell7.Border = 0;
                     table.AddCell(cell7);
                 }

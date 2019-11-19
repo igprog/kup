@@ -248,5 +248,26 @@ public class Admin : System.Web.Services.WebService {
         }
     }
 
+    [WebMethod]
+    public string BackupDB(string date) {
+        try {
+            var backupFolder = s.Data().backupFolder;
+            //var backupFolder = Server.MapPath("~/upload/");
+            var sqlConStrBuilder = new SqlConnectionStringBuilder(g.connectionString);
+            var backupFileName = string.Format("{0}{1}_{2}.bak", backupFolder, sqlConStrBuilder.InitialCatalog, date);
+            using (var connection = new SqlConnection(sqlConStrBuilder.ConnectionString)) {
+                var query = string.Format("BACKUP DATABASE {0} TO DISK='{1}'",
+                    sqlConStrBuilder.InitialCatalog, backupFileName);
+                using (var command = new SqlCommand(query, connection)) {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+            return JsonConvert.SerializeObject("Spremljeno", Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+        }
+    }
+
 
 }

@@ -826,6 +826,63 @@ public class Account : System.Web.Services.WebService {
         }
     }
 
+    public class MonthlyPayment {
+        public Loan.Loans loans;
+        public List<Fee> terminationWithdraw;  //TODO: napraviti listu (dodati ulog, duguje, za isplatu)
+        public List<Fee> otherFee;
+        public List<Fee> bankFee;
+    }
+
+    public class Fee {
+        public string title;
+        public double val;
+    }
+
+    [WebMethod]
+    public string LoadMonthlyPayment(int? month, int year) {
+        try {
+            MonthlyPayment x = new MonthlyPayment();
+            Loan l = new Loan();
+            x.loans = l.LoadData(month, year, null, null);
+            x.terminationWithdraw = GetMonthlyPayment(month, year, g.terminationWithdraw);
+            x.bankFee = GetMonthlyPayment(month, year, g.bankFee);
+            x.otherFee = GetMonthlyPayment(month, year, g.otherFee);
+            //TODO:
+            //x.terminationWithdraw = GetMonthlyPayment(month, year, g.terminationWithdraw)
+            //1. Load TerminationWithdraw(month, year)
+            //2. Loan BankFee()
+            //Staviti sve u jednu metodu
+
+
+            return JsonConvert.SerializeObject(x, Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+        }
+    }
+
+    public List<Fee> GetMonthlyPayment(int? month, int year, string recordType) {
+        //TODO: za terminationWithdraw staviti lefto outer join Users
+        List<Fee> xx = new List<Fee>();
+        string sql = string.Format(@"SELECT note, amount FROM Account WHERE mo = '{0}' AND yr = '{1}' AND recordType = '{2}'", month , year , recordType);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        Fee x = new Fee();
+                        x.title = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
+                        x.val = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
+                        xx.Add(x);
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return xx;
+    }
+
+
+
     private double GetTotalVal(string type, int? year) {
         double x = 0;
         string sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE a.recordType = '{0}' {1}"

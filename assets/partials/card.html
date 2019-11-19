@@ -58,7 +58,7 @@
                         <td class="text-right"><span ng-if="x.recordType=='terminationWithdraw'">{{x.amount | number:2}}</span></td>
                         <td class="text-right"><span ng-if="x.recordType=='monthlyFee'||x.recordType=='userPayment'">{{x.amount | number:2}}</span></td>
                         <td class="text-right">
-                            <!--<span ng-if="x.recordType=='repayment'">{{x.restToRepayment | number:2}}</span>-->
+                            <span ng-if="x.recordType=='repayment'">{{x.restToRepayment | number:2}}</span>
                             <span ng-if="x.recordType=='withdraw'">{{x.activatedLoan | number:2}}</span>
                         </td>
                         <td class="text-right"><span ng-if="x.recordType=='repayment' || x.recordType=='manipulativeCosts' || x.recordType=='loan'">{{x.amount | number:2}}</span></td>

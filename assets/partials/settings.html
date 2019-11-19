@@ -139,5 +139,25 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-sm-6 p-3">
+            <div class="card shadow">
+                <div class="card-header">Konto</div>
+                <div class="card-body table-responsive">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td>Backup Folder:</td>
+                            <td><input ng-model="d.backupFolder" class="form-control" /></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-right">
+                                <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fa fa-save"></i> Spremi</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
     <json-directive data="d" debug="config.debug"></json-directive>
 </div>

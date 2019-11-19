@@ -1,6 +1,6 @@
 ﻿{
-  "version": "1.5.7",
-  "date":  "17.11.2019",
+  "version": "1.5.8",
+  "date":  "18.11.2019",
   "appname": "KUP - Janaf",
   "apptitle": "Kasa Uzajamne Pomoći",
   "debug": true,
@@ -77,7 +77,7 @@
       "tpl": "fee",
       "title": "Troškovi Održavanja Računa",
       "ico": "wrench",
-      "type":  "bankFee"
+      "type": "bankFee"
     },
     {
       "tpl": "fee",
@@ -95,6 +95,11 @@
       "tpl": null,
       "title": null,
       "ico": null
+    },
+    {
+      "tpl": "monthlyPayment",
+      "title": "Mjesečna Isplata",
+      "ico": "money-bill-alt"
     },
     {
       "tpl": "suspension",

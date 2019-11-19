@@ -723,6 +723,57 @@
 
 }])
 
+.controller('monthlyPaymentCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+    var service = 'Account';
+
+    var data = {
+        loan: {},
+        records: {},
+        month: f.month(),
+        year: f.year(),
+        limit: $scope.g.recordslimit,
+        pdf: null,
+        loadingPdf: false,
+        loading: false
+    };
+    $scope.d = data;
+
+    var load = (x) => {
+        $scope.d.loading = true;
+        $scope.d.limit = $scope.g.recordslimit;
+        f.post(service, 'LoadMonthlyPayment', { month: x.month, year: x.year }).then((d) => {
+            $scope.d.records = d;
+            $scope.d.loading = false;
+        });
+    }
+
+    $scope.load = (x) => {
+        load(x);
+    }
+
+    $scope.print = (x) => {
+        alert('TODO'); return false;
+        if (f.defined(x.records.length)) {
+            if (x.records.length == 0) { return false; }
+        }
+        $scope.d.pdf = null;
+        $scope.d.loadingPdf = true;
+        f.post('Pdf', 'MonthlyPayment', { month: x.month, year: x.year, records: x.records }).then((d) => {
+            $scope.d.pdf = f.pdfTempPath(d);
+            $scope.d.loadingPdf = false;
+        });
+    }
+
+    $scope.removePdfLink = () => {
+        $scope.d.pdf = null;
+    }
+
+    $scope.readMore = (x) => {
+        $scope.d.limit = $scope.d.limit + x;
+    }
+
+}])
+
 .controller('suspensionCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
         var service = 'Account';
         var data = {
@@ -1186,6 +1237,21 @@
     }
     load();
 
+}])
+
+.controller('backupCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
+    var load = () => {
+        f.post('Settings', 'Load', {}).then((d) => {
+            $scope.d = d;
+        });
+    }
+    load();
+
+    $scope.save = (x) => {
+        f.post('Admin', 'BackupDB', { date: f.setDate(new Date()) }).then((d) => {
+            alert(d);
+        });
+    }
 
 }])
 

@@ -1,0 +1,19 @@
+﻿<div ng-controller="backupCtrl">
+    <div class="row">
+        <div class="col-sm-6 p-3">
+            <div class="card shadow">
+                <div class="card-header">Backup baze podataka</div>
+                <div class="card-body table-responsive">
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <label class="mb-2 mr-sm-2">Backup Folder:</label>
+                            <input ng-model="d.backupFolder" class="form-control mb-2 mr-sm-2" readonly />
+                        </div>
+                        <button ng-click="save(d)" type="submit" class="btn btn-outline-success mb-2 mr-sm-2"><i class="fas fa-trash"></i> Backup</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <json-directive data="d" debug="config.debug"></json-directive>
+</div>
