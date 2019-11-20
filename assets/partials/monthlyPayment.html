@@ -2,12 +2,6 @@
     <div class="row">
         <div class="col-sm-10">
             <form class="form-inline">
-                <!--<div class="form-group">
-                    <select ng-model="d.buisinessUnitCode" class="form-control mb-2 mr-sm-2" name="buissinesUnitCode">
-                        <option value="" selected disabled>Poslovna jedinica</option>
-                        <option ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.title}}</option>
-                    </select>
-                </div>-->
                 <select ng-model="d.month" class="form-control mb-2 mr-sm-2">
                     <option value="" selected disabled>Mjesec</option>
                     <option ng-repeat="x in g.months" value="{{x.id}}">{{x.title}}</option>
@@ -26,18 +20,6 @@
             <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()"><i class="fas fa-download"></i> Preuzmi PDF</a>
         </div>
     </div>
-    <!--<div class="row">
-        <div class="col-sm-3">
-            <form>
-                <div class="input-group mb-3">
-                    <input ng-model="d.search" type="text" class="form-control" placeholder="Pretraži...">
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-primary" type="submit" ng-click="load(d)"><i class="fa fa-search"></i></button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>-->
     <loading-directive loadingtitle="'Učitavanje...'" value="d.loading" size="5"></loading-directive>
     <div ng-if="d.records.loans.data.length>0&&!d.loading" class="table-responsive">
         <table class="table">
@@ -53,7 +35,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="x in d.records.loans.data | limitTo:d.limit track by $index">
+                <tr ng-if="d.records.loans.data.length>0" ng-repeat="x in d.records.loans.data | limitTo:d.limit track by $index">
                     <td>{{x.user.id}}</td>
                     <td>{{x.user.lastName}} {{x.user.firstName}}</td>
                     <td class="text-right">{{x.loan | number:2}}</td>
@@ -73,20 +55,35 @@
                 <tr style="height:50px">
                     <td colspan="7"></td>
                 </tr>
+                <tr ng-if="d.records.terminationWithdraw.length>0" class="bg-light">
+                    <th></th>
+                    <th>Isplata kod iščlanjenja:</th>
+                    <th colspan="5"></th>
+                </tr>
                 <tr ng-if="d.records.terminationWithdraw.length>0" ng-repeat="x in d.records.terminationWithdraw track by $index">
                     <td></td>
-                    <td>{{x.title}} (Ulog)</td>
+                    <td>{{x.title}}</td>
                     <td class="text-right">{{x.val | number:2}}</td>
                     <td class="text-right"></td>
                     <td class="text-right">{{x.val | number:2}}</td>
                     <td class="text-right"></td>
                     <td class="text-right">{{x.val | number:2}}</td>
                 </tr>
+                <tr ng-if="d.records.bankFee.length>0" class="bg-light">
+                    <th></th>
+                    <th>Troškovi održavanja računa:</th>
+                    <th colspan="5"></th>
+                </tr>
                 <tr ng-if="d.records.bankFee.length>0" ng-repeat="x in d.records.bankFee track by $index">
                     <td></td>
                     <td>{{x.title}}</td>
                     <td colspan="4"></td>
                     <td class="text-right">{{x.val | number:2}}</td>
+                </tr>
+                <tr ng-if="d.records.otherFee.length>0" class="bg-light">
+                    <th></th>
+                    <th>Razni materijalni troškovi:</th>
+                    <th colspan="5"></th>
                 </tr>
                 <tr ng-if="d.records.otherFee.length>0" ng-repeat="x in d.records.otherFee track by $index">
                     <td></td>

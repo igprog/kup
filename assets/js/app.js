@@ -751,7 +751,6 @@
     }
 
     $scope.print = (x) => {
-        alert('TODO'); return false;
         if (f.defined(x.records.length)) {
             if (x.records.length == 0) { return false; }
         }

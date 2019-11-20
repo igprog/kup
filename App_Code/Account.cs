@@ -858,9 +858,9 @@ public class Account : System.Web.Services.WebService {
 
     public List<Fee> GetMonthlyPayment(int? month, int year, string recordType) {
         List<Fee> xx = new List<Fee>();
-        string sql, firstName, lastName, note = null;
+        string sql, uid, firstName, lastName, note = null;
         if (recordType == g.terminationWithdraw) {
-            sql = string.Format(@"SELECT u.firstName, u.lastName, a.note, a.amount FROM Account a
+            sql = string.Format(@"SELECT u.id, u.firstName, u.lastName, a.note, a.amount FROM Account a
                                 LEFT OUTER JOIN Users u ON a.userId = u.id
                                 WHERE a.mo = '{0}' AND a.yr = '{1}' AND a.recordType = '{2}'", month, year, recordType);
         } else {
@@ -873,11 +873,12 @@ public class Account : System.Web.Services.WebService {
                     while (reader.Read()) {
                         Fee x = new Fee();
                         if (recordType == g.terminationWithdraw) {
-                            x.val = reader.GetValue(3) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(3));
-                            firstName = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
-                            lastName = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
-                            note = reader.GetValue(2) == DBNull.Value ? null : reader.GetString(2);
-                            x.title = string.Format("{0} {1}", lastName, firstName);
+                            x.val = reader.GetValue(4) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(4));
+                            uid = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
+                            firstName = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
+                            lastName = reader.GetValue(2) == DBNull.Value ? null : reader.GetString(2);
+                            note = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
+                            x.title = string.Format("{0} - {1} {2}", uid, lastName, firstName);
                         } else {
                             x.val = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
                             x.title = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
