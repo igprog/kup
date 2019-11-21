@@ -433,7 +433,7 @@
             return false;
         }
         if (x.terminationWithdraw < 0) {
-            alert('Dug nije podmiren. Iznos duga: ' + x.terminationWithdraw + ' ' + $scope.config.currency);
+            alert('Nije moguće isčlanjenje. Dug je veći od uloga. Iznos duga: ' + x.terminationWithdraw + ' ' + $scope.config.currency);
             return false;
         }
         f.post(service, 'SaveUserStatus', { x: x }).then((d) => {
