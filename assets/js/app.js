@@ -1186,7 +1186,7 @@
         x.type = $scope.g.currTplType;
         x.title = $scope.g.currTplTitle;
         var method = null;
-        if (x.type == 'income' || x.type == 'incomeExpenseDiff') {
+        if (x.type == 'income' || x.type == 'expense' || x.type == 'incomeExpenseDiff') {
             method = 'LoadBalance';
         } else {
             method = 'LoadRecapitulation';

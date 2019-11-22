@@ -19,6 +19,11 @@
     "giroAccountOutput": 2346692.4,
     "date": "2019-09-30"
   },
+  "startBalance1": {
+    "income": 278742.13,
+    "expense": 0,
+    "date": "2019-01-01"
+  },
   "printSettings": {
     "headerInfo": "KUP JANAF\nKasa uzajamne pomoći",
     "orientation": "h"

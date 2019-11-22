@@ -26,6 +26,7 @@ public class Settings : System.Web.Services.WebService {
         public int defaultDedline;
         public Account.AccountNo account;
         public StartBalance startBalance;
+        public StartBalance1 startBalance1;
         public PrintSettings printSettings;
         public string backupFolder;
     }
@@ -33,6 +34,12 @@ public class Settings : System.Web.Services.WebService {
     public class StartBalance {
         public double giroAccountInput;  // Potrazuje
         public double giroAccountOutput;  // Duguje
+        public string date;
+    }
+
+    public class StartBalance1 {
+        public double income;  // Potrazuje
+        public double expense;  // Duguje
         public string date;
     }
 
