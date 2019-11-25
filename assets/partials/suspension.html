@@ -54,16 +54,10 @@
                         <td><span ng-show="x.changed">* </span>{{x.user.id}}</td>
                         <td>{{x.user.lastName}} {{x.user.firstName}}</td>
                         <td class="text-right">{{x.monthlyFee | number:2}}</td>
-                        <td class="text-right">{{x.repayment | number:2}}</td>
+                        <!--<td class="text-right">{{x.repayment | number:2}}</td>-->
+                        <td class="text-right">{{x.currRepayment | number:2}}</td>
                         <td class="text-right">{{x.totalObligation | number:2}}</td>
                     </tr>
-                    <!--<tr ng-repeat="x in d.records.data track by $index" class="{{x.totalObligation !== x.lastMonthObligation ? 'font-weight-bold' : ''}}">
-                        <td><span ng-show="x.totalObligation !== x.lastMonthObligation">* </span>{{x.user.id}}</td>
-                        <td>{{x.user.lastName}} {{x.user.firstName}}</td>
-                        <td class="text-right">{{x.monthlyFee | number:2}}</td>
-                        <td class="text-right">{{x.repayment | number:2}}</td>
-                        <td class="text-right">{{x.totalObligation | number:2}}</td>
-                    </tr>-->
                 </tbody>
                 <tfoot ng-if="d.records.data.length>0" class="thead-light">
                     <tr class="text-right">
@@ -72,7 +66,8 @@
                             <span ng-show="d.buisinessUnitCode!=null && d.buisinessUnitCode!=''">Ukupno:</span>
                         </th>
                         <th>{{d.records.total.monthlyFee | number:2}}</th>
-                        <th>{{d.records.total.repayment | number:2}}</th>
+                        <!--<th>{{d.records.total.repayment | number:2}}</th>-->
+                        <th>{{d.records.total.currRepayment | number:2}}</th>
                         <th>{{d.records.total.totalObligation | number:2}}</th>
                     </tr>
                 </tfoot>

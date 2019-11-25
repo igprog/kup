@@ -951,19 +951,27 @@
     }
 
     $scope.setRepayment = (x, idx) => {
-        $scope.d.records.data[idx].amount = x.repayment;
+        //$scope.d.records.data[idx].amount = x.repayment;
+        $scope.d.records.data[idx].currRepayment = x.repayment;
     }
 
     $scope.save = (x, d, idx) => {
         x.month = d.month;
         x.year = d.year;
-        if (x.amount > x.restToRepayment) {
-            alert('Rata je veća od duga!');
-            return false;
+        //if (x.amount > x.restToRepayment) {
+        //    if (!confirm('Iznos rate veća je od duga! Dali svejedno želite uplatiti iznos?')) {
+        //        return false;
+        //    }
+        //}
+        if (x.currRepayment > x.restToRepayment) {
+            if (!confirm('Iznos rate veća je od duga! Dali svejedno želite uplatiti iznos?')) {
+                return false;
+            }
         }
         f.post('Account', 'SaveRepayment', { x: x }).then((d) => {
             $scope.d.records.data[idx].repaid = d.repaid;
-            $scope.d.records.data[idx].amount = d.amount;
+            //$scope.d.records.data[idx].amount = d.amount;
+            $scope.d.records.data[idx].currRepayment = d.currRepayment;
             $scope.d.records.data[idx].restToRepayment = d.restToRepayment;
         });
     }

@@ -228,9 +228,12 @@ public class User : System.Web.Services.WebService {
     }
 
     private void SaveTerminationRepayment(NewUser x) {
-        string sql = string.Format(@"BEGIN TRAN                                    
-                                        INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-                                        VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
+        string sql = string.Format(@"BEGIN TRAN 
+                                        BEGIN                                   
+                                            INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+                                            VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}');
+                                            UPDATE Loan SET isRepaid = 1 WHERE id = '{7}';
+                                        END
                                     COMMIT TRAN", Guid.NewGuid().ToString(), x.id, x.restToRepayment, x.terminationDate, g.GetMonth(x.terminationDate), g.GetYear(x.terminationDate), g.repayment, x.activeLoanId, "Dug odbijen od uloga");
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();

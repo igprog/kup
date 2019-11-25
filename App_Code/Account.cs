@@ -36,6 +36,7 @@ public class Account : System.Web.Services.WebService {
         public double loan;
         public string loanDate;
         public double repayment;
+        public double currRepayment;
         public double lastRepayment;
         public string repaymentDate;
         public double restToRepayment;
@@ -69,6 +70,7 @@ public class Account : System.Web.Services.WebService {
         public double input;
         public double output;
         public double manipulativeCosts;
+        public double currRepayment; // uplacena pozajmica
 
         public List<RecapMonthlyTotal> monthlyTotalList;  // TODO
     }
@@ -190,6 +192,7 @@ public class Account : System.Web.Services.WebService {
     public string SaveRepayment(NewAccount x) {
         try {
             x.recordType = g.repayment;
+            x.amount = x.currRepayment;
             return JsonConvert.SerializeObject(Save(x), Formatting.None);
         } catch (Exception e) {
             return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.None);
@@ -306,6 +309,7 @@ public class Account : System.Web.Services.WebService {
                     x.loan = 0;
                     x.loanDate = null;
                     x.repayment = 0;
+                    x.currRepayment = 0;
                     x.repaymentDate = null;
                     x.repaid = 0;
                     x.restToRepayment = 0;
@@ -313,13 +317,17 @@ public class Account : System.Web.Services.WebService {
                     //x = CheckLoan(x, user.id, month, year);  //TODO
                 }
                 x = CheckLoan(x, user.id);  //TODO
+                if (x.recordType == g.repayment) {
+                    x.currRepayment = x.amount;
+                }
                 //x = CheckLastRepayment(x, user.id);  //TODO???
                 x.user = user;
                 xx.data.Add(x);
             }
             xx.total = new Total();
-          //  xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
-            xx.total.repayment = xx.data.Sum(a => a.amount);
+            //  xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
+            // xx.total.repayment = xx.data.Sum(a => a.amount);
+            xx.total.currRepayment = xx.data.Sum(a => a.currRepayment);
             xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
           //  xx.total.totalObligation = xx.data.Sum(a => a.totalObligation);
             return JsonConvert.SerializeObject(xx, Formatting.None);
@@ -338,7 +346,14 @@ public class Account : System.Web.Services.WebService {
             xx.data = new List<NewAccount>();
             foreach(User.NewUser user in users) {
                 NewAccount x = new NewAccount();
-                x = GetRecord(user.id, month, year, null);
+                //x = GetRecord(user.id, month, year, null);
+                List<NewAccount> xxx = new List<NewAccount>();
+                xxx = GetRecords(user.id, month, year, null);
+                if (xxx.Count > 0) {
+                    x = xxx.First();
+                    x.monthlyFee = xxx.Where(a => a.recordType == g.monthlyFee || a.recordType == g.userPayment).Sum(a => a.amount);
+                    x.currRepayment = xxx.Where(a => a.recordType == g.repayment).Sum(a => a.amount);
+                }
                 if (string.IsNullOrEmpty(x.id)) {
                     x.id = Guid.NewGuid().ToString();
                     x.user = user;
@@ -353,6 +368,7 @@ public class Account : System.Web.Services.WebService {
                     x.loan = 0;
                     x.loanDate = null;
                     x.repayment = 0;
+                    x.currRepayment = 0;
                     x.repaymentDate = null;
                     x.repaid = 0;
                     x.restToRepayment = 0;
@@ -362,6 +378,7 @@ public class Account : System.Web.Services.WebService {
                 x = CheckLoan(x, user.id);
                 x = CheckMonthlyFee(x, user.id, g.monthlyFee);
                 x.totalObligation = x.monthlyFee + x.repayment;
+
 
                 // ***** Check last month obligation *****
                 NewAccount lastMonth = new NewAccount();
@@ -385,8 +402,10 @@ public class Account : System.Web.Services.WebService {
             }
             xx.total = new Total();
             xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
-            xx.total.repayment = xx.data.Sum(a => a.repayment);
+            //xx.total.repayment = xx.data.Sum(a => a.repayment);
+            xx.total.currRepayment = xx.data.Sum(a => a.currRepayment);
             xx.total.totalObligation = xx.data.Sum(a => a.totalObligation);
+            //xx.total.amount = xx.data.Sum(a => a.amount);
             if (changed) {
                 xx.data = xx.data.Where(a => a.changed == true).ToList();
             }
@@ -1277,6 +1296,29 @@ public class Account : System.Web.Services.WebService {
         return x;
     }
 
+    public List<NewAccount> GetRecords(string userId, int month, int year, string recordType) {
+        string sql = string.Format(@"SELECT * FROM Account WHERE userId = '{0}' AND mo = '{1}' AND yr = '{2}' {3}"
+                                , userId
+                                , month
+                                , year
+                                , !string.IsNullOrEmpty(recordType) ? string.Format("AND recordType = '{0}'", recordType) : "");
+        List<NewAccount> xx = new List<NewAccount>();
+        NewAccount x = new NewAccount();
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = ReadData(reader);
+                        xx.Add(x);
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return xx;
+    }
+
     public List<NewAccount> GetRecords(string userId, int? year) {
         db.Account();
         db.Loan();
@@ -1428,12 +1470,21 @@ public class Account : System.Web.Services.WebService {
                     SELECT a.userId, a.amount, u.monthlyFee FROM Account a
                     LEFT OUTER JOIN Users u
                     ON a.userId = u.id
-                    WHERE a.userId = '{0}' AND a.mo = '{1}' AND a.yr = '{2}' AND (a.recordType = '{3}' OR a.recordType = '{4}')"
+                    WHERE a.userId = '{0}' AND a.mo = '{1}' AND a.yr = '{2}' AND a.recordType = '{3}'"
                        , userId
                        , x.month
                        , x.year
-                       , g.monthlyFee
-                       , g.terminationWithdraw);
+                       , g.monthlyFee);
+        //string sql = string.Format(@"
+        //            SELECT a.userId, a.amount, u.monthlyFee FROM Account a
+        //            LEFT OUTER JOIN Users u
+        //            ON a.userId = u.id
+        //            WHERE a.userId = '{0}' AND a.mo = '{1}' AND a.yr = '{2}' AND (a.recordType = '{3}' OR a.recordType = '{4}')"
+        //               , userId
+        //               , x.month
+        //               , x.year
+        //               , g.monthlyFee
+        //               , g.terminationWithdraw);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
