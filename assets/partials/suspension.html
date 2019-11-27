@@ -54,7 +54,6 @@
                         <td><span ng-show="x.changed">* </span>{{x.user.id}}</td>
                         <td>{{x.user.lastName}} {{x.user.firstName}}</td>
                         <td class="text-right">{{x.monthlyFee | number:2}}</td>
-                        <!--<td class="text-right">{{x.repayment | number:2}}</td>-->
                         <td class="text-right">{{x.currRepayment | number:2}}</td>
                         <td class="text-right">{{x.totalObligation | number:2}}</td>
                     </tr>
@@ -66,7 +65,6 @@
                             <span ng-show="d.buisinessUnitCode!=null && d.buisinessUnitCode!=''">Ukupno:</span>
                         </th>
                         <th>{{d.records.total.monthlyFee | number:2}}</th>
-                        <!--<th>{{d.records.total.repayment | number:2}}</th>-->
                         <th>{{d.records.total.currRepayment | number:2}}</th>
                         <th>{{d.records.total.totalObligation | number:2}}</th>
                     </tr>

@@ -377,7 +377,7 @@ public class Account : System.Web.Services.WebService {
                 }
                 x = CheckLoan(x, user.id);
                 x = CheckMonthlyFee(x, user.id, g.monthlyFee);
-                x.totalObligation = x.monthlyFee + x.repayment;
+                x.totalObligation = x.monthlyFee + x.currRepayment;
 
 
                 // ***** Check last month obligation *****

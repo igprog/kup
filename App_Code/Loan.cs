@@ -220,6 +220,7 @@ public class Loan : System.Web.Services.WebService {
         xx.total.manipulativeCosts = xx.data.Sum(a => a.manipulativeCosts);
         xx.total.actualLoan = xx.data.Sum(a => a.actualLoan);
         xx.total.withdraw = xx.data.Sum(a => a.withdraw);
+        xx.total.lastLoanToRepaid = xx.total.actualLoan - xx.total.withdraw;
         xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
         xx.monthlyTotal = new List<MonthlyTotal>();
         xx.monthlyTotal = GetMonthlyTotal(xx.data);
