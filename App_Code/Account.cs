@@ -492,7 +492,8 @@ public class Account : System.Web.Services.WebService {
         x.output = l.GetLoansTotal(month, year);
         Loan.Loans loans = l.LoadData(month, year, null, null);
         //x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input) + loans.total.restToRepayment; TODO: ?? restToRepayment dali to treba
-        x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input);
+        //x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input);
+        x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input) + xx.Where(a => a.recordType == g.loan).Sum(a => a.input);
         x.account = GetAccountNo(g.loan);
         if (x.output > 0 || x.input > 0) {
             xxx.Add(x);
