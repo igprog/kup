@@ -536,7 +536,7 @@ public class Account : System.Web.Services.WebService {
         }
 
         x = new Recapitulation();
-        x.note = "Ostali troškovi";
+        x.note = "Razni materijalni troškovi";
         x.output = xx.Where(a => a.recordType == g.otherFee).Sum(a => a.input);
         x.input = 0;
         x.account = GetAccountNo(g.otherFee);
@@ -882,7 +882,7 @@ public class Account : System.Web.Services.WebService {
             x.terminationWithdraw = GetMonthlyPayment(month, year, g.terminationWithdraw);
             x.bankFee = GetMonthlyPayment(month, year, g.bankFee);
             x.otherFee = GetMonthlyPayment(month, year, g.otherFee);
-            x.total = x.loans.total.withdraw + x.terminationWithdraw.Sum(a => a.val) + x.bankFee.Sum(a => a.val);
+            x.total = x.loans.total.withdraw + x.terminationWithdraw.Sum(a => a.val) + x.bankFee.Sum(a => a.val) + x.otherFee.Sum(a => a.val);
             return JsonConvert.SerializeObject(x, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
@@ -1128,7 +1128,7 @@ public class Account : System.Web.Services.WebService {
                     x.total.note = string.Format("Promet Žiro-Računa {0}/{1}", g.Month(i), year);
                     x.total.accountBalance = x.total.outputAccumulation - x.total.inputAccumulation;
                 } else if (type == g.otherFee) {
-                    x.total.note = "Ostali troškovi";
+                    x.total.note = "Razni materijalni troškovi";
                 }
                 else {
                     x.total.note = null; // data.Where(a => a.month.ToString() == i.ToString()).FirstOrDefault().note;

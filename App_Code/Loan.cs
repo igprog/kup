@@ -115,6 +115,7 @@ public class Loan : System.Web.Services.WebService {
                                                    UPDATE Loan SET userId = '{1}', loan = '{2}', loanDate = '{3}', repayment = '{4}', manipulativeCosts = '{5}', withdraw = '{6}', dedline = '{7}', isRepaid = '{8}', note = '{9}' WHERE id = '{0}';
                                                    UPDATE Account SET userId = '{1}', amount = '{5}', recordDate = '{3}', mo = '{10}', yr = '{11}', note = 'Manipulativni troškovi' WHERE loanId = '{0}' AND recordType = 'manipulativeCosts';
                                                    UPDATE Account SET userId = '{1}', amount = '{6}', recordDate = '{3}', mo = '{10}', yr = '{11}', note = 'Isplata pozajmice' WHERE loanId = '{0}' AND recordType = 'withdraw';
+                                                   UPDATE Account SET userId = '{1}', recordDate = '{3}', mo = '{10}', yr = '{11}' WHERE loanId = '{0}' AND recordType = 'loan';
                                                 END
                                             ELSE
                                                 BEGIN

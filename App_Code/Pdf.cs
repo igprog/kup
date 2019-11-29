@@ -580,7 +580,7 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
                     totValue = g.Currency(records.total.interest);
                     break;
                 case "otherFee":
-                    typeTitle = "Ostali troškovi";
+                    typeTitle = "Razni materijalni troškovi";
                     totValue = g.Currency(records.total.otherFee);
                     break;
             }
