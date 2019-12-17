@@ -19,7 +19,8 @@
     <div ng-if="d.records.data.length>0 && !g.clearView" >
         Konto: {{d.records.account}}
     </div>
-    <div ng-if="d.records.data.length>0 && !g.clearView" class="table-responsive">
+    <loading-directive loadingtitle="'Učitavanje...'" value="d.loading" size="5"></loading-directive>
+    <div ng-if="d.records.data.length>0&&!g.clearView&&!d.loading" class="table-responsive">
         <table class="table">
             <thead>
                 <tr>

@@ -37,6 +37,8 @@ public class Loan : System.Web.Services.WebService {
         public int isRepaid;
         public string note;
         public double manipulativeCostsCoeff;
+        public bool includeManipulativeCosts; // ovo je za slucaj ako se greckom uplati na neciji žiro racun iako nije trazio pozajmicu, u tom slucaju treba biti false
+        public bool repaidOldDebt;  // ovo je za slucaj ako se greckom uplati na neciji žiro racun iako nije trazio pozajmicu, u tom slucaju treba biti false
         public BuisinessUnit.NewUnit buisinessUnit;
     }
 
@@ -77,6 +79,8 @@ public class Loan : System.Web.Services.WebService {
         x.isRepaid = 0;
         x.note = null;
         x.manipulativeCostsCoeff = s.Data().manipulativeCostsCoeff;
+        x.includeManipulativeCosts = true;
+        x.repaidOldDebt = true;
         x.buisinessUnit = new BuisinessUnit.NewUnit();
         return JsonConvert.SerializeObject(x, Formatting.Indented);
     }
@@ -104,7 +108,7 @@ public class Loan : System.Web.Services.WebService {
                 isNewLoan = true;
             }
 
-            if (isNewLoan && x.user.restToRepayment > 0) {
+            if (isNewLoan && x.user.restToRepayment > 0 && x.repaidOldDebt) {  // x.repaidOldDebt je za slucaj ako se greckom uplati na neciji žiro racun iako nije trazio pozajmicu, u tom slucaju treba biti false
                 UpdateActiveLoan(x);  //********** Ako postoji pozajmica koja nije otplacena onda se ona otplacuje sa dijelom nove pozajmice.
             }
 

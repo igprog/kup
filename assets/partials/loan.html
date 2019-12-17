@@ -41,13 +41,19 @@
                             <label for="repayment">Mjesečna rata:</label>
                             <input ng-model="d.loan.repayment" type="text" class="form-control" name="repayment" ng-change="calculateDedline(d.loan)" allow-only-numbers>
                         </div>
+                        <hr />
                         <div class="form-group">
+                            <input ng-model="d.loan.includeManipulativeCosts" type="checkbox" id="manipulativeCosts" ng-change="calculate(d.loan)" />
                             <label for="manipulativeCosts">Manipulativni troškovi ({{d.loan.manipulativeCostsCoeff * 100}}%):</label>
-                            <input ng-model="d.loan.manipulativeCosts" type="text" class="form-control" name="manipulativeCosts" ng-change="calculate(d.loan)" allow-only-numbers>
+                            <input ng-model="d.loan.manipulativeCosts" type="text" class="form-control" name="manipulativeCosts" ng-change="calculate(d.loan)" allow-only-numbers disabled>
+                        </div>
+                        <div ng-if="d.loan.user.restToRepayment>0" class="form-group">
+                            <input ng-model="d.loan.repaidOldDebt" type="checkbox" id="repaidOldDebt" ng-change="calculate(d.loan)" />
+                            <label for="repaidOldDebt">Otplati stari dug ({{d.loan.user.restToRepayment | number:2}} kn):</label>
                         </div>
                         <div class="form-group">
                             <label for="withdraw">Za isplatu:</label>
-                            <input ng-model="d.loan.withdraw" type="text" class="form-control" name="withdraw" ng-change="calculate(d.loan)" allow-only-numbers>
+                            <input ng-model="d.loan.withdraw" type="text" class="form-control" name="withdraw" allow-only-numbers disabled>
                         </div>
                         <div class="text-right">
                             <button class="btn btn-outline-danger" ng-click="remove(d.loan)" title="Briši"><i class="fas fa-trash-alt"></i> Briši</button>

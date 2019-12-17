@@ -605,9 +605,17 @@
 
     $scope.calculate = (x) => {
         if (x.loan > 0) {
-            $scope.d.loan.manipulativeCosts = x.loan * x.manipulativeCostsCoeff;
+            if (x.includeManipulativeCosts) {
+                $scope.d.loan.manipulativeCosts = x.loan * x.manipulativeCostsCoeff;
+            } else {
+                $scope.d.loan.manipulativeCosts = 0;
+            }
+            if (x.repaidOldDebt) {
+                $scope.d.loan.withdraw = $scope.d.loan.loan - $scope.d.loan.user.restToRepayment - $scope.d.loan.manipulativeCosts;
+            } else {
+                $scope.d.loan.withdraw = $scope.d.loan.loan - $scope.d.loan.manipulativeCosts;
+            }
             $scope.d.loan.repayment = (x.loan / x.dedline).toFixed(0);
-            $scope.d.loan.withdraw = $scope.d.loan.loan - $scope.d.loan.user.restToRepayment - $scope.d.loan.manipulativeCosts;
         }
     }
 
@@ -658,8 +666,12 @@
 
     $scope.getUser = (id) => {
         if (id !== null) {
-            f.post('User', 'Get', { id: id, year: null }).then((d) => {
-                $scope.d.loan.user = d;
+            f.post(service, 'Init', {}).then((d) => {
+                $scope.d.loan = d;
+                $scope.d.loan.loanDate = new Date();
+                f.post('User', 'Get', { id: id, year: null }).then((d) => {
+                    $scope.d.loan.user = d;
+                });
             });
         }
     }
@@ -1186,7 +1198,8 @@
         type: $scope.g.currTplType,
         title: $scope.g.currTplTitle,
         pdf: null,
-        loadingPdf: false
+        loadingPdf: false,
+        loading: false
     }
     $scope.d = data;
 
@@ -1199,9 +1212,11 @@
         } else {
             method = 'LoadRecapitulation';
         }
+        $scope.d.loading = true;
         f.post(service, method, { year: x.year, type: x.type }).then((d) => {
             $scope.d.records = d;
             $scope.g.clearView = false;
+            $scope.d.loading = false;
         });
     }
 
