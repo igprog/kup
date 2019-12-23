@@ -22,7 +22,7 @@ public class User : System.Web.Services.WebService {
     Global g = new Global();
     Account a = new Account();
     Settings s = new Settings();
-    string sqlString = @"SELECT u.id, u.buisinessUnitCode, u.firstName, u.lastName, u.pin, u.birthDate, u.accessDate, u.terminationDate, u.isActive, u.monthlyFee, b.id, b.title FROM Users u
+    string sqlString = @"SELECT DISTINCT u.id, u.buisinessUnitCode, u.firstName, u.lastName, u.pin, u.birthDate, u.accessDate, u.terminationDate, u.isActive, u.monthlyFee, b.id, b.title FROM Users u
                         LEFT OUTER JOIN BuisinessUnit b
                         ON u.buisinessUnitCode = b.code";
 
