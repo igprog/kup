@@ -58,6 +58,8 @@ public class Account : System.Web.Services.WebService {
         public double userPaymentWithMonthlyFee;
         public double userPaymentWithMonthlyFeeTotal;
         public double repayment;
+        public double userRepayment;
+        public double repaymentTotal;
         public double restToRepayment;
         public double totalObligation;
         public double terminationWithdraw;
@@ -120,6 +122,8 @@ public class Account : System.Web.Services.WebService {
         public string month;
         public int year;
         public string note;
+        public string type;
+        public string loanId;
     }
 
     // ***** Konto *****
@@ -175,13 +179,14 @@ public class Account : System.Web.Services.WebService {
             NewAccount x = new NewAccount();
             x.user = new User.NewUser();
             x.user.id = userId;
-            x.recordType = g.userPayment;
+            x.recordType = y.type; // g.userPayment;
             x.amount = y.amount;
             x.id = y.id;
             x.recordDate = y.recordDate;
             x.month = y.month;
             x.year = y.year;
             x.note = y.note;
+            x.loanId = y.loanId;
             return JsonConvert.SerializeObject(Save(x), Formatting.None);
         } catch (Exception e) {
             return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.None);
@@ -267,7 +272,7 @@ public class Account : System.Web.Services.WebService {
                     //x = CheckLoan(x, user.id, month, year);  //TODO
                 }
                 x = CheckMonthlyFee(x, user.id, g.monthlyFee);
-                x.userPayment = GetUserPayment(x, user.id);
+                x.userPayment = GetUserPayment(x, user.id, g.userPayment);
                 x.userPaymentTotal = x.userPayment.Sum(a => a.amount);
                 x.user = user;
                 xx.data.Add(x);
@@ -317,6 +322,10 @@ public class Account : System.Web.Services.WebService {
                     //x = CheckLoan(x, user.id, month, year);  //TODO
                 }
                 x = CheckLoan(x, user.id);  //TODO
+
+                x.userPayment = GetUserPayment(x, user.id, g.userRepayment);
+                x.userPaymentTotal = x.userPayment.Sum(a => a.amount);
+
                 if (x.recordType == g.repayment) {
                     x.currRepayment = x.amount;
                 }
@@ -1354,7 +1363,7 @@ public class Account : System.Web.Services.WebService {
                         x = CheckLoan(x, userId);
                         x.activatedLoan = GetActivatedLoan(Convert.ToInt32(x.month), x.year, userId);
                         x = CheckMonthlyFee(x, userId, g.monthlyFee);
-                        x.userPayment = GetUserPayment(x, userId);
+                        x.userPayment = GetUserPayment(x, userId, g.userPayment);
                         x.userPaymentTotal = x.userPayment.Sum(a => a.amount);
                         xx.Add(x);
                     }
@@ -1516,14 +1525,21 @@ public class Account : System.Web.Services.WebService {
         return x;
     }
 
-    public List<UserPayment> GetUserPayment(NewAccount x, string userId) {
+    public List<UserPayment> GetUserPayment(NewAccount x, string userId, string type) {
+        //string sql = string.Format(@"
+        //            SELECT a.id, a.recordDate, a.amount, a.note FROM Account a
+        //            WHERE a.userId = '{0}' AND a.mo = '{1}' AND a.yr = '{2}' AND a.recordType = '{3}'"
+        //               , userId
+        //               , x.month
+        //               , x.year
+        //               , g.userPayment);
         string sql = string.Format(@"
                     SELECT a.id, a.recordDate, a.amount, a.note FROM Account a
                     WHERE a.userId = '{0}' AND a.mo = '{1}' AND a.yr = '{2}' AND a.recordType = '{3}'"
-                       , userId
-                       , x.month
-                       , x.year
-                       , g.userPayment);
+                    , userId
+                    , x.month
+                    , x.year
+                    , type);
         List<UserPayment> xx = new List<UserPayment>();
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
@@ -1548,8 +1564,12 @@ public class Account : System.Web.Services.WebService {
         double repaid = 0;
         string sql = string.Format(@"
                     SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
-                    WHERE a.userId = '{0}' AND a.recordType = '{1}' AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) <= CAST('{2}-{3}-01' AS datetime)) AND a.loanId = '{4}'"
-                       , x.user.id, g.repayment, x.year, g.Month(Convert.ToInt32(x.month)), x.loanId);
+                    WHERE a.userId = '{0}' AND (a.recordType = '{1}' OR a.recordType = '{2}')  AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) <= CAST('{3}-{4}-01' AS datetime)) AND a.loanId = '{5}'"
+                       , x.user.id, g.repayment, g.userRepayment, x.year, g.Month(Convert.ToInt32(x.month)), x.loanId);
+        //string sql = string.Format(@"
+        //            SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
+        //            WHERE a.userId = '{0}' AND a.recordType = '{1}' AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) <= CAST('{2}-{3}-01' AS datetime)) AND a.loanId = '{4}'"
+        //               , x.user.id, g.repayment, x.year, g.Month(Convert.ToInt32(x.month)), x.loanId);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -1590,10 +1610,17 @@ public class Account : System.Web.Services.WebService {
         double loan = 0;
         string sql = string.Format(@"
                     SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
-                    {0} a.recordType = '{1}' AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{2}-01-01' AS datetime))"
+                    {0} (a.recordType = '{1}' OR a.recordType = '{2}') AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{3}-01-01' AS datetime))"
                        , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE a.userId = '{0}' AND", userId)
                        , g.repayment
+                       , g.userRepayment
                        , year);
+        //string sql = string.Format(@"
+        //            SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
+        //            {0} a.recordType = '{1}' AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{2}-01-01' AS datetime))"
+        //               , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE a.userId = '{0}' AND", userId)
+        //               , g.repayment
+        //               , year);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {

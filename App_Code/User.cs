@@ -275,7 +275,7 @@ public class User : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
-            x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment);
+            x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment) - GetAmount(id, g.userRepayment);
             x.totalMebershipFees = GetAmount(id, g.monthlyFee);
             x.totalUserPayment = GetAmount(id, g.userPayment);
             x.totalWithdrawn = GetAmount(id, g.terminationWithdraw);
@@ -294,6 +294,8 @@ public class User : System.Web.Services.WebService {
                 x.total.userPaymentWithMonthlyFeeTotal = a.GetMonthlyFeeStartBalance(id, year) + x.total.userPaymentWithMonthlyFee;
                 //x.total.repayment = x.records.Where(r => r.recordType == g.repayment).Sum(r => r.amount);
                 x.total.repayment = x.records.Where(r => r.recordType == g.repayment || r.recordType == g.loan).Sum(r => r.amount);
+                x.total.userRepayment = x.records.Where(r => r.recordType == g.userRepayment).Sum(r => r.amount);
+                x.total.repaymentTotal = x.total.repayment + x.total.userRepayment;
                 x.total.terminationWithdraw = x.records.Where(r => r.recordType == g.terminationWithdraw).Sum(r => r.amount);
                 x.total.activatedLoan = x.records.Where(r => r.recordType == g.withdraw).Sum(r => r.activatedLoan);
                 x.total.loanToRepaid = a.GetLoanStartBalance(id, year) + x.total.activatedLoan;

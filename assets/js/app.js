@@ -885,7 +885,9 @@
             userId: x.user.id,
             recordDate: new Date(),
             amount: null,
-            note: 'Uplata korisnika'
+            note: 'Uplata korisnika',
+            type: 'userPayment',
+            loanId: null
         });
     }
 
@@ -954,6 +956,11 @@
         $scope.d.limit = $scope.g.recordslimit;
         f.post(service, 'GetLoanUsers', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
             $scope.d.records = d;
+            angular.forEach(d.data, function (value1, key1) {
+                angular.forEach(value1.userPayment, function (value2, key2) {
+                    $scope.d.records.data[key1].userPayment[key2].recordDate = new Date(value2.recordDate);
+                });
+            });
             $scope.d.loading = false;
         });
     }
@@ -979,6 +986,39 @@
             $scope.d.records.data[idx].currRepayment = d.currRepayment;
             $scope.d.records.data[idx].restToRepayment = d.restToRepayment;
         });
+    }
+
+    $scope.add = (x, idx) => {
+        x.userPayment.push({
+            id: null,
+            userId: x.user.id,
+            recordDate: new Date(),
+            amount: null,
+            note: 'Uplata korisnika',
+            type: 'userRepayment',
+            loanId: x.loanId
+        });
+    }
+
+    $scope.saveUserPayment = (x, y, d, idx) => {
+        if (y.amount <= 0) {
+            alert('Unesit iznos.');
+            return false;
+        }
+        y.month = d.month;
+        y.year = d.year;
+        y.recordDate = f.setDate(y.recordDate);
+        f.post('Account', 'SaveUserPayment', { userId: x.user.id, y: y }).then((d) => {
+            getMonthlyRecords($scope.d);
+        });
+    }
+
+    $scope.removeUserPayment = (y) => {
+        if (confirm('Briši uplatu ' + y.amount + ' ' + $scope.config.currency + '?')) {
+            f.post('Account', 'Delete', { id: y.id }).then((d) => {
+                getMonthlyRecords($scope.d);
+            });
+        }
     }
 
     $scope.print = (x) => {

@@ -27,6 +27,7 @@ namespace Igprog {
         public string otherFee = "otherFee";
         public string terminationWithdraw = "terminationWithdraw";
         public string userPayment = "userPayment";
+        public string userRepayment = "userRepayment";
         #endregion RecordType
         public string giroaccount = "giroaccount";
         public string loan = "loan";  // otplata novom pozajmicom ?

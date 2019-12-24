@@ -58,8 +58,42 @@
                         <td>{{x.user.id}}</td>
                         <td>{{x.user.lastName}} {{x.user.firstName}}</td>
                         <td class="text-right">{{x.repayment | number:2}}<button class="btn btn-outline-primary ml-2" ng-click="setRepayment(x, $index)"><i class="fa fa-arrow-circle-right"></i></button></td>
-                        <!--<td class="text-right"><input ng-model="x.amount" class="form-control text-right" allow-only-numbers /></td>-->
-                        <td class="text-right"><input ng-model="x.currRepayment" class="form-control text-right" allow-only-numbers /></td>
+                        
+                        <td>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Obustava na plaći:</span>
+                                </div>
+                                <input ng-model="x.currRepayment" class="form-control text-right" allow-only-numbers />
+                            </div>
+                            <div ng-if="x.userPayment.length>0" ng-repeat="y in x.userPayment" class="card bg-light m-2 shadow">
+                                <div class="card-header">
+                                    <label>Uplata korisnika</label>
+                                </div>
+                                <div class="card-body">
+                                    <label>Datum:</label>
+                                    <input ng-model="y.recordDate" type="date" onkeydown="return false" class="form-control mb-2" />
+                                    <label>Iznos:</label>
+                                    <div class="input-group mb-2">
+                                        <input ng-model="y.amount" class="form-control text-right" allow-only-numbers />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">{{config.currency}}</span>
+                                        </div>
+                                    </div>
+                                    <label>Napomena:</label>
+                                    <input ng-model="y.note" class="form-control mb-2" />
+                                    <div class="pt-2 text-right">
+                                        <button ng-if="y.id!==null" class="btn btn-outline-danger" ng-click="removeUserPayment(y)" title="Briši"><i class="fas fa-trash-alt"></i> Briši</button>
+                                        <button class="btn btn-outline-secondary" ng-click="saveUserPayment(x, y, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pt-2">
+                                <button class="btn btn-outline-primary" ng-click="add(x, $index)" title="Dodaj novu uplatu"><i class="fas fa-plus"></i> Uplata korisnika</button>
+                            </div>
+                        </td>
+                        
+                        <!--<td class="text-right"><input ng-model="x.currRepayment" class="form-control text-right" allow-only-numbers /></td>-->
                         <td class="text-right">{{x.restToRepayment | number:2}}</td>
                         <td><input ng-model="x.note" class="form-control" /></td>
                         <td class="text-right"><button class="btn btn-outline-primary" ng-click="save(x, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button></td>
