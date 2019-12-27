@@ -484,8 +484,13 @@ public class Account : System.Web.Services.WebService {
         x.note = "Žiro račun";
         x.output = xx.Where(a => a.recordType == g.monthlyFee).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.userPayment).Sum(a => a.input)
+            + xx.Where(a => a.recordType == g.userRepayment).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.repayment).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.interest).Sum(a => a.input);
+        //x.output = xx.Where(a => a.recordType == g.monthlyFee).Sum(a => a.input)
+        //    + xx.Where(a => a.recordType == g.userPayment).Sum(a => a.input)
+        //    + xx.Where(a => a.recordType == g.repayment).Sum(a => a.input)
+        //    + xx.Where(a => a.recordType == g.interest).Sum(a => a.input);
         x.input = xx.Where(a => a.recordType == g.withdraw).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.bankFee).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input)
@@ -500,9 +505,10 @@ public class Account : System.Web.Services.WebService {
         Loan l = new Loan();
         x.output = l.GetLoansTotal(month, year);
         Loan.Loans loans = l.LoadData(month, year, null, null);
-        //x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input) + loans.total.restToRepayment; TODO: ?? restToRepayment dali to treba
-        //x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input);
-        x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input) + xx.Where(a => a.recordType == g.loan).Sum(a => a.input);
+        x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input)
+            + xx.Where(a => a.recordType == g.userRepayment).Sum(a => a.input)
+            + xx.Where(a => a.recordType == g.loan).Sum(a => a.input);
+        //x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input) + xx.Where(a => a.recordType == g.loan).Sum(a => a.input);
         x.account = GetAccountNo(g.loan);
         if (x.output > 0 || x.input > 0) {
             xxx.Add(x);
@@ -1252,6 +1258,9 @@ public class Account : System.Web.Services.WebService {
     public NewAccount Save(NewAccount x) {
         try {
             db.Account();
+            if (string.IsNullOrEmpty(x.id)) {
+                x.id = Guid.NewGuid().ToString();
+            }
             //  double lastRepayment = GetRecord(x.user.id, x.month, x.year).repayment;  // ***** in case of update repaiment  *****
             string sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Account WITH (updlock,serializable) WHERE id = '{0}')
@@ -1263,7 +1272,7 @@ public class Account : System.Web.Services.WebService {
                                                    INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
                                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
                                                 END
-                                        COMMIT TRAN", string.IsNullOrEmpty(x.id) ? Guid.NewGuid().ToString() : x.id, x.user.id, x.amount, x.recordDate, x.month, x.year, x.recordType, x.loanId, x.note);
+                                        COMMIT TRAN", x.id, x.user.id, x.amount, x.recordDate, x.month, x.year, x.recordType, x.loanId, x.note);
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -1534,7 +1543,7 @@ public class Account : System.Web.Services.WebService {
         //               , x.year
         //               , g.userPayment);
         string sql = string.Format(@"
-                    SELECT a.id, a.recordDate, a.amount, a.note FROM Account a
+                    SELECT a.id, a.recordDate, a.amount, a.note, a.recordType FROM Account a
                     WHERE a.userId = '{0}' AND a.mo = '{1}' AND a.yr = '{2}' AND a.recordType = '{3}'"
                     , userId
                     , x.month
@@ -1551,6 +1560,7 @@ public class Account : System.Web.Services.WebService {
                         up.recordDate = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
                         up.amount = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
                         up.note = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
+                        up.type = reader.GetValue(4) == DBNull.Value ? null : reader.GetString(4);
                         xx.Add(up);
                     }
                 }
