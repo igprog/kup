@@ -1265,12 +1265,12 @@ public class Account : System.Web.Services.WebService {
             string sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Account WITH (updlock,serializable) WHERE id = '{0}')
                                                 BEGIN
-                                                   UPDATE Account SET userId = '{1}', amount = '{2}', recordDate = '{3}', mo = '{4}', yr = '{5}', recordType = '{6}', loanId = '{7}', note = '{8}' WHERE id = '{0}'
+                                                   UPDATE Account SET userId = '{1}', amount = '{2}', recordDate = '{3}', mo = '{4}', yr = '{5}', recordType = '{6}', loanId = '{7}', note = N'{8}' WHERE id = '{0}'
                                                 END
                                             ELSE
                                                 BEGIN
                                                    INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-                                                   VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
+                                                   VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', N'{8}')
                                                 END
                                         COMMIT TRAN", x.id, x.user.id, x.amount, x.recordDate, x.month, x.year, x.recordType, x.loanId, x.note);
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
