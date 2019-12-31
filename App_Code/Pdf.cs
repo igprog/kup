@@ -882,7 +882,7 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
             doc.Add(p);
 
             PdfPTable table = new PdfPTable(5);
-            table.HeaderRows = 1;
+            //table.HeaderRows = 1;  //TODO
             table.WidthPercentage = 100f;
             table.SetWidths(new float[] { 1f, 2f, 1f, 1f, 1f });
             table.AddCell(new PdfPCell(new Phrase(string.IsNullOrEmpty(buisinessUnitCode) ? "" : "M. br.", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
