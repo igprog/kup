@@ -388,14 +388,15 @@ public class Account : System.Web.Services.WebService {
                 x = CheckMonthlyFee(x, user.id, g.monthlyFee);
                 x.totalObligation = x.monthlyFee + x.currRepayment;
 
-
                 // ***** Check last month obligation *****
                 NewAccount lastMonth = new NewAccount();
                 lastMonth = GetRecord(user.id, month == 1 ? 12 : month - 1, month == 1 ? year - 1 : year, null);
                 if (!string.IsNullOrEmpty(lastMonth.id)) {
-                    lastMonth = CheckLoan(lastMonth, user.id);
-                    lastMonth = CheckMonthlyFee(lastMonth, user.id, g.monthlyFee);
-                    x.lastMonthObligation = lastMonth.monthlyFee + lastMonth.repayment;
+                    //lastMonth = CheckLoan(lastMonth, user.id);
+                    //lastMonth = CheckMonthlyFee(lastMonth, user.id, g.monthlyFee);
+                    lastMonth.monthlyFee = GetRecord(user.id, month == 1 ? 12 : month - 1, month == 1 ? year - 1 : year, g.monthlyFee).amount;
+                    lastMonth.currRepayment = GetRecord(user.id, month == 1 ? 12 : month - 1, month == 1 ? year - 1 : year, g.repayment).amount;
+                    x.lastMonthObligation = lastMonth.monthlyFee + lastMonth.currRepayment;
                 } else {
                     x.lastMonthObligation = 0;
                 }
