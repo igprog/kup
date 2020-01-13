@@ -338,6 +338,8 @@ public class Account : System.Web.Services.WebService {
             // xx.total.repayment = xx.data.Sum(a => a.amount);
             xx.total.currRepayment = xx.data.Sum(a => a.currRepayment);
             xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
+            xx.total.userRepayment = xx.data.Sum(a => a.userPaymentTotal);
+            xx.total.repaymentTotal = xx.total.currRepayment + xx.total.userRepayment;
           //  xx.total.totalObligation = xx.data.Sum(a => a.totalObligation);
             return JsonConvert.SerializeObject(xx, Formatting.None);
         } catch (Exception e) {
