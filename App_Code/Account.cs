@@ -579,20 +579,6 @@ public class Account : System.Web.Services.WebService {
             double input = 0;
             double output = 0;
             if (type == g.entry_I) {
-                input = GetStartBalance(year, g.income);
-                output = LoadBalanceSql(year, g.expense);
-                x = new Recapitulation();
-                x.note = "Prijenos viška prihoda";
-                x.output = input - output;
-                x.account = GetAccountNo(g.incomeExpenseDiff);
-                et.data.Add(x);
-
-                x = new Recapitulation();
-                x.note = "Donos sa 73/75/76...";
-                x.input = input - output;
-                x.account = GetAccountNo(g.income);
-                et.data.Add(x);
-            } else if (type == g.entry_II) {
                 input = LoadBalanceSql(year, g.otherFee);
                 string note = string.Format("Prijenos na {0}", GetAccountNo(g.incomeExpenseDiff));
                 if (input > 0 ) {
@@ -637,6 +623,33 @@ public class Account : System.Web.Services.WebService {
                 x.input = input;
                 x.output = output;
                 x.account = GetAccountNo(g.incomeExpenseDiff);
+                et.data.Add(x);
+            } else if (type == g.entry_II) {
+                input = LoadBalanceSql(year, g.income);
+                output = LoadBalanceSql(year, g.expense);
+                x = new Recapitulation();
+
+                double diff = output - input;
+                if (diff > 0) {
+                    x.note = "Prijenos rashoda";
+                    x.input = diff;
+                } else {
+                    x.note = "Prijenos viška prihoda";
+                    x.output = input - output;
+                }
+
+                x.account = GetAccountNo(g.incomeExpenseDiff);
+                et.data.Add(x);
+
+                x = new Recapitulation();
+                if (diff > 0) {
+                    x.note = "Donos rashoda";
+                    x.output = diff;
+                } else {
+                    x.note = "Donos viška prihoda";
+                    x.input = input - output;
+                }
+                x.account = GetAccountNo(g.income);
                 et.data.Add(x);
             }
            
@@ -712,34 +725,42 @@ public class Account : System.Web.Services.WebService {
             RecapYearlyTotal xx = new RecapYearlyTotal();
             RecapMonthlyTotal x = new RecapMonthlyTotal();
             xx.data = new List<RecapMonthlyTotal>();
+            double balance = LoadBalanceSql(year, g.expense) - LoadBalanceSql(year, g.income);   // saldo
 
             if (type == g.income) {
                 x.month = "PS";
                 x.total = new Recapitulation();
                 x.total.date = "01.01";
                 x.total.note = "Početno stanje";
-                x.total.input = GetStartBalance(year, type);
+                double lastYearBalance = LoadBalanceSql(year-1, g.expense) - LoadBalanceSql(year-1, g.income); // saldo od prethodne godine
+                x.total.input = GetStartBalance(year, type) - GetTotalSaldo(year);
+                //x.total.input = GetStartBalance(year, type);
                 xx.data.Add(x);
                 x = new RecapMonthlyTotal();
                 x.month = "12";
                 x.total = new Recapitulation();
                 x.total.date = "31.12";
-                x.total.note = "Donos viška prihoda";
-                x.total.input = LoadBalanceSql(year, type);
+                x.total.note = string.Format("Donos viška prihoda za {0} g.", year);
+                x.total.output = balance;
+                //x.total.input = LoadBalanceSql(year, type);
                 xx.data.Add(x);
             } else if (type == g.expense) {
-                x.month = "PS";
+                x.month = "12";
                 x.total = new Recapitulation();
-                x.total.date = "01.01";
-                x.total.note = "Početno stanje";
-                x.total.output = GetStartBalance(year, type);
+                x.total.date = "31.12";
+                x.total.note = "Donos rashoda";
+                if (balance > 0) {
+                    x.total.output = balance;
+                }
                 xx.data.Add(x);
                 x = new RecapMonthlyTotal();
                 x.month = "12";
                 x.total = new Recapitulation();
                 x.total.date = "31.12";
-                x.total.note = "Rashodi";
-                x.total.output = LoadBalanceSql(year, type);
+                x.total.note = string.Format("Zatvaranje kartice i prijenos na {0}", s.Data().account.income);  // (konto 9320)
+                if (balance > 0) {
+                    x.total.input = balance;
+                }
                 xx.data.Add(x);
             } else if (type == g.incomeExpenseDiff) {
                 double input = LoadBalanceSql(year, g.income);
@@ -755,8 +776,17 @@ public class Account : System.Web.Services.WebService {
                 x.month = "12";
                 x.total = new Recapitulation();
                 x.total.date = "31.12";
-                x.total.note = "Prijenos viška prihoda";
-                x.total.output = input - output;
+                double diff = output - input;
+                if (diff > 0) {
+                    x.total.note = "Prijenos rashoda";
+                    x.total.input = diff;
+                } else {
+                    x.total.note = "Prijenos viška prihoda";
+                    x.total.output = input - output;
+                }
+
+                //x.total.note = "Prijenos viška prihoda";
+                //x.total.output = input - output;
                 xx.data.Add(x);
             }
 
@@ -1232,11 +1262,53 @@ public class Account : System.Web.Services.WebService {
             connection.Close();
         }
         if (type == g.income) {
-            x = x + s.Data().startBalance1.income;
+            //x = x + s.Data().startBalance1.income;
+            x = s.Data().startBalance1.income;
         }
         if (type == g.expense) {
-            x = x + s.Data().startBalance1.expense;
+            //x = x + s.Data().startBalance1.expense;
+            x = s.Data().startBalance1.expense;
         }
+        return x;
+    }
+
+    private double GetTotalSaldo(int year) {
+        double incomeTotal = 0;
+        double expenseTotal = 0;
+        double x = 0;
+        string sql = null;
+        string sql_ = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE a.yr < {0}", year);
+
+        sql = string.Format("{0} {1}"
+            , sql_
+            , string.Format("AND (a.recordType = '{0}' OR a.recordType = '{1}')", g.interest, g.manipulativeCosts));
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        incomeTotal = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+
+        sql = string.Format("{0} {1}"
+            , sql_
+            , string.Format("AND (a.recordType = '{0}' OR a.recordType = '{1}')", g.bankFee, g.otherFee));
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        expenseTotal = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        x = expenseTotal - incomeTotal;
         return x;
     }
 

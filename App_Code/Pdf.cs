@@ -1078,26 +1078,28 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
                 table.AddCell(cell6);
 
                 /****** Accumulation *****/
-                PdfPCell cell1_ = new PdfPCell(new Phrase("", GetFont()));
-                cell1_.Border = 0;
-                table.AddCell(cell1_);
-                PdfPCell cell2_ = new PdfPCell(new Phrase("", GetFont()));
-                cell2_.Border = 0;
-                table.AddCell(cell2_);
-                PdfPCell cell3_ = new PdfPCell(new Phrase("", GetFont()));
-                cell3_.Border = 0;
-                table.AddCell(cell3_);
-                if (records.type == g.giroaccount) {
-                    PdfPCell cell4_ = new PdfPCell(new Phrase("", GetFont()));
-                    cell4_.Border = 0;
-                    table.AddCell(cell4_);
+                if (x.total.outputAccumulation > 0 || x.total.inputAccumulation > 0) {
+                    PdfPCell cell1_ = new PdfPCell(new Phrase("", GetFont()));
+                    cell1_.Border = 0;
+                    table.AddCell(cell1_);
+                    PdfPCell cell2_ = new PdfPCell(new Phrase("", GetFont()));
+                    cell2_.Border = 0;
+                    table.AddCell(cell2_);
+                    PdfPCell cell3_ = new PdfPCell(new Phrase("", GetFont()));
+                    cell3_.Border = 0;
+                    table.AddCell(cell3_);
+                    if (records.type == g.giroaccount) {
+                        PdfPCell cell4_ = new PdfPCell(new Phrase("", GetFont()));
+                        cell4_.Border = 0;
+                        table.AddCell(cell4_);
+                    }
+                    PdfPCell cell5_ = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.outputAccumulation), GetFont(6, Font.ITALIC))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                    cell5_.Border = 0;
+                    table.AddCell(cell5_);
+                    PdfPCell cell6_ = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.inputAccumulation), GetFont(6, Font.ITALIC))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                    cell6_.Border = 0;
+                    table.AddCell(cell6_);
                 }
-                PdfPCell cell5_ = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.outputAccumulation), GetFont(6, Font.ITALIC))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
-                cell5_.Border = 0;
-                table.AddCell(cell5_);
-                PdfPCell cell6_ = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.inputAccumulation), GetFont(6, Font.ITALIC))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
-                cell6_.Border = 0;
-                table.AddCell(cell6_);
                 /****** Accumulation *****/
 
             }

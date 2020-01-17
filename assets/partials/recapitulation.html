@@ -38,8 +38,8 @@
                     <td>{{x.month}}</td>
                     <td>{{x.total.note}}</td>
                     <td ng-if="d.records.type=='giroaccount'"><span ng-if="x.total.accountBalance>0">{{x.total.accountBalance | number:2}}</span></td>
-                    <td class="text-right">{{x.total.output | number:2}}<br /><em class="text-muted small">{{x.total.outputAccumulation | number:2}}</em></td>
-                    <td class="text-right">{{x.total.input | number:2}}<br /><em class="text-muted small">{{x.total.inputAccumulation | number:2}}</em></td>
+                    <td class="text-right">{{x.total.output | number:2}}<span ng-if="x.total.outputAccumulation>0"><br /><em class="text-muted small">{{x.total.outputAccumulation | number:2}}</em></span></td>
+                    <td class="text-right">{{x.total.input | number:2}}<span ng-if="x.total.inputAccumulation>0"><br /><em class="text-muted small">{{x.total.inputAccumulation | number:2}}</em></span></td>
                 </tr>
             </tbody>
             <tfoot ng-if="d.records.data.length>0" class="thead-light">
