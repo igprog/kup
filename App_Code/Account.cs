@@ -1691,6 +1691,7 @@ public class Account : System.Web.Services.WebService {
         double x = 0;
         double repayed = 0;
         double loan = 0;
+        double startLoan = 0; // ukupno pozajmica na dan 30.09.2019 
         string sql = string.Format(@"
                     SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
                     {0} (a.recordType = '{1}' OR a.recordType = '{2}') AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{3}-01-01' AS datetime))"
@@ -1698,12 +1699,6 @@ public class Account : System.Web.Services.WebService {
                        , g.repayment
                        , g.userRepayment
                        , year);
-        //string sql = string.Format(@"
-        //            SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
-        //            {0} a.recordType = '{1}' AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{2}-01-01' AS datetime))"
-        //               , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE a.userId = '{0}' AND", userId)
-        //               , g.repayment
-        //               , year);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -1731,9 +1726,57 @@ public class Account : System.Web.Services.WebService {
             }
             connection.Close();
         }
-        x = loan - repayed;
+
+        startLoan = GetStartLoan(userId);
+        if (year.ToString() == g.GetYear(s.Data().startBalance.date)) {
+            x = loan - repayed + startLoan;  // Samo pocetna godina (2019)
+        } else {
+            x = loan - repayed;
+        }
         return x;
     }
+
+
+    //TODO
+    private double GetStartLoan(string userId) {
+        double x = 0;
+        string sql = string.Format(@"SELECT l.loan FROM Loan l WHERE l.loanDate = '{0}' AND l.userId = '{1}'", s.Data().startBalance.date, userId);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
+    }
+
+    private double GetLoanBalance(string userId) {
+        double x = 0;
+        string sql = string.Format(@"SELECT l.loan FROM Loan l WHERE l.loanDate = '{0}' AND l.userId = '{1}'", s.Data().startBalance.date, userId);
+        using (SqlConnection connection = new SqlConnection(g.connectionString))
+        {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection))
+            {
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
+    }
+
+
 
 
 
