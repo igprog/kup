@@ -1669,10 +1669,29 @@ public class Account : System.Web.Services.WebService {
 
     public double GetMonthlyFeeStartBalance(string userId, int? year) {
         double x = 0;
-        string sql = string.Format(@"
-                    SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
-                    WHERE a.userId = '{0}' AND (a.recordType = '{1}' OR a.recordType = '{2}') AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{3}-01-01' AS datetime))"
-                       , userId, g.monthlyFee, g.userPayment, year);
+        string sql = string.Format(@"SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
+                                    WHERE a.userId = '{0}' AND (a.recordType = '{1}' OR a.recordType = '{2}') AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{3}-01-01' AS datetime))"
+                                    , userId, g.monthlyFee, g.userPayment, year);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        x = x - GetTerminationWithdraw(userId, year);
+        return x;
+    }
+
+    private double GetTerminationWithdraw(string userId, int? year) {
+        double x = 0;
+        string sql = string.Format(@"SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
+                                    WHERE a.userId = '{0}' AND a.recordType = '{1}' AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{2}-01-01' AS datetime))"
+                                   , userId, g.terminationWithdraw, year);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
