@@ -136,6 +136,7 @@ public class Account : System.Web.Services.WebService {
         public string interest;
         public string otherFee;
         public string income;
+        public string expense;
         public string incomeExpenseDiff;
     }
 
@@ -836,8 +837,7 @@ public class Account : System.Web.Services.WebService {
         try {
             db.Account();
             string year_ = year != null && year > 0 ? string.Format("AND a.yr = {0}", year) : "";
-
-            string sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE a.recordType = '{0}' OR a.recordType = '{1}' {2}"
+            string sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE (a.recordType = '{0}' OR a.recordType = '{1}') {2}"
                 , g.monthlyFee
                 , g.userPayment
                 , year != null && year > 0 ? string.Format("AND a.yr = {0}", year) : "");
@@ -895,10 +895,10 @@ public class Account : System.Web.Services.WebService {
                 RecapMonthlyTotal rmt = new RecapMonthlyTotal();
                 rmt.month = i.ToString();
                 rmt.total = new Recapitulation();
-                rmt.total.input = rr.Where(a => a.month == i && a.year == DateTime.Now.Year
+                rmt.total.input = rr.Where(a => a.month == i && a.year == year
                                                            && (a.recordType == g.manipulativeCosts
                                                            || a.recordType == g.interest)).Sum(a => a.input);
-                rmt.total.output = rr.Where(a => a.month == i && a.year == DateTime.Now.Year
+                rmt.total.output = rr.Where(a => a.month == i && a.year == year
                                                             && (a.recordType == g.bankFee
                                                             || a.recordType == g.otherFee)).Sum(a => a.input);
                 x.monthlyTotalList.Add(rmt);
@@ -1023,6 +1023,9 @@ public class Account : System.Web.Services.WebService {
         }
         if (type == g.income) {
             x = s.Data().account.income;
+        }
+        if (type == g.expense) {
+            x = s.Data().account.expense;
         }
         if (type == g.incomeExpenseDiff) {
             x = s.Data().account.incomeExpenseDiff;

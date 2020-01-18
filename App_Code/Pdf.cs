@@ -385,6 +385,8 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
 
             Paragraph p = new Paragraph();
             p.Add(new Paragraph(string.Format("Otplata pozajmice: {0} / {1}/{2}", buisinessUnitCode, month, year), GetFont(12, Font.BOLD)));
+            p.Add(new Paragraph("* ONP: Obustave na plaći", GetFont(9, Font.ITALIC)));
+            p.Add(new Paragraph("* UK: Uplata korisnika", GetFont(9, Font.ITALIC)));
             doc.Add(p);
 
             PdfPTable table = new PdfPTable(6);
@@ -453,8 +455,8 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
             table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
             table.AddCell(new PdfPCell(new Phrase("Ukupno:", GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase(
-                string.Format(@"ONP: {0} 
-UK: {1}
+                string.Format(@"ONP*: {0} 
+UK*: {1}
 ___________________
 {2}"
                             , g.Currency(records.total.currRepayment), g.Currency(records.total.userRepayment), g.Currency(records.total.repaymentTotal))

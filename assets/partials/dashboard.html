@@ -1,18 +1,24 @@
 ﻿ <div ng-controller="dashboardCtrl" class="container-fluid">
+     <div class="text-right">
+         <span class="mr-2">Godina: </span>
+         <select ng-model="d.year" class="form-control mb-2 mr-sm-2" style="width:150px; display:inline" ng-change="loadTotal(d.year)">
+             <option ng-repeat="x in g.years" value="{{x}}">{{x}}</option>
+         </select>
+     </div>
      <div class="row h-100 justify-content-center align-items-center">
-        <div ng-if="x.dashboard!==undefined" ng-repeat="x in config.menu" class="col-lg-3 p-4">
-            <div class="same-height card btn btn-outline-{{x.dashboard.class}} shadow cursor" ng-click="toggleTpl(x.tpl, x.title)">
-                <div class="card-body text-center">
-                    <div>
-                        <i class="fas fa-{{x.ico}} fa-3x"></i>
-                    </div>
-                    <p class="card-text text-uppercase">{{x.title}}</p>
-                </div>
-            </div>
-        </div>
-        <div id="tot_chart_div" style="width:40%; height: 450px; background-color:#fff" class="shadow m-2 p-4"></div> 
-        <div id="piechart_3d" style="width:56%; height:450px;" class="shadow m-2"></div>
-        <div id="chart_div" style="width:97%; height: 450px; background-color:#fff" class="shadow m-2 p-4"></div> 
+         <div ng-if="x.dashboard!==undefined" ng-repeat="x in config.menu" class="col-lg-3 p-4">
+             <div class="same-height card btn btn-outline-{{x.dashboard.class}} shadow cursor" ng-click="toggleTpl(x.tpl, x.title)">
+                 <div class="card-body text-center">
+                     <div>
+                         <i class="fas fa-{{x.ico}} fa-3x"></i>
+                     </div>
+                     <p class="card-text text-uppercase">{{x.title}}</p>
+                 </div>
+             </div>
+         </div>
+         <div id="tot_chart_div" style="width:40%; height: 450px; background-color:#fff" class="shadow m-2 p-4"></div>
+         <div id="piechart_3d" style="width:56%; height:450px;" class="shadow m-2"></div>
+         <div id="chart_div" style="width:97%; height: 450px; background-color:#fff" class="shadow m-2 p-4"></div>
      </div>
      <json-directive data="d" debug="config.debug"></json-directive>
 </div>

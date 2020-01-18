@@ -223,7 +223,8 @@
 .controller('dashboardCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {
 
     $scope.d = {
-        total: null
+        total: null,
+        year: f.year()
     }
 
     google.charts.load('current', { 'packages': ['bar'] });
@@ -236,7 +237,7 @@
         ]);
 
         var options = {
-            title: 'Ulozi/Pozajmice ukupno'
+            title: 'Ulozi/Pozajmice ukupno ' + $scope.d.year + ' g.'
         };
 
         var chart = new google.charts.Bar(document.getElementById('tot_chart_div'));
@@ -256,7 +257,7 @@
            ['Manipulativni troškovi: ' + f.currency($scope.d.total.manipulativeCosts, $scope.config.currency), $scope.d.total.manipulativeCosts]
         ]);
         var options = {
-            title: 'Promet ' + f.year(),
+            title: 'Promet ' + $scope.d.year + ' g.',
             is3D: true,
             sliceVisibilityThreshold: 0.00001,
             chartArea: {
@@ -291,7 +292,7 @@
 
         var options = {
             chart: {
-                title: 'Prihodi i rashodi u ' + f.year() + ' g.',
+                title: 'Prihodi i rashodi u ' + $scope.d.year + ' g.',
                 hAxis: { title: 'Mjesec', titleTextStyle: { color: '#333' } },
                 vAxis: { title: 'Iznos (' + $scope.config.currency + ')', minValue: 0 }
             }
@@ -301,15 +302,24 @@
         chart.draw(data, options);
     }
 
-    var loadTotal = () => {
-        f.post('Account', 'LoadTotal', { year: f.year() }).then((d) => {
+    var loadTotal = (year) => {
+        f.post('Account', 'LoadTotal', { year: year }).then((d) => {
             $scope.d.total = d;
+            $scope.d.year = year;
             drawTotChart();
             drawPieChart();
             drawChart();
         });
     }
-    loadTotal();
+    loadTotal($scope.d.year);
+
+    $scope.loadTotal = (x) => {
+        if (x !== null) {
+            loadTotal(x);
+        } else {
+            $scope.d.year = f.year();
+        }
+    }
 
 }])
 
