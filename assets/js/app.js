@@ -351,6 +351,7 @@
                 $scope.d.users = d;
                 $scope.d.year = f.year();
                 $scope.d.loading = false;
+                $scope.zipFileName = null;
             });
         }
     }
@@ -459,6 +460,7 @@
             $scope.d.user.terminationDate = new Date(d.terminationDate);
             $scope.g.currTpl = f.currTpl(tpl);
             $scope.g.currTplTitle = title;
+            $scope.zipFileName = null;
         });
     }
 
