@@ -523,6 +523,18 @@
         $scope.d.limit = $scope.d.limit + x;
     }
 
+    //********* Save all cards - ZIP *********
+    $scope.zipFileName = null;
+    $scope.loadingZip = false;
+    $scope.createAllCards = (d) => {
+        $scope.loadingZip = true;
+        f.post('Pdf', 'AllCards', { users: d.users, buisinessUnitCode: d.buisinessUnitCode, year: d.year }).then((d) => {
+            $scope.zipFileName = d;
+            $scope.loadingZip = false;
+        });
+    }
+    //********* Save all cards - ZIP *********
+
 }])
 
 .controller('buisinessUnitCtrl', ['$scope', '$http', 'f', ($scope, $http, f) => {

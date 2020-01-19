@@ -1,6 +1,7 @@
 ﻿<div id="sidebar-container" class="sidebar-expanded d-none d-md-block">
     <ul class="list-group">
         <link-directive tpl="x.tpl" desc="x.title" ico="x.ico" ng-click="toggleTpl(x.tpl, x.title, x.type)" ng-repeat="x in config.menu"></link-directive>
+        <link-directive src="null" desc="'GODIŠNJA REKAPITULACIJA'" ico="null"></link-directive>
         <link-directive href="'#submenu1'" tpl="'null'" desc="'Financijske Kartice'" ico="'calculator'"></link-directive>
         <li id='submenu1' class="collapse sidebar-submenu">
             <a href="#" class="list-group-item list-group-item-action bg-dark text-white" ng-click="toggleTpl('recapitulation', 'Ulozi', 'monthlyFee')">

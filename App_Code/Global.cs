@@ -4,7 +4,9 @@ using System.Linq;
 using System.Web;
 using System.IO;
 using System.Configuration;
+using Ionic.Zip;
 using Igprog;
+
 
 /// <summary>
 /// Global
@@ -153,6 +155,50 @@ namespace Igprog {
             }
             return val_;
         }
+
+        public string Zip(string fileName) {
+            try {
+                string[] filePaths = Directory.GetFiles(HttpContext.Current.Server.MapPath("~/upload/pdf/temp/cards/"));
+                using (ZipFile zip = new ZipFile()) {
+                    foreach (string filePath in filePaths) {
+                        zip.AddFile(filePath);
+                    }
+                    zip.Save(HttpContext.Current.Server.MapPath(string.Format("~/upload/pdf/temp/{0}.zip", fileName)));
+                }
+                return string.Format("{0}.zip", fileName);
+            } catch(Exception e) {
+                return e.Message;
+            }
+            
+        }
+
+        //public void Zip() {
+            
+        //    string zipCreatePath = System.Web.Hosting.HostingEnvironment.MapPath("/myZip.zip");
+
+        //    using (ZipArchive archive = ZipFile.Open(zipCreatePath, ZipArchiveMode.Create))
+        //    {
+        //        List<string> files = new List<string>();
+        //        files.Add("wallhaven-103536.jpg");
+        //        files.Add("wallhaven-161383.jpg");
+        //        files.Add("wallhaven-30764.jpg");
+
+        //        foreach (string file in files)
+        //        {
+        //            string filePath = System.Web.Hosting.HostingEnvironment.MapPath(string.Format("/images/{0}", file));
+
+        //            archive.CreateEntryFromFile(filePath, file);
+        //        }
+        //    }
+
+        //    //string startPath = @".\start";
+        //    //string zipPath = @".\result.zip";
+        //    //string extractPath = @".\extract";
+
+        //    //ZipFile.CreateFromDirectory(startPath, zipPath);
+
+        //    //ZipFile.ExtractToDirectory(zipPath, extractPath);
+        //}
 
     }
 }

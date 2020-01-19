@@ -261,48 +261,49 @@ public class User : System.Web.Services.WebService {
     [WebMethod]
     public string Get(string id, int? year) {
         try {
-            db.Users();
-            string sql = string.Format("{0} WHERE u.id = '{1}'", sqlString, id);
-            NewUser x = new NewUser();
-            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(sql, connection)) {
-                    using (SqlDataReader reader = command.ExecuteReader()) {
-                        while (reader.Read()) {
-                            x = ReadData(reader);
-                        }
-                    }
-                }
-                connection.Close();
-            }
-            x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment) - GetAmount(id, g.userRepayment);
-            x.totalMebershipFees = GetAmount(id, g.monthlyFee);
-            x.totalUserPayment = GetAmount(id, g.userPayment);
-            x.totalWithdrawn = GetAmount(id, g.terminationWithdraw);
-            x.totalMebershipFeesWithUserPayment = x.totalMebershipFees + x.totalUserPayment;
-            DateTime now = DateTime.UtcNow;
-            //x.totalMebershipFeesRequired = a.GetMonthlyFeeRequiredAccu(x.id, now.Month, now.Year);  //TODO: provjeriti dali to treba???
-            x.terminationWithdraw = x.totalMebershipFeesWithUserPayment - x.restToRepayment - x.totalWithdrawn;
-            x.activeLoanId = GetActiveLoanId(id);
+            
+            //db.Users();
+            //string sql = string.Format("{0} WHERE u.id = '{1}'", sqlString, id);
+            //NewUser x = new NewUser();
+            //using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            //    connection.Open();
+            //    using (SqlCommand command = new SqlCommand(sql, connection)) {
+            //        using (SqlDataReader reader = command.ExecuteReader()) {
+            //            while (reader.Read()) {
+            //                x = ReadData(reader);
+            //            }
+            //        }
+            //    }
+            //    connection.Close();
+            //}
+            //x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment) - GetAmount(id, g.userRepayment);
+            //x.totalMebershipFees = GetAmount(id, g.monthlyFee);
+            //x.totalUserPayment = GetAmount(id, g.userPayment);
+            //x.totalWithdrawn = GetAmount(id, g.terminationWithdraw);
+            //x.totalMebershipFeesWithUserPayment = x.totalMebershipFees + x.totalUserPayment;
+            //DateTime now = DateTime.UtcNow;
+            ////x.totalMebershipFeesRequired = a.GetMonthlyFeeRequiredAccu(x.id, now.Month, now.Year);  //TODO: provjeriti dali to treba???
+            //x.terminationWithdraw = x.totalMebershipFeesWithUserPayment - x.restToRepayment - x.totalWithdrawn;
+            //x.activeLoanId = GetActiveLoanId(id);
 
-            if (year != null) {
-                x.records = a.GetRecords(x.id, year);
-                x.total = new Account.Total();
-                x.total.monthlyFee = x.records.Where(r => r.recordType == g.monthlyFee).Sum(r => r.amount);
-                x.total.userPayment = x.records.Where(r => r.recordType == g.userPayment).Sum(r => r.amount);
-                x.total.userPaymentWithMonthlyFee = x.total.monthlyFee + x.total.userPayment;
-                x.total.userPaymentWithMonthlyFeeTotal = a.GetMonthlyFeeStartBalance(id, year) + x.total.userPaymentWithMonthlyFee;
-                //x.total.repayment = x.records.Where(r => r.recordType == g.repayment).Sum(r => r.amount);
-                x.total.repayment = x.records.Where(r => r.recordType == g.repayment || r.recordType == g.loan).Sum(r => r.amount);
-                x.total.userRepayment = x.records.Where(r => r.recordType == g.userRepayment).Sum(r => r.amount);
-                x.total.repaymentTotal = x.total.repayment + x.total.userRepayment;
-                x.total.terminationWithdraw = x.records.Where(r => r.recordType == g.terminationWithdraw).Sum(r => r.amount);
-                x.total.activatedLoan = x.records.Where(r => r.recordType == g.withdraw).Sum(r => r.activatedLoan);
-                x.total.loanToRepaid = a.GetLoanStartBalance(id, year) + x.total.activatedLoan;
-            }
-            //TODO: Totals:
+            //if (year != null) {
+            //    x.records = a.GetRecords(x.id, year);
+            //    x.total = new Account.Total();
+            //    x.total.monthlyFee = x.records.Where(r => r.recordType == g.monthlyFee).Sum(r => r.amount);
+            //    x.total.userPayment = x.records.Where(r => r.recordType == g.userPayment).Sum(r => r.amount);
+            //    x.total.userPaymentWithMonthlyFee = x.total.monthlyFee + x.total.userPayment;
+            //    x.total.userPaymentWithMonthlyFeeTotal = a.GetMonthlyFeeStartBalance(id, year) + x.total.userPaymentWithMonthlyFee;
+            //    //x.total.repayment = x.records.Where(r => r.recordType == g.repayment).Sum(r => r.amount);
+            //    x.total.repayment = x.records.Where(r => r.recordType == g.repayment || r.recordType == g.loan).Sum(r => r.amount);
+            //    x.total.userRepayment = x.records.Where(r => r.recordType == g.userRepayment).Sum(r => r.amount);
+            //    x.total.repaymentTotal = x.total.repayment + x.total.userRepayment;
+            //    x.total.terminationWithdraw = x.records.Where(r => r.recordType == g.terminationWithdraw).Sum(r => r.amount);
+            //    x.total.activatedLoan = x.records.Where(r => r.recordType == g.withdraw).Sum(r => r.activatedLoan);
+            //    x.total.loanToRepaid = a.GetLoanStartBalance(id, year) + x.total.activatedLoan;
+            //}
+            ////TODO: Totals:
 
-            return JsonConvert.SerializeObject(x, Formatting.None);
+            return JsonConvert.SerializeObject(GetUserData(id, year), Formatting.None);
         } catch (Exception e) {
             return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.None);
         }
@@ -428,6 +429,50 @@ public class User : System.Web.Services.WebService {
         }
         xx = xx.Where(a => g.DateDiff(a.accessDate, date, false) <= 31).ToList();
         return xx;
+    }
+
+    public NewUser GetUserData(string id, int? year) {
+        db.Users();
+        string sql = string.Format("{0} WHERE u.id = '{1}'", sqlString, id);
+        NewUser x = new NewUser();
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = ReadData(reader);
+                    }
+                }
+            }
+            connection.Close();
+        }
+        x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment) - GetAmount(id, g.userRepayment);
+        x.totalMebershipFees = GetAmount(id, g.monthlyFee);
+        x.totalUserPayment = GetAmount(id, g.userPayment);
+        x.totalWithdrawn = GetAmount(id, g.terminationWithdraw);
+        x.totalMebershipFeesWithUserPayment = x.totalMebershipFees + x.totalUserPayment;
+        DateTime now = DateTime.UtcNow;
+        //x.totalMebershipFeesRequired = a.GetMonthlyFeeRequiredAccu(x.id, now.Month, now.Year);  //TODO: provjeriti dali to treba???
+        x.terminationWithdraw = x.totalMebershipFeesWithUserPayment - x.restToRepayment - x.totalWithdrawn;
+        x.activeLoanId = GetActiveLoanId(id);
+
+        if (year != null) {
+            x.records = a.GetRecords(x.id, year);
+            x.total = new Account.Total();
+            x.total.monthlyFee = x.records.Where(r => r.recordType == g.monthlyFee).Sum(r => r.amount);
+            x.total.userPayment = x.records.Where(r => r.recordType == g.userPayment).Sum(r => r.amount);
+            x.total.userPaymentWithMonthlyFee = x.total.monthlyFee + x.total.userPayment;
+            x.total.userPaymentWithMonthlyFeeTotal = a.GetMonthlyFeeStartBalance(id, year) + x.total.userPaymentWithMonthlyFee;
+            //x.total.repayment = x.records.Where(r => r.recordType == g.repayment).Sum(r => r.amount);
+            x.total.repayment = x.records.Where(r => r.recordType == g.repayment || r.recordType == g.loan).Sum(r => r.amount);
+            x.total.userRepayment = x.records.Where(r => r.recordType == g.userRepayment).Sum(r => r.amount);
+            x.total.repaymentTotal = x.total.repayment + x.total.userRepayment;
+            x.total.terminationWithdraw = x.records.Where(r => r.recordType == g.terminationWithdraw).Sum(r => r.amount);
+            x.total.activatedLoan = x.records.Where(r => r.recordType == g.withdraw).Sum(r => r.activatedLoan);
+            x.total.loanToRepaid = a.GetLoanStartBalance(id, year) + x.total.activatedLoan;
+        }
+        //TODO: Totals:
+        return x;
     }
 
      public double GetAmount(string id, string type) {
