@@ -652,8 +652,35 @@ public class Account : System.Web.Services.WebService {
                 }
                 x.account = GetAccountNo(g.income);
                 et.data.Add(x);
+            } else if (type == g.entry_III) {  // Kad su rashodi veci od prihoda u tekucoj godini
+                input = LoadBalanceSql(year, g.income);
+                output = LoadBalanceSql(year, g.expense);
+                x = new Recapitulation();
+
+                double diff = output - input;
+                if (diff > 0) {
+                    x.note = "Prijenos rashoda, zatvaranje kartice";
+                    x.input = diff;
+                } else {
+                    x.note = "Prijenos viška prihoda";  // TODO ???
+                    x.output = input - output;
+                }
+
+                x.account = GetAccountNo(g.incomeExpenseDiff);
+                et.data.Add(x);
+
+                x = new Recapitulation();
+                if (diff > 0) {
+                    x.note = "Donos rashoda na ukupni prihod";
+                    x.output = diff;
+                } else {
+                    x.note = "Donos viška prihoda";  // TODO ???
+                    x.input = input - output;
+                }
+                x.account = GetAccountNo(g.income);
+                et.data.Add(x);
             }
-           
+
             et.total = new Recapitulation();
             et.total.input = et.data.Sum(a => a.input);
             et.total.output = et.data.Sum(a => a.output);
@@ -1244,8 +1271,8 @@ public class Account : System.Web.Services.WebService {
         double x = 0;
         string sql = null;
         string _sql = string.Format(@"SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE a.yr < {0}", year);
-        if (type == g.giroaccount) {
-            sql = string.Format("{0} AND a.recordType = '{1}'", _sql, type);
+        if (type == g.monthlyFee) {
+            sql = string.Format("{0} AND a.recordType = '{1}' OR a.recordType = '{2}'", _sql, type, g.userPayment);
         } else if (type == g.income) {
             sql = string.Format("{0} AND (a.recordType = '{1}' OR a.recordType = '{2}')", _sql, g.interest, g.manipulativeCosts);
         } else if (type == g.expense) {
@@ -1265,12 +1292,31 @@ public class Account : System.Web.Services.WebService {
             connection.Close();
         }
         if (type == g.income) {
-            //x = x + s.Data().startBalance1.income;
             x = s.Data().startBalance1.income;
         }
         if (type == g.expense) {
-            //x = x + s.Data().startBalance1.expense;
             x = s.Data().startBalance1.expense;
+        }
+        if (type == g.monthlyFee) {
+            double terminationWithdraw = 0;
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                sql = string.Format("{0} AND a.recordType = '{1}'", _sql, g.terminationWithdraw);
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            terminationWithdraw = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                        }
+                    }
+                }
+                connection.Close();
+            }
+            if (year.ToString() == g.GetYear(s.Data().startBalance.date)) {
+                x = 0;  // samo pocetna godina (2019)
+            } else {
+                x = x - terminationWithdraw;
+            }
+            //x = x - terminationWithdraw;
         }
         return x;
     }
@@ -1652,10 +1698,6 @@ public class Account : System.Web.Services.WebService {
                     SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
                     WHERE a.userId = '{0}' AND (a.recordType = '{1}' OR a.recordType = '{2}')  AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) <= CAST('{3}-{4}-01' AS datetime)) AND a.loanId = '{5}'"
                        , x.user.id, g.repayment, g.userRepayment, x.year, g.Month(Convert.ToInt32(x.month)), x.loanId);
-        //string sql = string.Format(@"
-        //            SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
-        //            WHERE a.userId = '{0}' AND a.recordType = '{1}' AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) <= CAST('{2}-{3}-01' AS datetime)) AND a.loanId = '{4}'"
-        //               , x.user.id, g.repayment, x.year, g.Month(Convert.ToInt32(x.month)), x.loanId);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -1716,10 +1758,11 @@ public class Account : System.Web.Services.WebService {
         double startLoan = 0; // ukupno pozajmica na dan 30.09.2019 
         string sql = string.Format(@"
                     SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
-                    {0} (a.recordType = '{1}' OR a.recordType = '{2}') AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{3}-01-01' AS datetime))"
+                    {0} (a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}') AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{4}-01-01' AS datetime))"
                        , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE a.userId = '{0}' AND", userId)
                        , g.repayment
                        , g.userRepayment
+                       , g.loan
                        , year);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
@@ -1751,24 +1794,24 @@ public class Account : System.Web.Services.WebService {
 
         startLoan = GetStartLoan(userId);
         if (year.ToString() == g.GetYear(s.Data().startBalance.date)) {
-            x = loan - repayed + startLoan;  // Samo pocetna godina (2019)
+            x = 0; // loan - repayed + startLoan;  // Samo pocetna godina (2019) ???
         } else {
             x = loan - repayed;
         }
         return x;
     }
 
-
-    //TODO
     private double GetStartLoan(string userId) {
         double x = 0;
-        string sql = string.Format(@"SELECT l.loan FROM Loan l WHERE l.loanDate = '{0}' AND l.userId = '{1}'", s.Data().startBalance.date, userId);
+        string sql = string.Format(@"SELECT SUM(CAST(l.loan AS DECIMAL(10,2))) FROM Loan l WHERE l.loanDate = '{0}' {1}"
+                                , s.Data().startBalance.date
+                                , string.IsNullOrEmpty(userId) ? "" : string.Format("AND l.userId = '{0}'", userId));
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
                 using (SqlDataReader reader = command.ExecuteReader()) {
                     while (reader.Read()) {
-                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
                     }
                 }
             }
@@ -1777,26 +1820,26 @@ public class Account : System.Web.Services.WebService {
         return x;
     }
 
-    private double GetLoanBalance(string userId) {
-        double x = 0;
-        string sql = string.Format(@"SELECT l.loan FROM Loan l WHERE l.loanDate = '{0}' AND l.userId = '{1}'", s.Data().startBalance.date, userId);
-        using (SqlConnection connection = new SqlConnection(g.connectionString))
-        {
-            connection.Open();
-            using (SqlCommand command = new SqlCommand(sql, connection))
-            {
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
-                    }
-                }
-            }
-            connection.Close();
-        }
-        return x;
-    }
+    //private double GetLoanBalance(string userId) {
+    //    double x = 0;
+    //    string sql = string.Format(@"SELECT l.loan FROM Loan l WHERE l.loanDate = '{0}' AND l.userId = '{1}'", s.Data().startBalance.date, userId);
+    //    using (SqlConnection connection = new SqlConnection(g.connectionString))
+    //    {
+    //        connection.Open();
+    //        using (SqlCommand command = new SqlCommand(sql, connection))
+    //        {
+    //            using (SqlDataReader reader = command.ExecuteReader())
+    //            {
+    //                while (reader.Read())
+    //                {
+    //                    x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
+    //                }
+    //            }
+    //        }
+    //        connection.Close();
+    //    }
+    //    return x;
+    //}
 
 
 

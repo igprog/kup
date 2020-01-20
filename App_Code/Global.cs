@@ -38,6 +38,7 @@ namespace Igprog {
         public string incomeExpenseDiff = "incomeExpenseDiff";
         public string entry_I = "entry_I";
         public string entry_II = "entry_II";
+        public string entry_III = "entry_III";
         public string allUnitsTitle = "JANAF ukupno";
 
         #region Date

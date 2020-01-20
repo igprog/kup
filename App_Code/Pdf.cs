@@ -900,11 +900,20 @@ ___________________
             doc.Open();
             AppendHeader(doc);
 
+            string typeNo = null;
+            if (type == g.entry_I) {
+                typeNo = "I";
+            } else if (type == g.entry_II) {
+                typeNo = "II";
+            } else if (type == g.entry_III) {
+                typeNo = "III";
+            }
+
             Paragraph p = new Paragraph();
             p.Alignment = Element.ALIGN_CENTER;
             p.Add(new Paragraph(string.Format("Temeljnica za knjiženje br. {0}{1}"
                                 , month
-                                , !string.IsNullOrEmpty(type) ? (string.Format("/{0}", type == g.entry_I ? "I" : "II")) : ""), GetFont(12, Font.BOLD)));
+                                , !string.IsNullOrEmpty(type) ? (string.Format("/{0}", typeNo)) : ""), GetFont(12, Font.BOLD)));
             p.Add(new Paragraph(string.Format("Knjižiti na dan {0}.{1}", g.SetDayMonthDate(g.GetLastDayInMonth(year, month), month), year), GetFont()));
             doc.Add(p);
 

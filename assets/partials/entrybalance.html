@@ -19,7 +19,11 @@
         </div>
     </div>
     <div ng-if="d.records.data.length>0 && !g.clearView">
-        <strong>Temeljnica za knjiženje br. 12/{{d.type=='entry_I'?'I':'II'}}</strong>
+        <strong>Temeljnica za knjiženje br. 12/
+        <span ng-if="d.type==='entry_I'">I</span>
+            <span ng-if="d.type==='entry_II'">II</span>
+            <span ng-if="d.type==='entry_III'">III</span>
+        </strong>
         <div>Knjižiti na dan: 31.12.{{d.year}}</div>
     </div>
     <div ng-if="d.records.data.length>0 && !g.clearView" class="table-responsive">
