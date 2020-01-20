@@ -998,21 +998,22 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
             table.AddCell(new PdfPCell(new Phrase(string.Format("Konto: {0}", records.account), GetFont(10, Font.NORMAL))) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             doc.Add(table);
 
-            table = new PdfPTable(records.type == g.giroaccount ? 6 : 5);
+            //table = new PdfPTable(records.type == g.giroaccount ? 6 : 5);
+            table = new PdfPTable(6);
             table.HeaderRows = 1;
             table.WidthPercentage = 100f;
-            if (records.type == g.giroaccount) {
+            //if (records.type == g.giroaccount) {
                 table.SetWidths(new float[] { 1f, 1f, 4f, 1f, 1f, 1f });
-            } else {
-                table.SetWidths(new float[] { 1f, 1f, 4f, 1f, 1f });
-            }
+            //} else {
+            //    table.SetWidths(new float[] { 1f, 1f, 4f, 1f, 1f });
+            //}
             
             table.AddCell(new PdfPCell(new Phrase("Datum", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
             table.AddCell(new PdfPCell(new Phrase("Mjesec", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
             table.AddCell(new PdfPCell(new Phrase("Sadržaj", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
-            if (records.type == g.giroaccount) {
-                table.AddCell(new PdfPCell(new Phrase("Saldo", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
-            }
+            //if (records.type == g.giroaccount) {
+            table.AddCell(new PdfPCell(new Phrase("Saldo", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            //}
             table.AddCell(new PdfPCell(new Phrase("Duguje", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase("Potražuje", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
           
@@ -1026,11 +1027,14 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
                 PdfPCell cell3 = new PdfPCell(new Phrase(string.Format("{0}", x.total.note), GetFont()));
                 cell3.Border = 0;
                 table.AddCell(cell3);
-                if (records.type == g.giroaccount) {
-                    PdfPCell cell4 = new PdfPCell(new Phrase(x.total.accountBalance > 0 ? string.Format("{0:N}", x.total.accountBalance) : "", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
-                    cell4.Border = 0;
-                    table.AddCell(cell4);
-                }
+                //if (records.type == g.giroaccount) {
+                //PdfPCell cell4 = new PdfPCell(new Phrase(x.total.accountBalance > 0 ? string.Format("{0:N}", x.total.accountBalance) : "", GetFont(6, Font.ITALIC))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                //cell4.Border = 0;
+                //table.AddCell(cell4);
+                PdfPCell cell4 = new PdfPCell(new Phrase("", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell4.Border = 0;
+                table.AddCell(cell4);
+                //}
                 PdfPCell cell5 = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.output), GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 cell5.Border = 0;
                 table.AddCell(cell5);
@@ -1049,11 +1053,11 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
                     PdfPCell cell3_ = new PdfPCell(new Phrase("", GetFont()));
                     cell3_.Border = 0;
                     table.AddCell(cell3_);
-                    if (records.type == g.giroaccount) {
-                        PdfPCell cell4_ = new PdfPCell(new Phrase("", GetFont()));
-                        cell4_.Border = 0;
+                    //if (records.type == g.giroaccount) {
+                        PdfPCell cell4_ = new PdfPCell(new Phrase(x.total.accountBalance > 0 ? string.Format("{0:N}", x.total.accountBalance) : "", GetFont(6, Font.ITALIC))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                    cell4_.Border = 0;
                         table.AddCell(cell4_);
-                    }
+                    //}
                     PdfPCell cell5_ = new PdfPCell(new Phrase(string.Format("{0:N}", x.total.outputAccumulation), GetFont(6, Font.ITALIC))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                     cell5_.Border = 0;
                     table.AddCell(cell5_);
@@ -1066,18 +1070,19 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
             }
             doc.Add(table);
 
-            table = new PdfPTable(records.type == g.giroaccount ? 6 : 5);
+            //table = new PdfPTable(records.type == g.giroaccount ? 6 : 5);
+            table = new PdfPTable(6);
             table.WidthPercentage = 100f;
-            if (records.type == g.giroaccount) {
+            //if (records.type == g.giroaccount) {
                 table.SetWidths(new float[] { 1f, 1f, 4f, 1f, 1f, 1f });
-            } else {
-                table.SetWidths(new float[] { 1f, 1f, 4f, 1f, 1f });
-            }
+            //} else {
+            //    table.SetWidths(new float[] { 1f, 1f, 4f, 1f, 1f });
+            //}
             table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 5 });
             table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 5 });
-            if (records.type == g.giroaccount) {
+            //if (records.type == g.giroaccount) {
                 table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
-            }
+            //}
             table.AddCell(new PdfPCell(new Phrase("Ukupno:", GetFont(true))) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase(string.Format("{0:N}", records.total.output), GetFont(true))) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase(string.Format("{0:N}", records.total.input), GetFont(true))) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });

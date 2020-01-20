@@ -1146,6 +1146,8 @@ public class Account : System.Web.Services.WebService {
 
                 if (inputType == g.giroaccount && g.DateDiff(g.SetDate(g.GetLastDayInMonth(year, Convert.ToInt32(x.month)), Convert.ToInt32(x.month), year), s.Data().startBalance.date, false) >= 0) {
                     x.total.inputAccumulation = inputAccumulation.Sum(a => a.input) + startBalance + s.Data().startBalance.giroAccountInput;
+                } else if (inputType == g.repayment) {
+                    x.total.inputAccumulation = inputAccumulation.Sum(a => a.input);
                 } else {
                     x.total.inputAccumulation = inputAccumulation.Sum(a => a.input) + startBalance;
                 }
@@ -1211,13 +1213,13 @@ public class Account : System.Web.Services.WebService {
                     x.total.note = string.Format("{0}% Manipulativni troškovi {1}/{2}", g.manipulativeCostsPerc(), g.Month(i), year);
                 } else if (type == g.giroaccount) {
                     x.total.note = string.Format("Promet Žiro-Računa {0}/{1}", g.Month(i), year);
-                    x.total.accountBalance = x.total.outputAccumulation - x.total.inputAccumulation;
+                    //x.total.accountBalance = x.total.outputAccumulation - x.total.inputAccumulation;
                 } else if (type == g.otherFee) {
                     x.total.note = "Razni materijalni troškovi";
-                }
-                else {
+                } else {
                     x.total.note = null; // data.Where(a => a.month.ToString() == i.ToString()).FirstOrDefault().note;
                 }
+                x.total.accountBalance = Math.Abs(x.total.outputAccumulation - x.total.inputAccumulation);
                 x.month = g.Month(i);
                 xx.Add(x);
             }
@@ -1596,11 +1598,18 @@ public class Account : System.Web.Services.WebService {
         double loan = 0;
         string sql = string.Format(@"
                     SELECT SUM(CAST(l.loan AS decimal)) FROM Loan l
-                    {0} ((CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)))"
+                    {0} ((CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime) AND CAST(l.loanDate AS datetime) >= CAST('{1}-01-01' AS datetime)))"
                        , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE l.userId = '{0}' AND", userId)
                        , year
                        , g.Month(month)
                        , g.GetLastDayInMonth(year, month));
+        //string sql = string.Format(@"
+        //            SELECT SUM(CAST(l.loan AS decimal)) FROM Loan l
+        //            {0} ((CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)))"
+        //               , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE l.userId = '{0}' AND", userId)
+        //               , year
+        //               , g.Month(month)
+        //               , g.GetLastDayInMonth(year, month));
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
