@@ -172,33 +172,5 @@ namespace Igprog {
             
         }
 
-        //public void Zip() {
-            
-        //    string zipCreatePath = System.Web.Hosting.HostingEnvironment.MapPath("/myZip.zip");
-
-        //    using (ZipArchive archive = ZipFile.Open(zipCreatePath, ZipArchiveMode.Create))
-        //    {
-        //        List<string> files = new List<string>();
-        //        files.Add("wallhaven-103536.jpg");
-        //        files.Add("wallhaven-161383.jpg");
-        //        files.Add("wallhaven-30764.jpg");
-
-        //        foreach (string file in files)
-        //        {
-        //            string filePath = System.Web.Hosting.HostingEnvironment.MapPath(string.Format("/images/{0}", file));
-
-        //            archive.CreateEntryFromFile(filePath, file);
-        //        }
-        //    }
-
-        //    //string startPath = @".\start";
-        //    //string zipPath = @".\result.zip";
-        //    //string extractPath = @".\extract";
-
-        //    //ZipFile.CreateFromDirectory(startPath, zipPath);
-
-        //    //ZipFile.ExtractToDirectory(zipPath, extractPath);
-        //}
-
     }
 }

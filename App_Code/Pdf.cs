@@ -1088,7 +1088,7 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
         doc.Add(p);
         p = new Paragraph();
         p.Alignment = Element.ALIGN_CENTER;
-        p.Add(new Paragraph(string.Format("{0} {1}", user.lastName.ToUpper(), user.firstName.ToUpper()), GetFont(12, Font.BOLD | Font.UNDERLINE)));
+        p.Add(new Paragraph(string.Format("{0} - {1} {2}", user.id, user.lastName.ToUpper(), user.firstName.ToUpper()), GetFont(12, Font.BOLD | Font.UNDERLINE)));
         doc.Add(p);
         p = new Paragraph();
         p.Add(new Paragraph(string.Format("{0} god", year), GetFont(10, Font.BOLD)));
