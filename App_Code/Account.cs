@@ -1099,8 +1099,10 @@ public class Account : System.Web.Services.WebService {
                 x.total.input = startBalance;  // potražuje 
             }
             if (type == g.giroaccount && year >= Convert.ToDateTime(s.Data().startBalance.date).Year) {
-                x.total.output = s.Data().startBalance.giroAccountOutput;  // TODO: + ukupno ziro racun do te godine, metoda: getGiroAccountOutputTotal(year)
-                x.total.input = s.Data().startBalance.giroAccountInput; // TODO: + ukupno ziro racun do te godine, metoda: getGiroAccountInputTotal(year)
+                x.total.output = g.GetYear(s.Data().startBalance.date) == year.ToString() ? 0 : startBalance;
+                x.total.input = 0;
+               // x.total.output = s.Data().startBalance.giroAccountOutput;  // TODO: + ukupno ziro racun do te godine, metoda: getGiroAccountOutputTotal(year)
+               // x.total.input = s.Data().startBalance.giroAccountInput; // TODO: + ukupno ziro racun do te godine, metoda: getGiroAccountInputTotal(year)
             }
             xx.Add(x);
         }
@@ -1111,6 +1113,7 @@ public class Account : System.Web.Services.WebService {
             x.total = new Recapitulation();
             x.total.date = g.SetDayMonthDate(g.GetLastDayInMonth(year, i), i);
 
+            // Dugovna strana
             if (!string.IsNullOrEmpty(inputType)) {
                 List<Recapitulation> input = new List<Recapitulation>();
                 if (inputType == g.giroaccount) {
@@ -1145,21 +1148,22 @@ public class Account : System.Web.Services.WebService {
                 }
 
                 if (inputType == g.giroaccount && g.DateDiff(g.SetDate(g.GetLastDayInMonth(year, Convert.ToInt32(x.month)), Convert.ToInt32(x.month), year), s.Data().startBalance.date, false) >= 0) {
-                    x.total.inputAccumulation = inputAccumulation.Sum(a => a.input) + startBalance + s.Data().startBalance.giroAccountInput;
+                    x.total.inputAccumulation = inputAccumulation.Sum(a => a.input) + (g.GetYear(s.Data().startBalance.date) == year.ToString() ? s.Data().startBalance.giroAccountInput : 0);
+                } else if (inputType == g.giroaccount && g.DateDiff(g.SetDate(g.GetLastDayInMonth(year, Convert.ToInt32(x.month)), Convert.ToInt32(x.month), year), s.Data().startBalance.date, false) < 0) {
+                    x.total.inputAccumulation = 0;
                 } else if (inputType == g.repayment) {
                     x.total.inputAccumulation = inputAccumulation.Sum(a => a.input);
                 } else {
                     x.total.inputAccumulation = inputAccumulation.Sum(a => a.input) + startBalance;
                 }
-
             }
 
+            // Potrazna strana
             if (!string.IsNullOrEmpty(outputType)) {
                 if (outputType == g.loan) {
                     x.total.output = GetActivatedLoan(Convert.ToInt32(x.month), year, null);
                     x.total.outputAccumulation = GetActivatedLoanAccu(Convert.ToInt32(x.month), year, null) + startBalance;
                 } else {
-
                     List<Recapitulation> output = new List<Recapitulation>();
                     if (outputType == g.giroaccount) {
                         output = data.Where(a => a.month.ToString() == x.month && a.year == year && g.DateDiff(g.SetDate(g.GetLastDayInMonth(year, Convert.ToInt32(a.month)), Convert.ToInt32(a.month), year), s.Data().startBalance.date, false) > 0
@@ -1191,11 +1195,10 @@ public class Account : System.Web.Services.WebService {
                     }
 
                     if (outputType == g.giroaccount && g.DateDiff(g.SetDate(g.GetLastDayInMonth(year, Convert.ToInt32(x.month)), Convert.ToInt32(x.month), year), s.Data().startBalance.date, false) >= 0) {
-                        x.total.outputAccumulation = outputAccumulation.Sum(a => a.input) + s.Data().startBalance.giroAccountOutput;
+                        x.total.outputAccumulation = outputAccumulation.Sum(a => a.input) + (g.GetYear(s.Data().startBalance.date) == year.ToString() ? s.Data().startBalance.giroAccountOutput : startBalance);
                     } else {
                         x.total.outputAccumulation = outputAccumulation.Sum(a => a.input);
                     }
-
 
                 }
             }
@@ -1279,6 +1282,11 @@ public class Account : System.Web.Services.WebService {
             sql = string.Format("{0} AND (a.recordType = '{1}' OR a.recordType = '{2}')", _sql, g.interest, g.manipulativeCosts);
         } else if (type == g.expense) {
             sql = string.Format("{0} AND (a.recordType = '{1}' OR a.recordType = '{2}')", _sql, g.bankFee, g.otherFee);
+        } else if(type == g.giroaccount) {
+            sql = string.Format(@"{0} AND CAST(a.recordDate AS DATETIME) > '{1}' AND 
+                                (a.recordType = '{2}' OR a.recordType = '{3}' OR a.recordType = '{4}'
+                                OR  a.recordType = '{5}' OR a.recordType = '{6}')"
+                                , _sql, s.Data().startBalance.date, g.repayment, g.userRepayment, g.monthlyFee, g.userPayment, g.interest);
         } else {
             sql = _sql;
         }
@@ -1295,11 +1303,9 @@ public class Account : System.Web.Services.WebService {
         }
         if (type == g.income) {
             x = s.Data().startBalance1.income;
-        }
-        if (type == g.expense) {
+        } else if (type == g.expense) {
             x = s.Data().startBalance1.expense;
-        }
-        if (type == g.monthlyFee) {
+        } else if (type == g.monthlyFee) {
             double terminationWithdraw = 0;
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
                 connection.Open();
@@ -1319,6 +1325,27 @@ public class Account : System.Web.Services.WebService {
                 x = x - terminationWithdraw;
             }
             //x = x - terminationWithdraw;
+        } else if (type == g.giroaccount) {
+            double expense = 0;
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                sql = string.Format(@"{0} AND CAST(a.recordDate AS DATETIME) > '{1}' AND 
+                                (a.recordType = '{2}' OR a.recordType = '{3}' OR a.recordType = '{4}' OR  a.recordType = '{5}')"
+                                , _sql, s.Data().startBalance.date, g.withdraw, g.bankFee, g.otherFee, g.terminationWithdraw);
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            expense = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                        }
+                    }
+                }
+                connection.Close();
+            }
+            if (year.ToString() == g.GetYear(s.Data().startBalance.date)) {
+                x = s.Data().startBalance.giroAccountOutput - s.Data().startBalance.giroAccountInput;  // samo pocetna godina (2019)
+            } else {
+                x = (x + s.Data().startBalance.giroAccountOutput) - (expense + s.Data().startBalance.giroAccountInput);
+            }
         }
         return x;
     }
@@ -1371,12 +1398,13 @@ public class Account : System.Web.Services.WebService {
             } else if (type == "output") {
                 x += i.total.output;
             } else if (type == "accountBalance") {
-                x += i.total.accountBalance;
+                //x += i.total.accountBalance;
+                x += i.total.output - i.total.input;
             } else {
                 x = 0;
             }
         }
-        return x;
+        return Math.Abs(x);
     }
 
     public NewAccount Save(NewAccount x) {

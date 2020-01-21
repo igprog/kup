@@ -1079,11 +1079,12 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
             //    table.SetWidths(new float[] { 1f, 1f, 4f, 1f, 1f });
             //}
             table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 5 });
-            table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 5 });
+            //table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 5 });
             //if (records.type == g.giroaccount) {
                 table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             //}
             table.AddCell(new PdfPCell(new Phrase("Ukupno:", GetFont(true))) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase(string.Format("{0:N}", records.total.accountBalance), GetFont(true))) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase(string.Format("{0:N}", records.total.output), GetFont(true))) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase(string.Format("{0:N}", records.total.input), GetFont(true))) { Border = PdfPCell.TOP_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             doc.Add(table);
