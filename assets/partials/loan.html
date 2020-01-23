@@ -4,7 +4,7 @@
             <button class="btn btn-outline-success" ng-click="init()" title="Nova pozajmica"><i class="fas fa-file"></i> Nova</button>
         </div>
         <div class="col-sm-6 text-right">
-            <button ng-show="!d.pdf && !g.clearView" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d)" title="PDF">
+            <button ng-show="!d.pdf && !d.loading" class="btn btn-outline-danger" ng-disabled="d.loadingPdf" ng-click="print(d)" title="PDF">
                 <loading-directive btntitle="'PDF'" loadingTitle="'Kreiranje PDF-a...'" value="d.loadingPdf" pdf="true"></loading-directive>
             </button>
             <a ng-if="d.pdf" href="{{d.pdf}}" class="btn btn-outline-success" download ng-click="removePdfLink()" title="PDF"><i class="fas fa-download"></i> Preuzmi PDF</a>

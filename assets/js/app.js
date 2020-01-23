@@ -161,7 +161,6 @@
 	        years: f.years($scope.config.fromYear),
 	        buisinessUnits: [],
 	        recordTypes: f.recordTypes(),
-	        clearView: false,
 	        total: null,
 	        recordslimit: $scope.config.recordslimit
 	    }
@@ -214,7 +213,6 @@
         $scope.g.currTplTitle = title;
         if (f.defined(currTplType)) {   // ***** Only for recapitualtion and fee *****
             $scope.g.currTplType = currTplType;
-            $scope.g.clearView = true;
         }
     }
 
@@ -1077,22 +1075,26 @@
         title: $scope.g.currTplTitle,
         date: null,
         pdf: null,
-        loadingPdf: false
+        loadingPdf: false,
+        loading: false
+
     }
     $scope.d = data;
 
     var load = (x) => {
+        $scope.d.loading = true;
         f.post(service, 'LoadEntry', { month: x.month, year: x.year }).then((d) => {
             $scope.d.records = d;
-            $scope.g.clearView = false;
-            $scope.d.date = f.lastDayInMonth(x.month, x.year);
+            $scope.d.loading = false;
+            $scope.d.date = x.month == 0 ? "01.01." + x.year : f.lastDayInMonth(x.month, x.year);
         });
     }
 
     var loadBalance = (x) => {
+        $scope.d.loading = true;
         f.post(service, 'LoadBalanceEntry', { year: x.year, type: x.type }).then((d) => {
             $scope.d.records = d;
-            $scope.g.clearView = false;
+            $scope.d.loading = false;
         });
     }
 
@@ -1133,16 +1135,18 @@
         type: $scope.g.currTplType,
         title: $scope.g.currTplTitle,
         pdf: null,
-        loadingPdf: false
+        loadingPdf: false,
+        loading: false
     }
     $scope.d = data;
 
     var load = (x) => {
         x.type = $scope.g.currTplType;
         x.title = $scope.g.currTplTitle;
+        $scope.d.loading = true;
         f.post(service, 'LoadBalanceEntry', { year: x.year, type: x.type }).then((d) => {
             $scope.d.records = d;
-            $scope.g.clearView = false;
+            $scope.d.loading = false;
         });
     }
 
@@ -1179,7 +1183,8 @@
         year: $scope.g.year,
         type: $scope.g.currTplType,
         pdf: null,
-        loadingPdf: false
+        loadingPdf: false,
+        loading: false
     }
     $scope.d = data;
 
@@ -1197,13 +1202,14 @@
 
     var load = (x) => {
         x.type = $scope.g.currTplType;
+        $scope.d.loading = true;
         f.post(service, 'Load', { year: x.year, type: x.type }).then((d) => {
             $scope.d.records = d;
             angular.forEach(d.data, function (value, key) {
                 $scope.d.records.data[key].recordDate = new Date(value.recordDate);
                 $scope.d.records.data[key].month = parseInt(value.month);
             });
-            $scope.g.clearView = false;
+            $scope.d.loading = false;
         });
     }
 
@@ -1272,7 +1278,6 @@
         $scope.d.loading = true;
         f.post(service, method, { year: x.year, type: x.type }).then((d) => {
             $scope.d.records = d;
-            $scope.g.clearView = false;
             $scope.d.loading = false;
         });
     }

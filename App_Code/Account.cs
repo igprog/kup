@@ -450,8 +450,10 @@ public class Account : System.Web.Services.WebService {
     public string LoadEntry(int year, int month) {
         try {
             db.Account();
-            string sql = string.Format(@"SELECT SUM(CAST(a.amount AS DECIMAL(10,2))), a.recordType FROM Account a WHERE yr = '{0}' and mo = '{1}'
-                                        GROUP BY a.recordType", year, month);
+            string sql = string.Format(@"SELECT SUM(CAST(a.amount AS DECIMAL(10,2))), a.recordType FROM Account a WHERE yr = '{0}' {1}
+                                        GROUP BY a.recordType"
+                                        , year
+                                        , month == 0 ? "" : string.Format("AND mo = '{0}'" ,month));
             EntryTotal xx = new EntryTotal();
             xx.data = new List<Recapitulation>();
             EntryTotal et = new EntryTotal();
@@ -471,7 +473,12 @@ public class Account : System.Web.Services.WebService {
                     }
                 }
                 connection.Close();
-                et.data = PrepareEntryData(xx.data, year, month);
+                if (month == 0) {
+                    et.data = PrepareEntryData_PS(year);  // Pocetno stanje
+                } else {
+                    et.data = PrepareEntryData(xx.data, year, month);
+                }       
+                
                 et.total = new Recapitulation();
                 et.total.input = et.data.Sum(a => a.input);
                 et.total.output = et.data.Sum(a => a.output);
@@ -491,10 +498,6 @@ public class Account : System.Web.Services.WebService {
             + xx.Where(a => a.recordType == g.userRepayment).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.repayment).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.interest).Sum(a => a.input);
-        //x.output = xx.Where(a => a.recordType == g.monthlyFee).Sum(a => a.input)
-        //    + xx.Where(a => a.recordType == g.userPayment).Sum(a => a.input)
-        //    + xx.Where(a => a.recordType == g.repayment).Sum(a => a.input)
-        //    + xx.Where(a => a.recordType == g.interest).Sum(a => a.input);
         x.input = xx.Where(a => a.recordType == g.withdraw).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.bankFee).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input)
@@ -564,6 +567,55 @@ public class Account : System.Web.Services.WebService {
         }
 
         return xxx;
+    }
+
+    private List<Recapitulation> PrepareEntryData_PS(int year) {
+        List<Recapitulation> xx = new List<Recapitulation>();
+        Recapitulation x = new Recapitulation();
+        x.note = "Žiro račun";
+        double val = GetStartBalance(year, g.giroaccount);
+        if (val > 0) {
+            x.output = val;
+        } else {
+            x.output = Math.Abs(val);
+        }
+        x.account = GetAccountNo(g.giroaccount);
+        xx.Add(x);
+
+        x = new Recapitulation();
+        x.note = "Pozajmice";
+        val = GetLoanStartBalance(null, year);
+        if (val > 0) {
+            x.output = val;
+        } else {
+            x.output = Math.Abs(val);
+        }
+        x.account = GetAccountNo(g.loan);
+        xx.Add(x);
+
+        x = new Recapitulation();
+        x.note = "Ulozi";
+        val = GetStartBalance(year, g.monthlyFee);
+        if (val > 0) {
+            x.input = val;
+        } else {
+            x.output = Math.Abs(val);
+        }
+        x.account = GetAccountNo(g.monthlyFee);
+        xx.Add(x);
+
+        x = new Recapitulation();
+        x.note = "Prihodi";
+        val = GetStartBalance(year, g.income) - GetTotalSaldo(year);
+        if (val > 0) {
+            x.input = val;
+        } else {
+            x.output = Math.Abs(val);
+        }
+        x.account = GetAccountNo(g.income);
+        xx.Add(x);
+
+        return xx;
     }
     /***** Temeljnica *****/
 
@@ -760,7 +812,7 @@ public class Account : System.Web.Services.WebService {
                 x.total = new Recapitulation();
                 x.total.date = "01.01";
                 x.total.note = "Početno stanje";
-                double lastYearBalance = LoadBalanceSql(year-1, g.expense) - LoadBalanceSql(year-1, g.income); // saldo od prethodne godine
+                //double lastYearBalance = LoadBalanceSql(year-1, g.expense) - LoadBalanceSql(year-1, g.income); // saldo od prethodne godine
                 x.total.input = GetStartBalance(year, type) - GetTotalSaldo(year);
                 //x.total.input = GetStartBalance(year, type);
                 xx.data.Add(x);

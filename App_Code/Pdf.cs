@@ -912,9 +912,13 @@ ___________________
             Paragraph p = new Paragraph();
             p.Alignment = Element.ALIGN_CENTER;
             p.Add(new Paragraph(string.Format("Temeljnica za knjiženje br. {0}{1}"
-                                , month
+                                , month == 0 ? "PS" : month.ToString()
                                 , !string.IsNullOrEmpty(type) ? (string.Format("/{0}", typeNo)) : ""), GetFont(12, Font.BOLD)));
-            p.Add(new Paragraph(string.Format("Knjižiti na dan {0}.{1}", g.SetDayMonthDate(g.GetLastDayInMonth(year, month), month), year), GetFont()));
+            if (month == 0) {
+                p.Add(new Paragraph(string.Format("Knjižiti na dan 01.01.{0}", year), GetFont()));
+            } else {
+                p.Add(new Paragraph(string.Format("Knjižiti na dan {0}.{1}", g.SetDayMonthDate(g.GetLastDayInMonth(year, month), month), year), GetFont()));
+            }
             doc.Add(p);
 
             PdfPTable table = new PdfPTable(4);
