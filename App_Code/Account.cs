@@ -1588,17 +1588,6 @@ public class Account : System.Web.Services.WebService {
     }
 
     public NewAccount CheckLoan(NewAccount x, string userId) {
-        //string sql = string.Format(@"
-        //               SELECT l.id, l.loan, l.repayment FROM Loan l
-        //               LEFT OUTER JOIN Account a
-        //               ON l.id = a.loanId AND a.mo = {5} AND a.yr = {1}
-        //               WHERE l.userId = {0} AND (CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)) {4}"
-        //            , userId
-        //            , x.year
-        //            , g.Month(Convert.ToInt32(x.month))
-        //            , g.GetLastDayInMonth(x.year, Convert.ToInt32(x.month))
-        //            , !string.IsNullOrEmpty(x.loanId) ? string.Format(" AND l.id = '{0}'", x.loanId) : ""
-        //         , x.month);
         string sql = string.Format(@"
                     SELECT l.id, l.loan, l.repayment FROM Loan l
                     WHERE l.userId = '{0}' AND (CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)) {4} AND l.isRepaid = 0"
@@ -1683,13 +1672,6 @@ public class Account : System.Web.Services.WebService {
                        , year
                        , g.Month(month)
                        , g.GetLastDayInMonth(year, month));
-        //string sql = string.Format(@"
-        //            SELECT SUM(CAST(l.loan AS decimal)) FROM Loan l
-        //            {0} ((CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)))"
-        //               , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE l.userId = '{0}' AND", userId)
-        //               , year
-        //               , g.Month(month)
-        //               , g.GetLastDayInMonth(year, month));
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -1714,16 +1696,6 @@ public class Account : System.Web.Services.WebService {
                        , x.month
                        , x.year
                        , g.monthlyFee);
-        //string sql = string.Format(@"
-        //            SELECT a.userId, a.amount, u.monthlyFee FROM Account a
-        //            LEFT OUTER JOIN Users u
-        //            ON a.userId = u.id
-        //            WHERE a.userId = '{0}' AND a.mo = '{1}' AND a.yr = '{2}' AND (a.recordType = '{3}' OR a.recordType = '{4}')"
-        //               , userId
-        //               , x.month
-        //               , x.year
-        //               , g.monthlyFee
-        //               , g.terminationWithdraw);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -1746,13 +1718,6 @@ public class Account : System.Web.Services.WebService {
     }
 
     public List<UserPayment> GetUserPayment(NewAccount x, string userId, string type) {
-        //string sql = string.Format(@"
-        //            SELECT a.id, a.recordDate, a.amount, a.note FROM Account a
-        //            WHERE a.userId = '{0}' AND a.mo = '{1}' AND a.yr = '{2}' AND a.recordType = '{3}'"
-        //               , userId
-        //               , x.month
-        //               , x.year
-        //               , g.userPayment);
         string sql = string.Format(@"
                     SELECT a.id, a.recordDate, a.amount, a.note, a.recordType FROM Account a
                     WHERE a.userId = '{0}' AND a.mo = '{1}' AND a.yr = '{2}' AND a.recordType = '{3}'"
@@ -1883,7 +1848,12 @@ public class Account : System.Web.Services.WebService {
 
         startLoan = GetStartLoan(userId);
         if (year.ToString() == g.GetYear(s.Data().startBalance.date)) {
-            x = 0; // loan - repayed + startLoan;  // Samo pocetna godina (2019) ???
+            if (string.IsNullOrEmpty(userId)) {
+                x = 0;  // Samo pocetna godina (2019) ???
+            } else {
+                x = loan - repayed + startLoan;
+            }
+            //x = 0; // loan - repayed + startLoan;  // Samo pocetna godina (2019) ???
         } else {
             x = loan - repayed;
         }

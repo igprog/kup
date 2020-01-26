@@ -54,7 +54,7 @@
                     <tr>
                         <th colspan="3"></th>
                         <th colspan="2" class="text-center border-left">Ulog</th>
-                        <th colspan="2" class="text-center border-left">Pozajmica</th>
+                        <th colspan="3" class="text-center border-left">Pozajmica</th>
                     </tr>
                     <tr class="thead-light">
                         <th>Datum</th>
@@ -64,6 +64,7 @@
                         <th class="text-right">Potražuje ({{config.currency}})</th>
                         <th class="text-right border-left">Duguje ({{config.currency}})</th>
                         <th class="text-right">Potražuje ({{config.currency}})</th>
+                        <th class="text-right">Saldo ({{config.currency}})</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -87,6 +88,7 @@
                             <span ng-if="x.recordType=='withdraw'">{{x.activatedLoan | number:2}}</span>
                         </td>
                         <td class="text-right"><span ng-if="x.recordType=='repayment' || x.recordType == 'userRepayment' || x.recordType=='manipulativeCosts' || x.recordType=='loan'">{{x.amount | number:2}}</span></td>
+                        <td></td>
                     </tr>
                 </tbody>
                 <tfoot ng-if="d.user.records.length>0" class="thead-light">
@@ -96,6 +98,7 @@
                         <th>{{d.user.total.userPaymentWithMonthlyFeeTotal | number:2}}</th>
                         <th class="border-left">{{d.user.total.loanToRepaid | number:2}}</th>
                         <th>{{d.user.total.repaymentTotal | number:2}}</th>
+                        <th>{{d.user.total.totalObligation | number:2}}</th>
                     </tr>
                 </tfoot>
             </table>
