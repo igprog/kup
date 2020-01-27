@@ -63,6 +63,7 @@ public class Account : System.Web.Services.WebService {
         public double restToRepayment;
         public double totalObligation;
         public double terminationWithdraw;
+        public double userPaymentBalance;  // stanje na racunu
         public double activatedLoan;
         public double withdraw;
         public double loanToRepaid;

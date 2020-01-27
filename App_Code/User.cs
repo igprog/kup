@@ -426,6 +426,7 @@ public class User : System.Web.Services.WebService {
             x.total.userRepayment = x.records.Where(r => r.recordType == g.userRepayment).Sum(r => r.amount);
             x.total.repaymentTotal = x.total.repayment + x.total.userRepayment;
             x.total.terminationWithdraw = x.records.Where(r => r.recordType == g.terminationWithdraw).Sum(r => r.amount);
+            x.total.userPaymentBalance = x.total.userPaymentWithMonthlyFeeTotal - x.total.terminationWithdraw;
             x.total.activatedLoan = x.records.Where(r => r.recordType == g.withdraw).Sum(r => r.activatedLoan);
             x.total.loanToRepaid = a.GetLoanStartBalance(id, year) + x.total.activatedLoan;
             x.total.totalObligation = x.total.loanToRepaid - x.total.repaymentTotal;

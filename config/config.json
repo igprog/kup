@@ -1,6 +1,6 @@
 ﻿{
-  "version": "1.7.3",
-  "date":  "22.1.2020",
+  "version": "1.7.5",
+  "date":  "27.1.2020",
   "appname": "KUP - Janaf",
   "apptitle": "Kasa Uzajamne Pomoći",
   "debug": true,
@@ -113,6 +113,7 @@
       "tpl": "entry",
       "title": "Temeljnica",
       "ico": "file-invoice-dollar",
+      "type": "entry",
       "dashboard": {
         "class": "info"
       }

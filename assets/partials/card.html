@@ -53,7 +53,7 @@
                 <thead>
                     <tr>
                         <th colspan="3"></th>
-                        <th colspan="2" class="text-center border-left">Ulog</th>
+                        <th colspan="3" class="text-center border-left">Ulog</th>
                         <th colspan="3" class="text-center border-left">Pozajmica</th>
                     </tr>
                     <tr class="thead-light">
@@ -62,6 +62,7 @@
                         <th>Opis</th>
                         <th class="text-right border-left">Duguje ({{config.currency}})</th>
                         <th class="text-right">Potražuje ({{config.currency}})</th>
+                        <th class="text-right">Saldo ({{config.currency}})</th>
                         <th class="text-right border-left">Duguje ({{config.currency}})</th>
                         <th class="text-right">Potražuje ({{config.currency}})</th>
                         <th class="text-right">Saldo ({{config.currency}})</th>
@@ -74,8 +75,10 @@
                         <td>{{d.user.records[0].note}}</td>
                         <td class="text-right border-left"></td>
                         <td class="text-right">{{d.user.records[0].monthlyFeeStartBalance | number:2}}</td>
+                        <td></td>
                         <td class="text-right border-left">{{d.user.records[0].loanStartBalance | number:2}}</td>
                         <td class="text-right"></td>
+                        <td></td>
                     </tr>
                     <tr ng-if="x.lastDayInMonth!=='01.01'" ng-repeat="x in d.user.records track by $index">
                         <td>{{x.lastDayInMonth}}</td>
@@ -83,6 +86,7 @@
                         <td >{{x.note}}</td>
                         <td class="text-right border-left"><span ng-if="x.recordType=='terminationWithdraw'">{{x.amount | number:2}}</span></td>
                         <td class="text-right"><span ng-if="x.recordType=='monthlyFee'||x.recordType=='userPayment'">{{x.amount | number:2}}</span></td>
+                        <td></td>
                         <td class="text-right border-left">
                             <!--<span ng-if="x.recordType=='repayment'||x.recordType=='userRepayment'"><em class="text-muted small">{{x.restToRepayment | number:2}}</em></span>-->
                             <span ng-if="x.recordType=='withdraw'">{{x.activatedLoan | number:2}}</span>
@@ -96,6 +100,7 @@
                         <th colspan="3">Ukupno:</th>
                         <th class="border-left">{{d.user.total.terminationWithdraw | number:2}}</th>
                         <th>{{d.user.total.userPaymentWithMonthlyFeeTotal | number:2}}</th>
+                        <th>{{d.user.total.userPaymentBalance | number:2}}</th>
                         <th class="border-left">{{d.user.total.loanToRepaid | number:2}}</th>
                         <th>{{d.user.total.repaymentTotal | number:2}}</th>
                         <th>{{d.user.total.totalObligation | number:2}}</th>
