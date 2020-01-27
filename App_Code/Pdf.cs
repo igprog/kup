@@ -1125,11 +1125,11 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
         table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.NO_BORDER, Padding = 5, MinimumHeight = 20 });
         table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.NO_BORDER, Padding = 5, MinimumHeight = 20 });
         table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.NO_BORDER, Padding = 5, MinimumHeight = 20 });
-        table.AddCell(new PdfPCell(new Phrase("Ulog", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 5, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
         table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 5, MinimumHeight = 20 });
+        table.AddCell(new PdfPCell(new Phrase("Ulog", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 5, MinimumHeight = 20 });
         table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 5, MinimumHeight = 20 });
-        table.AddCell(new PdfPCell(new Phrase("Pozajmica", GetFont())) { Border = PdfPCell.BOTTOM_BORDER | PdfPCell.LEFT_BORDER, Padding = 5, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
-        table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 5, MinimumHeight = 20 });
+        table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER | PdfPCell.LEFT_BORDER, Padding = 5, MinimumHeight = 20 });
+        table.AddCell(new PdfPCell(new Phrase("Pozajmica", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 5, MinimumHeight = 20 });
         table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 5, MinimumHeight = 20 });
         doc.Add(table);
 
