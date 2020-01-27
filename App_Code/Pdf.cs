@@ -269,7 +269,7 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
     [WebMethod]
     public string Card(int year, User.NewUser user) {
         try {
-            PrintDoc pd = PreparePrintDoc(false);
+            PrintDoc pd = PreparePrintDoc(Orientation());
             Document doc = pd.doc;
             doc.Open();
             AppendHeader(doc);
@@ -298,9 +298,9 @@ Visinu tražene pozajmice odobrio je UPRAVNI ODBOR KUP-a na svojoj sjednici od _
                 GetFont(8, Font.ITALIC).SetColor(255, 122, 56);
                 Rectangle ps_ = PageSize.A4;
                 doc = new Document();
-                bool rotate = false;
+                bool rotate = Orientation();
                 if (rotate) {
-                    doc = new Document(); // new Document(ps_.Rotate());
+                    doc = new Document(ps_.Rotate());
                 }
 
                 string fileName = Guid.NewGuid().ToString();
