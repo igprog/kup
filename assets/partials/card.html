@@ -1,6 +1,6 @@
 ﻿<div ng-controller="userCtrl">
     <div class="row">
-        <div class="col-lg-3">
+        <div class="col-lg-4">
             <form class="form-inline">
                 <div class="form-group">
                     <select ng-model="d.buisinessUnitCode" class="form-control mb-2 mr-sm-2" name="buissinesUnitCode" ng-change="load(d)">
@@ -14,7 +14,24 @@
                 </div>
             </form>
         </div>
-        <div class="col-lg-9 text-right">
+        <div class="col-lg-5">
+            <button class="btn btn-outline-info" ng-click="showPrintCards()"><i class="fa fa-print"></i> Ispis kartica</button>
+            <div ng-if="showPrint" class="p-2">
+                <div class="shadow p-3">
+                    <label>Folder:</label>
+                    <div class="input-group mb-3">
+                        <input ng-model="pdfDir" class="form-control" />
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-info input-group-text" ng-click="printAllCards(pdfDir)"><i class="fa fa-print"></i> <span class="pl-1">Ispiši kartice</span></button>
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>{{printAllCardsRes}}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 text-right">
             <button class="btn btn-outline-success" ng-disabled="loadingZip==true" ng-click="createAllCards(d)">
                 <loading-directive btntitle="'Spremi sve katrice u ZIP'" loadingtitle="'Kreiranje Kartica...'" value="loadingZip" pdf="true"></loading-directive>
             </button>

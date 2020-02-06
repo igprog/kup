@@ -6,11 +6,12 @@ using System.Web.Services;
 using System.IO;
 using Newtonsoft.Json;
 using Igprog;
+//using System.Diagnostics;
 
 /// <summary>
 /// Settings
 /// </summary>
-[WebService(Namespace = "http://janaf.hr/")]
+[WebService(Namespace = "http://igprog.hr/kup/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
 public class Settings : System.Web.Services.WebService {
@@ -28,6 +29,7 @@ public class Settings : System.Web.Services.WebService {
         public StartBalance startBalance;
         public StartBalance1 startBalance1;
         public PrintSettings printSettings;
+        public string acrobatReaderDir;
         public string backupFolder;
     }
 

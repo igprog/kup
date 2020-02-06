@@ -12,7 +12,7 @@ using Igprog;
 /// <summary>
 /// Loan
 /// </summary>
-[WebService(Namespace = "http://janaf.hr/")]
+[WebService(Namespace = "http://igprog.hr/kup/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
 public class Loan : System.Web.Services.WebService {

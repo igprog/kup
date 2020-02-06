@@ -523,7 +523,7 @@
         $scope.d.limit = $scope.d.limit + x;
     }
 
-    //********* Save all cards - ZIP *********
+    /********* Save all cards - ZIP *********/
     $scope.zipFileName = null;
     $scope.loadingZip = false;
     $scope.createAllCards = (d) => {
@@ -533,7 +533,22 @@
             $scope.loadingZip = false;
         });
     }
-    //********* Save all cards - ZIP *********
+    /********* Save all cards - ZIP *********/
+
+    /********* Prina all cards **********/
+    $scope.showPrint = false;
+    $scope.pdfDir = null;
+    $scope.printAllCardsRes = null;
+    $scope.showPrintCards = () => {
+        $scope.showPrint = !$scope.showPrint;
+    }
+    $scope.printAllCards = (x) => {
+        f.post('Pdf', 'PrintAllCards', { dir: x }).then((d) => {
+            $scope.printAllCardsRes = d;
+        });
+    }
+    /********* Prina all cards **********/
+
 
 }])
 

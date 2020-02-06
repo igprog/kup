@@ -14,7 +14,7 @@ using Igprog;
 /// <summary>
 /// User
 /// </summary>
-[WebService(Namespace = "http://janaf.hr/")]
+[WebService(Namespace = "http://igprog.hr/kup/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
 public class User : System.Web.Services.WebService {

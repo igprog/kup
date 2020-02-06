@@ -9,12 +9,13 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Text;
 using System.Configuration;
+using System.Diagnostics;
 using Igprog;
 
 /// <summary>
 /// Pdf
 /// </summary>
-[WebService(Namespace = "http://janaf.hr/")]
+[WebService(Namespace = "http://igprog.hr/kup/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
 public class Pdf : System.Web.Services.WebService {
@@ -1100,6 +1101,56 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
             return e.Message;
         }
     }
+
+    #region PrintAllCards
+    [WebMethod]
+    public string PrintAllCards(string dir) {
+        try {
+            string[] files = Directory.GetFiles(dir);
+            foreach (string file in files) {
+                PrintPDFs(file);
+            }
+            return JsonConvert.SerializeObject("Ispis završen", Formatting.Indented);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+        }
+    }
+
+    public bool PrintPDFs(string file) {
+        try {
+            Process proc = new Process();
+            proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            proc.StartInfo.Verb = "print";
+            proc.StartInfo.FileName = string.Format(@"{0}\AcroRd32.exe", s.Data().acrobatReaderDir);
+            proc.StartInfo.Arguments = String.Format(@"/p /h {0}", file);
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.CreateNoWindow = true;
+
+            proc.Start();
+            proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            if (proc.HasExited == false) {
+                proc.WaitForExit(10000);
+            }
+
+            proc.EnableRaisingEvents = true;
+            proc.Close();
+            KillAdobe("AcroRd32");
+            return true;
+        } catch (Exception e) {
+            string msg = e.Message;
+            return false;
+        }
+    }
+
+    private static bool KillAdobe(string name) {
+        foreach (Process clsProcess in Process.GetProcesses().Where(
+                     clsProcess => clsProcess.ProcessName.StartsWith(name))) {
+            clsProcess.Kill();
+            return true;
+        }
+        return false;
+    }
+    #endregion PrintAllCard
 
     public void CreateCard(Document doc, User.NewUser user, int year) {
         Paragraph p = new Paragraph();

@@ -12,7 +12,7 @@ using Igprog;
 /// <summary>
 /// BuisinessUnit
 /// </summary>
-[WebService(Namespace = "http://janaf.hr/")]
+[WebService(Namespace = "http://igprog.hr/kup/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 [System.Web.Script.Services.ScriptService]
 public class BuisinessUnit : System.Web.Services.WebService {
