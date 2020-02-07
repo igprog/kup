@@ -16,19 +16,19 @@
                 <div class="card-body">
                     <form>
                         <div class="form-group">
-                            <label for="loanDate">Datum:</label>
-                            <input ng-model="d.loan.loanDate" type="date" onkeydown="return false" class="form-control" style="width:190px" />
-                        </div>
-                        <div class="form-group">
                             <label for="userId">Korisnik:</label>
                             <select ng-model="d.loan.user.id" class="form-control" name="userId" ng-click="getUser(d.loan.user.id)">
                                 <option ng-repeat="x in d.users" value="{{x.id}}">{{x.lastName}} {{x.firstName}} ({{x.id}})</option>
                             </select>
                         </div>
                         <div>
-                            <label for="restToRepayment">Dug: {{d.loan.user.restToRepayment | number:2}} kn</label>
+                            <label for="restToRepayment" class="{{d.loan.user.restToRepayment>0?'text-danger':''}}">Dug: {{d.loan.user.restToRepayment | number:2}} kn</label>
                         </div>
                         <hr />
+                        <div class="form-group">
+                            <label for="loanDate">Datum:</label>
+                            <input ng-model="d.loan.loanDate" type="date" onkeydown="return false" class="form-control" style="width:190px" />
+                        </div>
                         <div class="form-group">
                             <label for="loan">Pozajmica:</label>
                             <input ng-model="d.loan.loan" type="text" class="form-control" name="loan" ng-change="calculate(d.loan)" allow-only-numbers>
