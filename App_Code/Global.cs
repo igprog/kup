@@ -159,10 +159,10 @@ namespace Igprog {
 
         public string Zip(string fileName) {
             try {
-                string[] filePaths = Directory.GetFiles(HttpContext.Current.Server.MapPath("~/upload/pdf/temp/cards/"));
+                string[] files = Directory.GetFiles(HttpContext.Current.Server.MapPath("~/upload/pdf/temp/cards/"));
                 using (ZipFile zip = new ZipFile()) {
-                    foreach (string filePath in filePaths) {
-                        zip.AddFile(filePath);
+                    foreach (string file in files) {
+                        zip.AddFile(file);
                     }
                     zip.Save(HttpContext.Current.Server.MapPath(string.Format("~/upload/pdf/temp/{0}.zip", fileName)));
                 }

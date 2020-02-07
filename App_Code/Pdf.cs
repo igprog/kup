@@ -1103,10 +1103,12 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
     }
 
     #region PrintAllCards
+    //TODO. Ne radi na serveru
     [WebMethod]
     public string PrintAllCards(string dir) {
         try {
-            string[] files = Directory.GetFiles(dir);
+            //string[] files = Directory.GetFiles(dir);
+            string[] files = Directory.GetFiles(HttpContext.Current.Server.MapPath("~/upload/pdf/temp/cards/"));
             foreach (string file in files) {
                 PrintPDFs(file);
             }
@@ -1169,7 +1171,6 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
 
         PdfPTable table = new PdfPTable(colNo);
         //table.HeaderRows = 1;
-
 
         table.WidthPercentage = 100f;
         table.SetWidths(cellWidths);

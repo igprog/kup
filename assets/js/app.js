@@ -1,4 +1,8 @@
-﻿angular.module('app', [])
+﻿/*!
+app.js
+(c) 2019 - 2020 IG PROG, www.igprog.hr
+*/
+angular.module('app', [])
 .config(['$httpProvider', ($httpProvider) => {
     //*******************disable catche**********************
         if (!$httpProvider.defaults.headers.get) {
