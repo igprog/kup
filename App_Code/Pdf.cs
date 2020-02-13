@@ -879,7 +879,7 @@ ___________________
             table.WidthPercentage = 100f;
             table.SetWidths(new float[] { 1f, 2f, 1f, 1f, 1f });
             table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
-            table.AddCell(new PdfPCell(new Phrase(string.IsNullOrEmpty(buisinessUnitCode) ? "JANAF - ukupno obustave:" : "Ukupno:", GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+            table.AddCell(new PdfPCell(new Phrase(string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("{0} - ukupno obustave:", g.companyName) : "Ukupno:", GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase(g.Currency(records.total.monthlyFee), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase(g.Currency(records.total.currRepayment), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
             table.AddCell(new PdfPCell(new Phrase(g.Currency(records.total.totalObligation), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
@@ -1102,57 +1102,57 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
         }
     }
 
-    #region PrintAllCards
-    //TODO. Ne radi na serveru
-    [WebMethod]
-    public string PrintAllCards(string dir) {
-        try {
-            //string[] files = Directory.GetFiles(dir);
-            string[] files = Directory.GetFiles(HttpContext.Current.Server.MapPath("~/upload/pdf/temp/cards/"));
-            foreach (string file in files) {
-                PrintPDFs(file);
-            }
-            return JsonConvert.SerializeObject("Ispis završen", Formatting.Indented);
-        } catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
-        }
-    }
+    //#region PrintAllCards
+    ////TODO. Ne radi na serveru
+    //[WebMethod]
+    //public string PrintAllCards(string dir) {
+    //    try {
+    //        //string[] files = Directory.GetFiles(dir);
+    //        string[] files = Directory.GetFiles(HttpContext.Current.Server.MapPath("~/upload/pdf/temp/cards/"));
+    //        foreach (string file in files) {
+    //            PrintPDFs(file);
+    //        }
+    //        return JsonConvert.SerializeObject("Ispis završen", Formatting.Indented);
+    //    } catch (Exception e) {
+    //        return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+    //    }
+    //}
 
-    public bool PrintPDFs(string file) {
-        try {
-            Process proc = new Process();
-            proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            proc.StartInfo.Verb = "print";
-            proc.StartInfo.FileName = string.Format(@"{0}\AcroRd32.exe", s.Data().acrobatReaderDir);
-            proc.StartInfo.Arguments = String.Format(@"/p /h {0}", file);
-            proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.CreateNoWindow = true;
+    //public bool PrintPDFs(string file) {
+    //    try {
+    //        Process proc = new Process();
+    //        proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+    //        proc.StartInfo.Verb = "print";
+    //        proc.StartInfo.FileName = string.Format(@"{0}\AcroRd32.exe", s.Data().acrobatReaderDir);
+    //        proc.StartInfo.Arguments = String.Format(@"/p /h {0}", file);
+    //        proc.StartInfo.UseShellExecute = false;
+    //        proc.StartInfo.CreateNoWindow = true;
 
-            proc.Start();
-            proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            if (proc.HasExited == false) {
-                proc.WaitForExit(10000);
-            }
+    //        proc.Start();
+    //        proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+    //        if (proc.HasExited == false) {
+    //            proc.WaitForExit(10000);
+    //        }
 
-            proc.EnableRaisingEvents = true;
-            proc.Close();
-            KillAdobe("AcroRd32");
-            return true;
-        } catch (Exception e) {
-            string msg = e.Message;
-            return false;
-        }
-    }
+    //        proc.EnableRaisingEvents = true;
+    //        proc.Close();
+    //        KillAdobe("AcroRd32");
+    //        return true;
+    //    } catch (Exception e) {
+    //        string msg = e.Message;
+    //        return false;
+    //    }
+    //}
 
-    private static bool KillAdobe(string name) {
-        foreach (Process clsProcess in Process.GetProcesses().Where(
-                     clsProcess => clsProcess.ProcessName.StartsWith(name))) {
-            clsProcess.Kill();
-            return true;
-        }
-        return false;
-    }
-    #endregion PrintAllCard
+    //private static bool KillAdobe(string name) {
+    //    foreach (Process clsProcess in Process.GetProcesses().Where(
+    //                 clsProcess => clsProcess.ProcessName.StartsWith(name))) {
+    //        clsProcess.Kill();
+    //        return true;
+    //    }
+    //    return false;
+    //}
+    //#endregion PrintAllCard
 
     public void CreateCard(Document doc, User.NewUser user, int year) {
         Paragraph p = new Paragraph();

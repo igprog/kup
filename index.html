@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
-<html>
+<html ng-app="app" ng-controller="appCtrl">
 <head>
-    <title>KUP JANAF</title>
+    <title ng-bind="config.appname"></title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="./assets/css/vendor/bootstrap.min.css">
@@ -17,17 +17,17 @@
     <link rel="stylesheet" href="./assets/css/style.css">
     <link href='https://fonts.googleapis.com/css?family=Encode Sans Expanded' rel='stylesheet'>
 </head>
-<body ng-app="app" ng-controller="appCtrl" ng-cloak>
+<body >
     <nav class="navbar navbar-expand-md navbar-dark bg-primary">
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <a class="navbar-brand" href="#">
             <i class="fa fa-piggy-bank fa-2x"></i>
-            <span class="menu-collapsed">KUP JANAF</span>
+            <span class="menu-collapsed text-uppercase" ng-cloak>{{config.appname}}</span>
         </a>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav ml-auto">
+            <ul class="navbar-nav ml-auto" ng-cloak>
                 <li class="nav-item">
                     <a href="#" class="nav-link" data-toggle="modal" data-target="#infoModal"><i class="fa fa-info"></i> Info</a>
                 </li>
@@ -110,11 +110,11 @@
         </div>
     </nav>
     
-    <div ng-if="!d.isLogin">
+    <div ng-if="!d.isLogin" ng-cloak>
         <ng-include src="'./assets/partials/login.html'"></ng-include>
     </div>
 
-    <div ng-if="d.isLogin" class="row" id="body-row">
+    <div ng-if="d.isLogin" class="row" id="body-row" ng-cloak>
         <ng-include src="'./assets/partials/sidebar.html'"></ng-include>
         <div class="col bg-light">
             <div style="min-height:50px">

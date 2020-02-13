@@ -61,7 +61,7 @@
                 <tfoot ng-if="d.records.data.length>0" class="thead-light">
                     <tr class="text-right">
                         <th colspan="2">
-                            <span ng-show="d.buisinessUnitCode==null || d.buisinessUnitCode==''">JANAF - ukupno obustave:</span>
+                            <span ng-show="d.buisinessUnitCode==null || d.buisinessUnitCode==''">{{config.appname}} - ukupno obustave:</span>
                             <span ng-show="d.buisinessUnitCode!=null && d.buisinessUnitCode!=''">Ukupno:</span>
                         </th>
                         <th>{{d.records.total.monthlyFee | number:2}}</th>

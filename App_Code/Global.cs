@@ -18,6 +18,7 @@ namespace Igprog {
         }
 
         public string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
+        public string companyName = ConfigurationManager.AppSettings["companyName"];
 
         #region RecordType
         public string repayment = "repayment";
@@ -39,7 +40,7 @@ namespace Igprog {
         public string entry_I = "entry_I";
         public string entry_II = "entry_II";
         public string entry_III = "entry_III";
-        public string allUnitsTitle = "JANAF ukupno";
+        public string allUnitsTitle = string.Format("{0} ukupno", ConfigurationManager.AppSettings["companyName"]);
 
         #region Date
         public string ReffDate(int? month, int year) {

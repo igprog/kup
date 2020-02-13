@@ -29,7 +29,7 @@ public class Settings : System.Web.Services.WebService {
         public StartBalance startBalance;
         public StartBalance1 startBalance1;
         public PrintSettings printSettings;
-        public string acrobatReaderDir;
+        //public string acrobatReaderDir;
         public string backupFolder;
     }
 
