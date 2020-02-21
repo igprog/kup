@@ -80,3 +80,7 @@
 .border-left {
     border-left:1px solid #000;
 }
+
+.logo {
+    height: 30px;
+}
