@@ -53,9 +53,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="x in d.records.data | limitTo:d.limit track by $index">
+                    <tr ng-repeat="x in d.records.data | limitTo:d.limit track by $index" class="{{x.user.isActive==0?'text-muted small':''}}">
                         <td>{{x.user.id}}</td>
-                        <td>{{x.user.lastName}} {{x.user.firstName}}</td>
+                        <td>{{x.user.lastName}} {{x.user.firstName}} <span ng-if="x.user.isActive==0"><em>(Neaktivan)</em></span></td>
                         <td class="text-right">{{x.user.monthlyFee | number:2}}<button class="btn btn-outline-primary ml-2" ng-click="setMonthlyFee(x, $index)"><i class="fa fa-arrow-circle-right"></i></button></td>
                         <td>
                             <div class="input-group">

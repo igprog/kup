@@ -24,7 +24,7 @@
     <div ng-if="!d.loading" class="table-responsive">
         <table class="table">
             <thead>
-                <tr>
+                <tr class="bg-light">
                     <th>Mat. br.</th>
                     <th>Korisnik</th>
                     <th class="text-right">Odobrena pozajmica ({{config.currency}})</th>
@@ -52,27 +52,29 @@
                     <th>{{d.records.loans.total.lastLoanToRepaid | number:2}}</th>
                     <th>{{d.records.loans.total.withdraw | number:2}}</th>
                 </tr>
-                <tr style="height:50px">
-                    <td colspan="7"></td>
+                <tr ng-if="d.records.terminationWithdraw.length>0" style="height:50px">
+                    <td colspan="7"><strong>Isplata kod iščlanjenja:</strong></td>
                 </tr>
                 <tr ng-if="d.records.terminationWithdraw.length>0" class="bg-light">
-                    <th></th>
-                    <th>Isplata kod iščlanjenja:</th>
-                    <th colspan="5"></th>
+                    <th>Mat. br.</th>
+                    <th>Korisnik</th>
+                    <th class="text-right">Uplačeni ulog ({{config.currency}})</th>
+                    <th class="text-right"></th>
+                    <th class="text-right"></th>
+                    <th class="text-right">Neotplaćena pozajmica ({{config.currency}})</th>
+                    <th class="text-right">Za isplatu ({{config.currency}})</th>
                 </tr>
                 <tr ng-if="d.records.terminationWithdraw.length>0" ng-repeat="x in d.records.terminationWithdraw track by $index">
                     <td></td>
-                    <td>{{x.title}}</td>
-                    <td class="text-right">{{x.val | number:2}}</td>
+                    <td>{{x.user.lastName}} {{x.user.firstName}}</td>
+                    <td class="text-right">{{x.userPayment | number:2}}</td>
                     <td class="text-right"></td>
-                    <td class="text-right">{{x.val | number:2}}</td>
-                    <td class="text-right"></td>
-                    <td class="text-right">{{x.val | number:2}}</td>
+                    <td class="text-right">{{x.userPayment | number:2}}</td>
+                    <td class="text-right">{{x.debt | number:2}}</td>
+                    <td class="text-right">{{x.terminationWithdraw | number:2}}</td>
                 </tr>
-                <tr ng-if="d.records.bankFee.length>0" class="bg-light">
-                    <th></th>
-                    <th>Troškovi održavanja računa:</th>
-                    <th colspan="5"></th>
+                <tr ng-if="d.records.bankFee.length>0" >
+                    <td colspan="7"><strong>Troškovi održavanja računa:</strong></td>
                 </tr>
                 <tr ng-if="d.records.bankFee.length>0" ng-repeat="x in d.records.bankFee track by $index">
                     <td></td>
@@ -80,10 +82,8 @@
                     <td colspan="4"></td>
                     <td class="text-right">{{x.val | number:2}}</td>
                 </tr>
-                <tr ng-if="d.records.otherFee.length>0" class="bg-light">
-                    <th></th>
-                    <th>Razni materijalni troškovi:</th>
-                    <th colspan="5"></th>
+                <tr ng-if="d.records.otherFee.length>0">
+                    <td colspan="7"><strong>Razni materijalni troškovi:</strong></td>
                 </tr>
                 <tr ng-if="d.records.otherFee.length>0" ng-repeat="x in d.records.otherFee track by $index">
                     <td></td>

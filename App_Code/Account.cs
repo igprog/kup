@@ -254,7 +254,7 @@ public class Account : System.Web.Services.WebService {
     public string GetMonthlyFee(int month, int year, string buisinessUnitCode, string search) {
         try {
             User u = new User();
-            List<User.NewUser> users = u.GetMonthlyFeeUsers(buisinessUnitCode, search, true, g.ReffDate(month, year));
+            List<User.NewUser> users = u.GetMonthlyFeeUsers(buisinessUnitCode, search, false, g.ReffDate(month, year));
             db.Account();
             Accounts xx = new Accounts();
             xx.data = new List<NewAccount>();
@@ -807,6 +807,7 @@ public class Account : System.Web.Services.WebService {
             RecapMonthlyTotal x = new RecapMonthlyTotal();
             xx.data = new List<RecapMonthlyTotal>();
             double balance = LoadBalanceSql(year, g.expense) - LoadBalanceSql(year, g.income);   // saldo
+            int nowYear = DateTime.Now.Year;
 
             if (type == g.income) {
                 x.month = "PS";
@@ -817,14 +818,18 @@ public class Account : System.Web.Services.WebService {
                 x.total.input = GetStartBalance(year, type) - GetTotalSaldo(year);
                 //x.total.input = GetStartBalance(year, type);
                 xx.data.Add(x);
-                x = new RecapMonthlyTotal();
-                x.month = "12";
-                x.total = new Recapitulation();
-                x.total.date = "31.12";
-                x.total.note = string.Format("Donos viška prihoda za {0} g.", year);
-                x.total.output = balance;
-                //x.total.input = LoadBalanceSql(year, type);
-                xx.data.Add(x);
+
+                if (nowYear > year) {
+                    x = new RecapMonthlyTotal();
+                    x.month = "12";
+                    x.total = new Recapitulation();
+                    x.total.date = "31.12";
+                    x.total.note = string.Format("Donos viška prihoda za {0} g.", year);
+                    x.total.output = balance;
+                    //x.total.input = LoadBalanceSql(year, type);
+                    xx.data.Add(x);
+                }
+
             } else if (type == g.expense) {
                 x.month = "12";
                 x.total = new Recapitulation();
@@ -834,15 +839,18 @@ public class Account : System.Web.Services.WebService {
                     x.total.output = balance;
                 }
                 xx.data.Add(x);
-                x = new RecapMonthlyTotal();
-                x.month = "12";
-                x.total = new Recapitulation();
-                x.total.date = "31.12";
-                x.total.note = string.Format("Zatvaranje kartice i prijenos na {0}", s.Data().account.income);  // (konto 9320)
-                if (balance > 0) {
-                    x.total.input = balance;
+
+                if (nowYear > year) {
+                    x = new RecapMonthlyTotal();
+                    x.month = "12";
+                    x.total = new Recapitulation();
+                    x.total.date = "31.12";
+                    x.total.note = string.Format("Zatvaranje kartice i prijenos na {0}", s.Data().account.income);  // (konto 9320)
+                    if (balance > 0) {
+                        x.total.input = balance;
+                    }
+                    xx.data.Add(x);
                 }
-                xx.data.Add(x);
             } else if (type == g.incomeExpenseDiff) {
                 double input = LoadBalanceSql(year, g.income);
                 double output = LoadBalanceSql(year, g.expense);
@@ -993,11 +1001,11 @@ public class Account : System.Web.Services.WebService {
 
     public class MonthlyPayment {
         public Loan.Loans loans;
-        public List<Fee> terminationWithdraw;  //TODO: napraviti listu (dodati ulog, duguje, za isplatu)
+        public List<Fee> terminationWithdraw_;  //TODO: napraviti listu (dodati ulog, duguje, za isplatu)
+        public List<TermWithdraw> terminationWithdraw;
         public List<Fee> otherFee;
         public List<Fee> bankFee;
         public double total;
-
     }
 
     public class Fee {
@@ -1005,16 +1013,26 @@ public class Account : System.Web.Services.WebService {
         public double val;
     }
 
+
+    public class TermWithdraw {
+        public User.NewUser user;
+        public double userPayment;
+        public double debt;
+        public double terminationWithdraw;
+    }
+
+
+
     [WebMethod]
     public string LoadMonthlyPayment(int? month, int year) {
         try {
             MonthlyPayment x = new MonthlyPayment();
             Loan l = new Loan();
             x.loans = l.LoadData(month, year, null, null);
-            x.terminationWithdraw = GetMonthlyPayment(month, year, g.terminationWithdraw);
+            x.terminationWithdraw = GetTerminationWithdraw(month, year);
             x.bankFee = GetMonthlyPayment(month, year, g.bankFee);
             x.otherFee = GetMonthlyPayment(month, year, g.otherFee);
-            x.total = x.loans.total.withdraw + x.terminationWithdraw.Sum(a => a.val) + x.bankFee.Sum(a => a.val) + x.otherFee.Sum(a => a.val);
+            x.total = x.loans.total.withdraw + x.terminationWithdraw.Sum(a => a.terminationWithdraw) + x.bankFee.Sum(a => a.val) + x.otherFee.Sum(a => a.val);
             return JsonConvert.SerializeObject(x, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
@@ -1057,7 +1075,54 @@ public class Account : System.Web.Services.WebService {
         return xx;
     }
 
+    public List<TermWithdraw> GetTerminationWithdraw(int? month, int year) {
+        List<TermWithdraw> xx = new List<TermWithdraw>();
+        string sql = string.Format(@"SELECT u.id, u.firstName, u.lastName, a.amount FROM Account a
+                                LEFT OUTER JOIN Users u ON a.userId = u.id
+                                WHERE a.mo = '{0}' AND a.yr = '{1}' AND a.recordType = '{2}'"
+                                , month, year, g.terminationWithdraw);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        TermWithdraw x = new TermWithdraw();
+                        x.user = new User.NewUser();
+                        x.user.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
+                        x.user.firstName = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
+                        x.user.lastName = reader.GetValue(2) == DBNull.Value ? null : reader.GetString(2);
+                        x.terminationWithdraw = reader.GetValue(3) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(3));
+                        xx.Add(x);
+                    }
+                }
+            }
+            connection.Close();
 
+            foreach (var t in xx) {
+                t.userPayment = GetUserPaymentTotal(t.user.id);
+                t.debt = t.userPayment - t.terminationWithdraw;
+            }
+        }
+        return xx;
+    }
+
+    private double GetUserPaymentTotal(string id) {
+        double x = 0;
+        string sql = string.Format(@"SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE a.userId = '{0}' AND (a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}')"
+                                , id , g.monthlyFee, g.userPayment, g.userRepayment);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+            return x;
+        }
+    }
 
     private double GetTotalVal(string type, int? year) {
         double x = 0;
