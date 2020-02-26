@@ -200,11 +200,13 @@ public class User : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
-            if(x.isActive == 0) {
+            if (x.isActive == 0) {
+
                 if (x.restToRepayment > 0) {
                     SaveTerminationRepayment(x);  // Otplata ostatka pozajmice sa ulogom
-                    SubtractUserPayment(x);   // Oduzimanje uloga za iznos otplate duga pozajmice
+                    //SubtractUserPayment(x);   // Oduzimanje uloga za iznos otplate duga pozajmice
                 }
+
                 SaveTerminationWithdraw(x);
             }
             return JsonConvert.SerializeObject("Spremljeno", Formatting.None);
@@ -234,7 +236,7 @@ public class User : System.Web.Services.WebService {
                                             VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}');
                                             UPDATE Loan SET isRepaid = 1 WHERE id = '{7}';
                                         END
-                                    COMMIT TRAN", Guid.NewGuid().ToString(), x.id, x.restToRepayment, x.terminationDate, g.GetMonth(x.terminationDate), g.GetYear(x.terminationDate), g.repayment, x.activeLoanId, "Dug odbijen od uloga");
+                                    COMMIT TRAN", Guid.NewGuid().ToString(), x.id, x.restToRepayment, x.terminationDate, g.GetMonth(x.terminationDate), g.GetYear(x.terminationDate), g.terminationRepayment, x.activeLoanId, "Dug odbijen od uloga");
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -244,19 +246,24 @@ public class User : System.Web.Services.WebService {
         }
     }
 
-    private void SubtractUserPayment(NewUser x) {
-        string sql = string.Format(@"BEGIN TRAN                                    
-                                        INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
-                                        VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
-                                    COMMIT TRAN", Guid.NewGuid().ToString(), x.id, -x.restToRepayment, x.terminationDate, g.GetMonth(x.terminationDate), g.GetYear(x.terminationDate), g.userPayment, null, "Odbijeno od uloga za otplatu duga");
-        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-            connection.Open();
-            using (SqlCommand command = new SqlCommand(sql, connection)) {
-                command.ExecuteNonQuery();
-            }
-            connection.Close();
-        }
-    }
+    //private void SubtractUserPayment(NewUser x) {
+    //    //string sql = string.Format(@"BEGIN TRAN                                    
+    //    //                                INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+    //    //                                VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
+    //    //                            COMMIT TRAN", Guid.NewGuid().ToString(), x.id, -x.restToRepayment, x.terminationDate, g.GetMonth(x.terminationDate), g.GetYear(x.terminationDate), g.userPayment, null, "Odbijeno od uloga za otplatu duga");
+    //    string sql = string.Format(@"BEGIN TRAN                                    
+    //                                    INSERT INTO Account (id, userId, amount, recordDate, mo, yr, recordType, loanId, note)
+    //                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')
+    //                                COMMIT TRAN", Guid.NewGuid().ToString(), x.id, x.restToRepayment, x.terminationDate, g.GetMonth(x.terminationDate), g.GetYear(x.terminationDate), g.terminationRepayment, null, "Odbijeno od uloga za otplatu duga kod isclanjenja");
+    //    using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+    //        connection.Open();
+    //        using (SqlCommand command = new SqlCommand(sql, connection)) {
+    //            command.ExecuteNonQuery();
+    //        }
+    //        connection.Close();
+    //    }
+    //}
+
 
     [WebMethod]
     public string Get(string id, int? year) {
@@ -404,14 +411,15 @@ public class User : System.Web.Services.WebService {
             }
             connection.Close();
         }
-        x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment) - GetAmount(id, g.userRepayment);
+        //x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment) - GetAmount(id, g.userRepayment);
+        x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment) - GetAmount(id, g.userRepayment) - GetAmount(id, g.terminationRepayment);
         x.totalMebershipFees = GetAmount(id, g.monthlyFee);
         x.totalUserPayment = GetAmount(id, g.userPayment);
         x.totalWithdrawn = GetAmount(id, g.terminationWithdraw);
         x.totalMebershipFeesWithUserPayment = x.totalMebershipFees + x.totalUserPayment;
         DateTime now = DateTime.UtcNow;
-        //x.totalMebershipFeesRequired = a.GetMonthlyFeeRequiredAccu(x.id, now.Month, now.Year);  //TODO: provjeriti dali to treba???
-        x.terminationWithdraw = x.totalMebershipFeesWithUserPayment - x.restToRepayment - x.totalWithdrawn;
+        //x.terminationWithdraw = x.totalMebershipFeesWithUserPayment - x.restToRepayment - x.totalWithdrawn;
+        x.terminationWithdraw = x.totalMebershipFeesWithUserPayment - x.restToRepayment - x.totalWithdrawn - GetAmount(id, g.terminationRepayment);
         x.activeLoanId = GetActiveLoanId(id);
 
         if (year != null) {

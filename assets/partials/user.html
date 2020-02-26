@@ -84,7 +84,7 @@
                             <label for="terminationDate">Datum:</label>
                             <input ng-model="d.user.terminationDate" type="date" class="form-control" name="terminationDate" onkeydown="return false" style="width:190px" />
                         </div>
-                        <div ng-if="d.user.isActive==0" class="col-sm-12 pt-2">
+                        <div ng-if="d.user.isActive==0&&d.user.terminationWithdraw>0" class="col-sm-12 pt-2">
                             <label for="terminationWithdraw">Isplata kod isčlanjenja <em>(uplaćeni ulog - neotplaćena pozajmica)</em>:</label>
                             <div class="input-group">
                                 <input ng-model="d.user.terminationWithdraw" type="text" class="form-control" name="terminationWithdraw" allow-only-numbers readonly>

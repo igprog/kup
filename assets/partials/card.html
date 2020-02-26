@@ -111,7 +111,7 @@
                         <td class="text-right"></td>
                         <td></td>
                     </tr>
-                    <tr ng-if="x.lastDayInMonth!=='01.01'" ng-repeat="x in d.user.records track by $index">
+                    <tr ng-if="x.lastDayInMonth!=='01.01'&&x.recordType!=='terminationRepayment'" ng-repeat="x in d.user.records track by $index">
                         <td>{{x.lastDayInMonth}}</td>
                         <td>{{x.month}}</td>
                         <td >{{x.note}}</td>

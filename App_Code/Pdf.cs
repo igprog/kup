@@ -1221,7 +1221,7 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
         table.AddCell(new PdfPCell(new Phrase("", GetFont(true))) { Border = PdfPCell.NO_BORDER, Padding = 5, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
 
         foreach (Account.NewAccount x in user.records) {
-            if (x.lastDayInMonth != "01.01") {
+            if (x.lastDayInMonth != "01.01" && x.recordType != g.terminationRepayment) {
                 PdfPCell cell1 = new PdfPCell(new Phrase(x.lastDayInMonth, GetFont())) { Padding = 5 };
                 cell1.Border = 0;
                 table.AddCell(cell1);

@@ -31,9 +31,10 @@ namespace Igprog {
         public string terminationWithdraw = "terminationWithdraw";
         public string userPayment = "userPayment";
         public string userRepayment = "userRepayment";
+        public string terminationRepayment = "terminationRepayment"; //***** otplata duga iz uloga kod isclanjenja ???  *****
         #endregion RecordType
         public string giroaccount = "giroaccount";
-        public string loan = "loan";  // otplata novom pozajmicom ?
+        public string loan = "loan";  //***** otplata novom pozajmicom ? *****
         public string income = "income";
         public string expense = "expense";
         public string incomeExpenseDiff = "incomeExpenseDiff";
