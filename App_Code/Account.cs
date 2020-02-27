@@ -756,12 +756,19 @@ public class Account : System.Web.Services.WebService {
                                     , _sql
                                     , g.withdraw
                                     , type
-                                    , type == g.loan ? string.Format("OR a.recordType = '{0}' OR a.recordType = '{1}'", g.repayment, g.userRepayment) : "");
+                                    , type == g.loan ? string.Format("OR a.recordType = '{0}' OR a.recordType = '{1}' OR a.recordType = '{2}'", g.repayment, g.userRepayment, g.terminationRepayment) : "");
+                //if (type == g.repayment || type == g.withdraw || type == g.loan) {
+                //    sql = string.Format(@"{0} AND (a.recordType = '{1}' OR a.recordType = '{2}' {3})"
+                //                        , _sql
+                //                        , g.withdraw
+                //                        , type
+                //                        , type == g.loan ? string.Format("OR a.recordType = '{0}' OR a.recordType = '{1}'", g.repayment, g.userRepayment) : "");
 
             } else if (type == g.giroaccount) {
                 sql = _sql;
             } else if (type == g.monthlyFee) {
-                sql = string.Format(@"{0} AND (a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}')", _sql, g.monthlyFee, g.userPayment, g.terminationWithdraw);
+                //sql = string.Format(@"{0} AND (a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}')", _sql, g.monthlyFee, g.userPayment, g.terminationWithdraw);
+                sql = string.Format(@"{0} AND (a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}' OR a.recordType = '{4}')", _sql, g.monthlyFee, g.userPayment, g.terminationWithdraw, g.terminationRepayment);
             } else {
                 sql = string.Format(@"{0} AND a.recordType = '{1}'", _sql, type);
             }
@@ -1241,9 +1248,10 @@ public class Account : System.Web.Services.WebService {
                                                                     || a.recordType == g.otherFee
                                                                     || a.recordType == g.terminationWithdraw)).ToList();
                 } else if (inputType == g.monthlyFee) {
-                     input = data.Where(a => a.month.ToString() == x.month && a.year == year && (a.recordType == inputType || a.recordType == g.userPayment)).ToList();
+                    input = data.Where(a => a.month.ToString() == x.month && a.year == year && (a.recordType == inputType || a.recordType == g.userPayment)).ToList();
                 } else if (inputType == g.repayment) {
-                    input = data.Where(a => a.month.ToString() == x.month && a.year == year && (a.recordType == inputType || a.recordType == g.loan || a.recordType == g.userRepayment)).ToList();
+                    input = data.Where(a => a.month.ToString() == x.month && a.year == year && (a.recordType == inputType || a.recordType == g.loan || a.recordType == g.userRepayment || a.recordType == g.terminationRepayment)).ToList();
+                    //input = data.Where(a => a.month.ToString() == x.month && a.year == year && (a.recordType == inputType || a.recordType == g.loan || a.recordType == g.userRepayment)).ToList();
                 } else {
                      input = data.Where(a => a.month.ToString() == x.month && a.year == year && a.recordType == inputType).ToList();
                 }
@@ -1260,7 +1268,8 @@ public class Account : System.Web.Services.WebService {
                 } else if (inputType == g.monthlyFee) {
                     inputAccumulation = data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && (a.recordType == inputType || a.recordType == g.userPayment)).ToList();
                 } else if (inputType == g.repayment) {
-                    inputAccumulation = data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && (a.recordType == inputType || a.recordType == g.loan || a.recordType == g.userRepayment)).ToList();
+                    inputAccumulation = data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && (a.recordType == inputType || a.recordType == g.loan || a.recordType == g.userRepayment || a.recordType == g.terminationRepayment)).ToList();
+                    //inputAccumulation = data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && (a.recordType == inputType || a.recordType == g.loan || a.recordType == g.userRepayment)).ToList();
                 } else {
                     inputAccumulation = data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && a.recordType == inputType).ToList();
                 }
@@ -1292,6 +1301,8 @@ public class Account : System.Web.Services.WebService {
                                                                         || a.recordType == g.interest)).ToList();
                     } else if (outputType == g.monthlyFee) {
                         output = data.Where(a => a.month.ToString() == x.month && a.year == year && (a.recordType == outputType || a.recordType == g.userPayment)).ToList();
+                    } else if (outputType == g.terminationWithdraw) {
+                        output = data.Where(a => a.month.ToString() == x.month && a.year == year && (a.recordType == outputType || a.recordType == g.userPayment || a.recordType == g.terminationRepayment)).ToList();
                     } else {
                         output = data.Where(a => a.month.ToString() == x.month && a.year == year && a.recordType == outputType).ToList();
                     }
@@ -1308,6 +1319,8 @@ public class Account : System.Web.Services.WebService {
                                                                         || a.recordType == g.interest)).ToList();
                     } else if (outputType == g.monthlyFee) {
                         outputAccumulation = data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && (a.recordType == outputType || a.recordType == g.userPayment)).ToList();
+                    } else if (outputType == g.terminationWithdraw) {
+                        outputAccumulation = data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && (a.recordType == outputType || a.recordType == g.userPayment || a.recordType == g.terminationRepayment)).ToList();
                     } else {
                         outputAccumulation = data.Where(a => Convert.ToDateTime(g.SetDate(1, a.month, a.year)) <= Convert.ToDateTime(g.SetDate(g.GetLastDayInMonth(year, i), i, year)) && a.recordType == outputType).ToList();
                     }
