@@ -371,14 +371,23 @@ public class User : System.Web.Services.WebService {
         db.Users();
         string sql = string.Format(@"{0}
                         LEFT OUTER JOIN Loan l on u.id = l.userId
-                        {1} {2} {3} {4} l.isRepaid = 0 AND u.isActive = 1"
-                        , sqlString
-                        , !string.IsNullOrEmpty(buisinessUnitCode) || !string.IsNullOrEmpty(search) ? "WHERE" : ""
-                        , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("u.buisinessUnitCode = '{0}'", buisinessUnitCode) : ""
-                        , !string.IsNullOrEmpty(search) ? string.Format("{0} (u.id LIKE '%{1}%' OR u.firstName LIKE N'{1}%' OR u.lastName LIKE N'{1}%')"
-                                                                      , !string.IsNullOrEmpty(buisinessUnitCode) && !string.IsNullOrEmpty(search) ? "AND" : ""
-                                                                      , search) : ""
-                        , string.IsNullOrEmpty(buisinessUnitCode) && string.IsNullOrEmpty(search) ? "WHERE" : "AND" );
+                        {1} {2} {3}"
+                , sqlString
+                , !string.IsNullOrEmpty(buisinessUnitCode) || !string.IsNullOrEmpty(search) ? "WHERE" : ""
+                , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("u.buisinessUnitCode = '{0}'", buisinessUnitCode) : ""
+                , !string.IsNullOrEmpty(search) ? string.Format("{0} (u.id LIKE '%{1}%' OR u.firstName LIKE N'{1}%' OR u.lastName LIKE N'{1}%')"
+                                                              , !string.IsNullOrEmpty(buisinessUnitCode) && !string.IsNullOrEmpty(search) ? "AND" : ""
+                                                              , search) : "" );
+        //string sql = string.Format(@"{0}
+        //                LEFT OUTER JOIN Loan l on u.id = l.userId
+        //                {1} {2} {3} {4} l.isRepaid = 0 AND u.isActive = 1"
+        //                , sqlString
+        //                , !string.IsNullOrEmpty(buisinessUnitCode) || !string.IsNullOrEmpty(search) ? "WHERE" : ""
+        //                , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("u.buisinessUnitCode = '{0}'", buisinessUnitCode) : ""
+        //                , !string.IsNullOrEmpty(search) ? string.Format("{0} (u.id LIKE '%{1}%' OR u.firstName LIKE N'{1}%' OR u.lastName LIKE N'{1}%')"
+        //                                                              , !string.IsNullOrEmpty(buisinessUnitCode) && !string.IsNullOrEmpty(search) ? "AND" : ""
+        //                                                              , search) : ""
+        //                , string.IsNullOrEmpty(buisinessUnitCode) && string.IsNullOrEmpty(search) ? "WHERE" : "AND" );
         List<NewUser> xx = new List<NewUser>();
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
