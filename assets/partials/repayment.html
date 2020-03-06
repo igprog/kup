@@ -9,7 +9,7 @@
                     </select>
                     <select ng-model="d.month" class="form-control mb-2 mr-sm-2">
                         <option value="" selected disabled>Mjesec</option>
-                        <option ng-repeat="x in g.months" value="{{x.id}}">{{x.title}}</option>
+                        <option ng-repeat="x in g.months" value="{{x.id}}">{{x.id}} | {{x.title}}</option>
                     </select>
                     <select ng-model="d.year" class="form-control mb-2 mr-sm-2">
                         <option value="" selected disabled>Godina</option>
@@ -48,6 +48,7 @@
                         <th>Korisnik</th>
                         <th class="text-right">Ugovorena rata ({{config.currency}})</th>
                         <th class="text-right">Uplaćeno ({{config.currency}})</th>
+                        <th></th>
                         <th class="text-right">Ostatak za otplatu ({{config.currency}})</th>
                         <th>Napomena</th>
                         <th></th>
@@ -91,6 +92,9 @@
                                 <button class="btn btn-outline-primary" ng-click="add(x, $index)" title="Dodaj novu uplatu"><i class="fas fa-plus"></i> Uplata korisnika</button>
                             </div>
                         </td>
+                        <td class="pl-0">
+                            <button class="btn btn-outline-danger" ng-click="removeRecord(x, d, $index)" title="Briši uplatu"><i class="fa fa-times"></i></button>
+                        </td>
                         <td class="text-right">{{x.restToRepayment | number:2}}</td>
                         <td><input ng-model="x.note" class="form-control" /></td>
                         <td class="text-right"><button class="btn btn-outline-primary" ng-click="save(x, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button></td>
@@ -109,7 +113,7 @@
                         {{d.records.total.repaymentTotal | number:2}}
                         </th>
                         <th>{{d.records.total.restToRepayment | number:2}}</th>
-                        <th colspan="2"></th>
+                        <th colspan="3"></th>
                     </tr>
                 </tfoot>
             </table>

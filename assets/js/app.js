@@ -1022,7 +1022,13 @@ angular.module('app', [])
                 return false;
             }
         }
+        save(x, d, idx);
+    }
+
+    var save = (x, d, idx) => {
         f.post('Account', 'SaveRepayment', { x: x }).then((d) => {
+            debugger;
+            $scope.d.records.data[idx].id = d.id;
             $scope.d.records.data[idx].repaid = d.repaid;
             $scope.d.records.data[idx].currRepayment = d.currRepayment;
             $scope.d.records.data[idx].restToRepayment = d.restToRepayment;
@@ -1080,6 +1086,14 @@ angular.module('app', [])
 
     $scope.readMore = (x) => {
         $scope.d.limit = $scope.d.limit + x;
+    }
+
+    $scope.removeRecord = (x, d, idx) => {
+        if (confirm('Briši uplatu ' + x.amount + ' ' + $scope.config.currency + '?')) {
+            x.amount = 0;
+            save(x, d, idx);
+            $scope.d.records.data[idx].currRepayment = 0;
+        }
     }
 
 }])

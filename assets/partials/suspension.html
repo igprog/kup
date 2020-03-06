@@ -9,7 +9,7 @@
                     </select>
                     <select ng-model="d.month" class="form-control mb-2 mr-sm-2">
                         <option value="" selected disabled>Mjesec</option>
-                        <option ng-value="x.id" ng-selected="x.id==d.month?true:false" ng-repeat="x in g.months">{{x.title}}</option>
+                        <option ng-value="x.id" ng-selected="x.id==d.month?true:false" ng-repeat="x in g.months">{{x.id}} | {{x.title}}</option>
                     </select>
                     <select ng-model="d.year" class="form-control mb-2 mr-sm-2">
                         <option value="" selected disabled>Godina</option>

@@ -144,7 +144,7 @@ public class Account : System.Web.Services.WebService {
     [WebMethod]
     public string Init(string type) {
         NewAccount x = new NewAccount();
-        x.id = null; Guid.NewGuid().ToString();
+        x.id = null;                       //Guid.NewGuid().ToString();
         x.user = new User.NewUser();
         x.amount = 0;
         x.recordDate = g.Date(DateTime.Now);
@@ -303,7 +303,7 @@ public class Account : System.Web.Services.WebService {
                 NewAccount x = new NewAccount();
                 x = GetRecord(user.id, month, year, g.repayment);
                 if (string.IsNullOrEmpty(x.id)) {
-                    x.id = Guid.NewGuid().ToString();
+                    x.id = null; // Guid.NewGuid().ToString();
                     x.user = user;
                     x.amount = 0;
                     x.recordDate = g.Date(DateTime.Now);
@@ -1541,11 +1541,26 @@ public class Account : System.Web.Services.WebService {
     public NewAccount Save(NewAccount x) {
         try {
             db.Account();
+            bool isNewRecord = false;
             if (string.IsNullOrEmpty(x.id)) {
                 x.id = Guid.NewGuid().ToString();
+                isNewRecord = true;
             }
             //  double lastRepayment = GetRecord(x.user.id, x.month, x.year).repayment;  // ***** in case of update repaiment  *****
-            string sql = string.Format(@"BEGIN TRAN
+
+            string sql = null;
+
+            if (x.amount == 0 && !isNewRecord) {
+                sql = string.Format(@"BEGIN TRAN
+                                            IF EXISTS (SELECT * from Account WITH (updlock,serializable) WHERE id = '{0}')
+                                                BEGIN
+                                                   DELETE FROM Account WHERE id = '{0}' AND userId = '{1}'
+                                                END
+                                        COMMIT TRAN", x.id, x.user.id);
+            } else if (x.amount == 0 && isNewRecord) {
+                // ***** DO NOTHING !!! (Ne spremaj vrijednost 0) *****
+            } else {
+                sql = string.Format(@"BEGIN TRAN
                                             IF EXISTS (SELECT * from Account WITH (updlock,serializable) WHERE id = '{0}')
                                                 BEGIN
                                                    UPDATE Account SET userId = '{1}', amount = '{2}', recordDate = '{3}', mo = '{4}', yr = '{5}', recordType = '{6}', loanId = '{7}', note = N'{8}' WHERE id = '{0}'
@@ -1556,17 +1571,63 @@ public class Account : System.Web.Services.WebService {
                                                    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', N'{8}')
                                                 END
                                         COMMIT TRAN", x.id, x.user.id, x.amount, x.recordDate, x.month, x.year, x.recordType, x.loanId, x.note);
-            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(sql, connection)) {
-                    command.ExecuteNonQuery();
-                }
-                connection.Close();
             }
-            x.restToRepayment = x.loan - Repaid(x);
+
+            if (!string.IsNullOrEmpty(sql)) {
+                using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection)) {
+                        command.ExecuteNonQuery();
+                    }
+                    connection.Close();
+                }
+            }
+
+            double loan = x.loan;
+            if (x.loan == 0) {
+                loan = GetLoanAmount(x.loanId);
+            }
+
+            x.restToRepayment = loan - Repaid(x);
+            SetLoanIsRepaid(x);
+
             return x;
         } catch (Exception e) {
             return new NewAccount();
+        }
+    }
+
+
+    private double GetLoanAmount(string id) {
+        double x = 0;
+        string sql = string.Format("SELECT loan FROM Loan WHERE id = '{0}'", id);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
+    }
+
+    private void SetLoanIsRepaid(NewAccount x) {
+        int isRepaid = x.restToRepayment == 0 ? 1 : 0;
+        string sql = string.Format(@"BEGIN TRAN
+                                BEGIN
+                                    UPDATE Loan SET isRepaid = {0} WHERE id = '{1}'
+                                END
+                            COMMIT TRAN", isRepaid, x.loanId);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
         }
     }
 

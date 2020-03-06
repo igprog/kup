@@ -337,7 +337,7 @@ public class User : System.Web.Services.WebService {
                         , sqlString
                         , !string.IsNullOrEmpty(buisinessUnitCode) || !string.IsNullOrEmpty(search) ? "WHERE" : ""
                         , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("u.buisinessUnitCode = '{0}'", buisinessUnitCode): ""
-                        , !string.IsNullOrEmpty(search) ? string.Format("{0} u.id LIKE '%{1}%' OR u.firstName LIKE N'{1}%' OR u.lastName LIKE N'{1}%'"
+                        , !string.IsNullOrEmpty(search) ? string.Format("{0} (u.id LIKE '%{1}%' OR u.firstName LIKE N'{1}%' OR u.lastName LIKE N'{1}%')"
                                                                         , !string.IsNullOrEmpty(buisinessUnitCode) && !string.IsNullOrEmpty(search) ? "AND" : ""                                             
                                                                         , search) : "");
         List<NewUser> xx = new List<NewUser>();

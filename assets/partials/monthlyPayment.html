@@ -4,7 +4,7 @@
             <form class="form-inline">
                 <select ng-model="d.month" class="form-control mb-2 mr-sm-2">
                     <option value="" selected disabled>Mjesec</option>
-                    <option ng-repeat="x in g.months" value="{{x.id}}">{{x.title}}</option>
+                    <option ng-repeat="x in g.months" value="{{x.id}}">{{x.id}} | {{x.title}}</option>
                 </select>
                 <select ng-model="d.year" class="form-control mb-2 mr-sm-2">
                     <option value="" selected disabled>Godina</option>
