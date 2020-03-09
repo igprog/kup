@@ -59,10 +59,12 @@ public class Account : System.Web.Services.WebService {
         public double userPaymentWithMonthlyFeeTotal;
         public double repayment;
         public double userRepayment;
+        public double terminationRepayment;
         public double repaymentTotal;
         public double restToRepayment;
         public double totalObligation;
         public double terminationWithdraw;
+        public double terminationWithdrawWithTerminationRepayment;
         public double userPaymentBalance;  // stanje na racunu
         public double activatedLoan;
         public double withdraw;
@@ -1009,10 +1011,15 @@ public class Account : System.Web.Services.WebService {
     public class MonthlyPayment {
         public Loan.Loans loans;
         public List<Fee> terminationWithdraw_;  //TODO: napraviti listu (dodati ulog, duguje, za isplatu)
-        public List<TermWithdraw> terminationWithdraw;
+        public TerminationWithdraw terminationWithdraw;
         public List<Fee> otherFee;
         public List<Fee> bankFee;
         public double total;
+    }
+
+    public class TerminationWithdraw {
+        public List<TermWithdraw> data;
+        public TermWithdraw total;
     }
 
     public class Fee {
@@ -1028,8 +1035,6 @@ public class Account : System.Web.Services.WebService {
         public double terminationWithdraw;
     }
 
-
-
     [WebMethod]
     public string LoadMonthlyPayment(int? month, int year) {
         try {
@@ -1039,7 +1044,7 @@ public class Account : System.Web.Services.WebService {
             x.terminationWithdraw = GetTerminationWithdraw(month, year);
             x.bankFee = GetMonthlyPayment(month, year, g.bankFee);
             x.otherFee = GetMonthlyPayment(month, year, g.otherFee);
-            x.total = x.loans.total.withdraw + x.terminationWithdraw.Sum(a => a.terminationWithdraw) + x.bankFee.Sum(a => a.val) + x.otherFee.Sum(a => a.val);
+            x.total = x.loans.total.withdraw + x.terminationWithdraw.data.Sum(a => a.terminationWithdraw) + x.bankFee.Sum(a => a.val) + x.otherFee.Sum(a => a.val);
             return JsonConvert.SerializeObject(x, Formatting.Indented);
         } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
@@ -1082,8 +1087,9 @@ public class Account : System.Web.Services.WebService {
         return xx;
     }
 
-    public List<TermWithdraw> GetTerminationWithdraw(int? month, int year) {
-        List<TermWithdraw> xx = new List<TermWithdraw>();
+    public TerminationWithdraw GetTerminationWithdraw(int? month, int year) {
+        TerminationWithdraw xx = new TerminationWithdraw();
+        xx.data = new List<TermWithdraw>();
         string sql = string.Format(@"SELECT u.id, u.firstName, u.lastName, a.amount FROM Account a
                                 LEFT OUTER JOIN Users u ON a.userId = u.id
                                 WHERE a.mo = '{0}' AND a.yr = '{1}' AND a.recordType = '{2}'"
@@ -1099,16 +1105,21 @@ public class Account : System.Web.Services.WebService {
                         x.user.firstName = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
                         x.user.lastName = reader.GetValue(2) == DBNull.Value ? null : reader.GetString(2);
                         x.terminationWithdraw = reader.GetValue(3) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(3));
-                        xx.Add(x);
+                        xx.data.Add(x);
                     }
                 }
             }
             connection.Close();
 
-            foreach (var t in xx) {
+            foreach (var t in xx.data) {
                 t.userPayment = GetUserPaymentTotal(t.user.id);
                 t.debt = t.userPayment - t.terminationWithdraw;
             }
+
+            xx.total = new TermWithdraw();
+            xx.total.userPayment = xx.data.Sum(a => a.userPayment);
+            xx.total.debt = xx.data.Sum(a => a.debt);
+            xx.total.terminationWithdraw = xx.data.Sum(a => a.terminationWithdraw);
         }
         return xx;
     }

@@ -52,10 +52,10 @@
                     <th>{{d.records.loans.total.lastLoanToRepaid | number:2}}</th>
                     <th>{{d.records.loans.total.withdraw | number:2}}</th>
                 </tr>
-                <tr ng-if="d.records.terminationWithdraw.length>0" style="height:50px">
+                <tr ng-if="d.records.terminationWithdraw.data.length>0" style="height:50px">
                     <td colspan="7"><strong>Isplata kod iščlanjenja:</strong></td>
                 </tr>
-                <tr ng-if="d.records.terminationWithdraw.length>0" class="bg-light">
+                <tr ng-if="d.records.terminationWithdraw.data.length>0" class="bg-light">
                     <th>Mat. br.</th>
                     <th>Korisnik</th>
                     <th class="text-right">Uplačeni ulog ({{config.currency}})</th>
@@ -64,7 +64,7 @@
                     <th class="text-right">Neotplaćena pozajmica ({{config.currency}})</th>
                     <th class="text-right">Za isplatu ({{config.currency}})</th>
                 </tr>
-                <tr ng-if="d.records.terminationWithdraw.length>0" ng-repeat="x in d.records.terminationWithdraw track by $index">
+                <tr ng-if="d.records.terminationWithdraw.data.length>0" ng-repeat="x in d.records.terminationWithdraw.data track by $index">
                     <td>{{x.user.id}}</td>
                     <td>{{x.user.lastName}} {{x.user.firstName}}</td>
                     <td class="text-right">{{x.userPayment | number:2}}</td>
@@ -72,6 +72,14 @@
                     <td class="text-right">{{x.userPayment | number:2}}</td>
                     <td class="text-right">{{x.debt | number:2}}</td>
                     <td class="text-right">{{x.terminationWithdraw | number:2}}</td>
+                </tr>
+                <tr ng-if="d.records.terminationWithdraw.data.length>0" class="thead-light text-right">
+                    <th colspan="2">Ukupno:</th>
+                    <th class="text-right">{{d.records.terminationWithdraw.total.userPayment | number:2}}</th>
+                    <th class="text-right"></th>
+                    <th class="text-right">{{d.records.terminationWithdraw.total.userPayment | number:2}}</th>
+                    <th class="text-right">{{d.records.terminationWithdraw.total.debt | number:2}}</th>
+                    <th class="text-right">{{d.records.terminationWithdraw.total.terminationWithdraw | number:2}}</th>
                 </tr>
                 <tr ng-if="d.records.bankFee.length>0" >
                     <td colspan="7"><strong>Troškovi održavanja računa:</strong></td>

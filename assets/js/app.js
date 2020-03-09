@@ -693,6 +693,9 @@ angular.module('app', [])
         f.post(service, 'Save', { x: x.loan }).then((d) => {
             $scope.d.loan = d;
             $scope.d.loan.loanDate = new Date($scope.d.loan.loanDate);
+            if ($scope.d.loan.id !== null || $scope.d.loan.id !== undefined) {
+                alert('Spremljeno.');
+            }
         });
     }
 

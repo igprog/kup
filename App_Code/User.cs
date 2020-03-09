@@ -236,7 +236,7 @@ public class User : System.Web.Services.WebService {
                                             VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}');
                                             UPDATE Loan SET isRepaid = 1 WHERE id = '{7}';
                                         END
-                                    COMMIT TRAN", Guid.NewGuid().ToString(), x.id, x.restToRepayment, x.terminationDate, g.GetMonth(x.terminationDate), g.GetYear(x.terminationDate), g.terminationRepayment, x.activeLoanId, "Dug odbijen od uloga");
+                                    COMMIT TRAN", Guid.NewGuid().ToString(), x.id, x.restToRepayment, x.terminationDate, g.GetMonth(x.terminationDate), g.GetYear(x.terminationDate), g.terminationRepayment, x.activeLoanId, "Uplata duga ulogom");
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -441,9 +441,11 @@ public class User : System.Web.Services.WebService {
             //x.total.repayment = x.records.Where(r => r.recordType == g.repayment).Sum(r => r.amount);
             x.total.repayment = x.records.Where(r => r.recordType == g.repayment || r.recordType == g.loan).Sum(r => r.amount);
             x.total.userRepayment = x.records.Where(r => r.recordType == g.userRepayment).Sum(r => r.amount);
-            x.total.repaymentTotal = x.total.repayment + x.total.userRepayment;
             x.total.terminationWithdraw = x.records.Where(r => r.recordType == g.terminationWithdraw).Sum(r => r.amount);
-            x.total.userPaymentBalance = x.total.userPaymentWithMonthlyFeeTotal - x.total.terminationWithdraw;
+            x.total.terminationRepayment = x.records.Where(r => r.recordType == g.terminationRepayment).Sum(r => r.amount);
+            x.total.terminationWithdrawWithTerminationRepayment = x.total.terminationWithdraw + x.total.terminationRepayment;
+            x.total.repaymentTotal = x.total.repayment + x.total.userRepayment + x.total.terminationRepayment;
+            x.total.userPaymentBalance = x.total.userPaymentWithMonthlyFeeTotal - x.total.terminationWithdraw - x.total.terminationRepayment;
             x.total.activatedLoan = x.records.Where(r => r.recordType == g.withdraw).Sum(r => r.activatedLoan);
             x.total.loanToRepaid = a.GetLoanStartBalance(id, year) + x.total.activatedLoan;
             x.total.totalObligation = x.total.loanToRepaid - x.total.repaymentTotal;

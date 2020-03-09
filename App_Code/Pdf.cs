@@ -691,7 +691,7 @@ _____________
                 doc.Add(table);
             }
 
-            if (records.terminationWithdraw.Count > 0) {
+            if (records.terminationWithdraw.data.Count > 0) {
                 table = new PdfPTable(1);
                 table.WidthPercentage = 100f;
                 table.SetWidths(new float[] { 1f });
@@ -714,7 +714,7 @@ _____________
                 table = new PdfPTable(7);
                 table.WidthPercentage = 100f;
                 table.SetWidths(new float[] { 0.5f, 2f, 1f, 1f, 1f, 1f, 1f });
-                foreach (var x in records.terminationWithdraw) {
+                foreach (var x in records.terminationWithdraw.data) {
                     PdfPCell cell1 = new PdfPCell(new Phrase(string.Format("{0}", x.user.id), GetFont()));
                     cell1.Border = 0;
                     table.AddCell(cell1);
@@ -737,6 +737,18 @@ _____________
                     cell7.Border = 0;
                     table.AddCell(cell7);
                 }
+                doc.Add(table);
+
+                table = new PdfPTable(7);
+                table.WidthPercentage = 100f;
+                table.SetWidths(new float[] { 0.5f, 2f, 1f, 1f, 1f, 1f, 1f });
+                table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+                table.AddCell(new PdfPCell(new Phrase("Ukupno:", GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+                table.AddCell(new PdfPCell(new Phrase(g.Currency(records.terminationWithdraw.total.userPayment), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+                table.AddCell(new PdfPCell(new Phrase("", GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+                table.AddCell(new PdfPCell(new Phrase(g.Currency(records.terminationWithdraw.total.userPayment), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+                table.AddCell(new PdfPCell(new Phrase(g.Currency(records.terminationWithdraw.total.debt), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+                table.AddCell(new PdfPCell(new Phrase(g.Currency(records.terminationWithdraw.total.terminationWithdraw), GetFont(true))) { Border = PdfPCell.BOTTOM_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
                 doc.Add(table);
             }
 
@@ -1221,7 +1233,7 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
         table.AddCell(new PdfPCell(new Phrase("", GetFont(true))) { Border = PdfPCell.NO_BORDER, Padding = 5, MinimumHeight = 20, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
 
         foreach (Account.NewAccount x in user.records) {
-            if (x.lastDayInMonth != "01.01" && x.recordType != g.terminationRepayment) {
+            if (x.lastDayInMonth != "01.01") {
                 PdfPCell cell1 = new PdfPCell(new Phrase(x.lastDayInMonth, GetFont())) { Padding = 5 };
                 cell1.Border = 0;
                 table.AddCell(cell1);
@@ -1231,7 +1243,7 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
                 PdfPCell cell3 = new PdfPCell(new Phrase(x.note, GetFont())) { Padding = 5, HorizontalAlignment = PdfPCell.ALIGN_LEFT };
                 cell3.Border = 0;
                 table.AddCell(cell3);
-                PdfPCell cell4 = new PdfPCell(new Phrase(x.recordType == g.terminationWithdraw ? string.Format("{0:N}", x.amount) : "", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                PdfPCell cell4 = new PdfPCell(new Phrase(x.recordType == g.terminationWithdraw || x.recordType == g.terminationRepayment ? string.Format("{0:N}", x.amount) : "", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 cell4.Border = 0;
                 table.AddCell(cell4);
                 PdfPCell cell5 = new PdfPCell(new Phrase(x.recordType == g.monthlyFee || x.recordType == g.userPayment ? string.Format("{0:N}", x.amount) : "", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
@@ -1249,7 +1261,7 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
                 PdfPCell cell6 = new PdfPCell(new Phrase(cell6Val, GetFont())) { Border = PdfCell.LEFT_BORDER, Padding = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 //cell6.Border = 0;
                 table.AddCell(cell6);
-                PdfPCell cell7 = new PdfPCell(new Phrase(x.recordType == g.repayment || x.recordType == g.userRepayment || x.recordType == g.manipulativeCosts || x.recordType == g.loan ? string.Format("{0:N}", x.amount) : "", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                PdfPCell cell7 = new PdfPCell(new Phrase(x.recordType == g.repayment || x.recordType == g.userRepayment || x.recordType == g.manipulativeCosts || x.recordType == g.loan || x.recordType== g.terminationRepayment ? string.Format("{0:N}", x.amount) : "", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
                 cell7.Border = 0;
                 table.AddCell(cell7);
                 PdfPCell cell8 = new PdfPCell(new Phrase("", GetFont())) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
@@ -1265,7 +1277,7 @@ Datum........................................"), GetFont(8))) { Border = PdfPCel
         table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.TOP_BORDER, Padding = 5, MinimumHeight = 20, PaddingTop = 5 });
         table.AddCell(new PdfPCell(new Phrase("", GetFont())) { Border = PdfPCell.TOP_BORDER, Padding = 5, MinimumHeight = 20, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
         table.AddCell(new PdfPCell(new Phrase("Ukupno:", GetFont(true))) { Border = PdfPCell.TOP_BORDER, Padding = 5, MinimumHeight = 20, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
-        table.AddCell(new PdfPCell(new Phrase(g.Format(user.total.terminationWithdraw), GetFont(true))) { Border = PdfPCell.TOP_BORDER | PdfCell.BOTTOM_BORDER, Padding = 5, MinimumHeight = 20, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
+        table.AddCell(new PdfPCell(new Phrase(g.Format(user.total.terminationWithdrawWithTerminationRepayment), GetFont(true))) { Border = PdfPCell.TOP_BORDER | PdfCell.BOTTOM_BORDER, Padding = 5, MinimumHeight = 20, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
         table.AddCell(new PdfPCell(new Phrase(g.Format(user.total.userPaymentWithMonthlyFeeTotal), GetFont(true))) { Border = PdfPCell.TOP_BORDER | PdfCell.BOTTOM_BORDER, Padding = 5, MinimumHeight = 20, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
         table.AddCell(new PdfPCell(new Phrase(g.Format(user.total.userPaymentBalance), GetFont(true))) { Border = PdfPCell.TOP_BORDER | PdfCell.BOTTOM_BORDER, Padding = 5, MinimumHeight = 20, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
         table.AddCell(new PdfPCell(new Phrase(g.Format(user.total.loanToRepaid), GetFont(true))) { Border = PdfPCell.TOP_BORDER | PdfCell.LEFT_BORDER | PdfCell.BOTTOM_BORDER, Padding = 5, MinimumHeight = 20, PaddingTop = 5, HorizontalAlignment = PdfPCell.ALIGN_RIGHT });
