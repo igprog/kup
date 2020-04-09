@@ -515,10 +515,13 @@ public class Account : System.Web.Services.WebService {
         Loan l = new Loan();
         x.output = l.GetLoansTotal(month, year);
         Loan.Loans loans = l.LoadData(month, year, null, null);
+        //x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input)
+        //    + xx.Where(a => a.recordType == g.userRepayment).Sum(a => a.input)
+        //    + xx.Where(a => a.recordType == g.loan).Sum(a => a.input);
         x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.userRepayment).Sum(a => a.input)
-            + xx.Where(a => a.recordType == g.loan).Sum(a => a.input);
-        //x.input = xx.Where(a => a.recordType == g.repayment).Sum(a => a.input) + xx.Where(a => a.recordType == g.loan).Sum(a => a.input);
+            + xx.Where(a => a.recordType == g.loan).Sum(a => a.input)
+            + xx.Where(a => a.recordType == g.terminationRepayment).Sum(a => a.input);
         x.account = GetAccountNo(g.loan);
         if (x.output > 0 || x.input > 0) {
             xxx.Add(x);
@@ -526,7 +529,8 @@ public class Account : System.Web.Services.WebService {
 
         x = new Recapitulation();
         x.note = "Ulozi";
-        x.output = xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input);
+        //x.output = xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input);
+        x.output = xx.Where(a => a.recordType == g.terminationWithdraw || a.recordType == g.terminationRepayment).Sum(a => a.input);
         x.input = xx.Where(a => a.recordType == g.monthlyFee || a.recordType == g.userPayment).Sum(a => a.input);
         x.account = GetAccountNo(g.monthlyFee);
         if (x.output > 0 || x.input > 0) {
