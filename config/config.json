@@ -92,6 +92,12 @@
       "type": "otherFee"
     },
     {
+      "tpl": "fee",
+      "title": "Ulaganja u računalne programe",
+      "ico": "laptop-code",
+      "type": "softwareInvestment"
+    },
+    {
       "tpl": null,
       "title": "MJESEČNA REKAPITULACIJA",
       "ico": null

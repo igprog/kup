@@ -562,15 +562,15 @@ _____________
             string totValue = null;
             switch (type) {
                 case "bankFee":
-                    typeTitle = "Troškovi održavanja računa";
+                    typeTitle = "Bankarske usluge i usluge patnog prometa";
                     totValue = g.Currency(records.total.bankFee);
                     break;
                 case "interest":
-                    typeTitle = "Kamate po štednji";
+                    typeTitle = "Kamate na oročena sredstva i depozite po viđenju";
                     totValue = g.Currency(records.total.interest);
                     break;
                 case "otherFee":
-                    typeTitle = "Razni materijalni troškovi";
+                    typeTitle = "Intelektualne i osobne usluge";
                     totValue = g.Currency(records.total.otherFee);
                     break;
             }
@@ -756,7 +756,7 @@ _____________
                 table = new PdfPTable(1);
                 table.WidthPercentage = 100f;
                 table.SetWidths(new float[] { 1f });
-                table.AddCell(new PdfPCell(new Phrase("Troškovi održavanja računa:", GetFont(true))) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+                table.AddCell(new PdfPCell(new Phrase("Bankarske usluge i usluge platnog prometa:", GetFont(true))) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
                 doc.Add(table);
 
                 table = new PdfPTable(7);
@@ -792,7 +792,7 @@ _____________
                 table = new PdfPTable(1);
                 table.WidthPercentage = 100f;
                 table.SetWidths(new float[] { 1f });
-                table.AddCell(new PdfPCell(new Phrase("Razni materijalni troškovi:", GetFont(true))) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
+                table.AddCell(new PdfPCell(new Phrase("Intelektualne i osobne usluge:", GetFont(true))) { Border = PdfPCell.NO_BORDER, Padding = 2, MinimumHeight = 30, PaddingTop = 15 });
                 doc.Add(table);
 
                 table = new PdfPTable(7);

@@ -38,7 +38,7 @@
                     <td><input ng-model="x.recordDate" type="date" class="form-control" style="width:190px"></td>
                     <td>
                         <select ng-model="x.month" class="form-control mb-2 mr-sm-2">
-                            <option ng-value="y.id" ng-repeat="y in g.months" ng-selected="x.month===Number(y.id)?true:false">{{y.title}}</option>
+                            <option ng-value="y.id" ng-repeat="y in g.months" ng-selected="x.month===Number(y.id)?true:false">{{y.id}} | {{y.title}}</option>
                         </select>
                     </td>
                     <td><input ng-model="x.note" class="form-control" /></td>

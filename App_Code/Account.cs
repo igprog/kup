@@ -141,6 +141,9 @@ public class Account : System.Web.Services.WebService {
         public string income;
         public string expense;
         public string incomeExpenseDiff;
+        public string softwareInvestment;
+        public string amortization;
+        public string correction;
     }
 
     [WebMethod]
