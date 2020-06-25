@@ -76,6 +76,7 @@ public class Account : System.Web.Services.WebService {
         public double output;
         public double manipulativeCosts;
         public double currRepayment; // uplacena pozajmica
+        public double amortization;
 
         public List<RecapMonthlyTotal> monthlyTotalList;  // TODO
     }
@@ -96,7 +97,8 @@ public class Account : System.Web.Services.WebService {
         public double accountBalance;  // stanje racuna
         public string recordType;
         public string note;
-        public string account;  // konto
+        //public string account;  // konto  // TODO: CodeTitle
+        public CodeTitle account;
     }
 
     public class RecapMonthlyTotal {
@@ -107,7 +109,7 @@ public class Account : System.Web.Services.WebService {
     public class RecapYearlyTotal {
         public int year;
         public string type;
-        public string account;  // Konto
+        public CodeTitle account;  // Konto
         public List<RecapMonthlyTotal> data;
         public Recapitulation total;
     }
@@ -130,20 +132,41 @@ public class Account : System.Web.Services.WebService {
     }
 
     // ***** Konto *****
+    //public class AccountNo {
+    //    public string giroAccount;
+    //    public string loan;
+    //    public string monthlyFee;
+    //    public string manipulativeCosts;
+    //    public string bankFee;
+    //    public string interest;
+    //    public string otherFee;
+    //    public string income;
+    //    public string expense;
+    //    public string incomeExpenseDiff;
+    //    public string softwareInvestment;
+    //    public string amortization;
+    //    public string correction;
+    //}
+
     public class AccountNo {
-        public string giroAccount;
-        public string loan;
-        public string monthlyFee;
-        public string manipulativeCosts;
-        public string bankFee;
-        public string interest;
-        public string otherFee;
-        public string income;
-        public string expense;
-        public string incomeExpenseDiff;
-        public string softwareInvestment;
-        public string amortization;
-        public string correction;
+        public CodeTitle giroAccount;
+        public CodeTitle loan;
+        public CodeTitle monthlyFee;
+        public CodeTitle manipulativeCosts;
+        public CodeTitle bankFee;
+        public CodeTitle interest;
+        public CodeTitle otherFee;
+        public CodeTitle income;
+        public CodeTitle expense;
+        public CodeTitle incomeExpenseDiff;
+        public CodeTitle softwareInvestment;
+        public CodeTitle amortization;
+        public CodeTitle correction;
+    }
+
+    public class CodeTitle {
+        public string code;
+        public string title;
     }
 
     [WebMethod]
@@ -250,7 +273,7 @@ public class Account : System.Web.Services.WebService {
         xx.total.otherFee = xx.data.Where(a => a.recordType == g.otherFee).Sum(a => a.amount);
         xx.total.bankFee = xx.data.Where(a => a.recordType == g.bankFee).Sum(a => a.amount);
         xx.total.interest = xx.data.Where(a => a.recordType == g.interest).Sum(a => a.amount);
-
+        xx.total.amortization = xx.data.Where(a => a.recordType == g.amortization).Sum(a => a.amount);
         return xx;
     }
 
@@ -508,13 +531,15 @@ public class Account : System.Web.Services.WebService {
             + xx.Where(a => a.recordType == g.bankFee).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.otherFee).Sum(a => a.input);
-        x.account = GetAccountNo(g.giroaccount);
+        //x.account = GetAccountNo(g.giroaccount);
+        x.account = GetAccount(g.giroaccount);
+        x.note = x.account.title;
         if (x.output > 0 || x.input > 0) {
             xxx.Add(x);
         }
 
         x = new Recapitulation();
-        x.note = "Pozajmice";
+        //x.note = "Pozajmice";
         Loan l = new Loan();
         x.output = l.GetLoansTotal(month, year);
         Loan.Loans loans = l.LoadData(month, year, null, null);
@@ -525,53 +550,59 @@ public class Account : System.Web.Services.WebService {
             + xx.Where(a => a.recordType == g.userRepayment).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.loan).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.terminationRepayment).Sum(a => a.input);
-        x.account = GetAccountNo(g.loan);
+        x.account = GetAccount(g.loan);
+        x.note = x.account.title;
         if (x.output > 0 || x.input > 0) {
             xxx.Add(x);
         }
 
         x = new Recapitulation();
-        x.note = "Ulozi";
+        //x.note = "Ulozi";
         //x.output = xx.Where(a => a.recordType == g.terminationWithdraw).Sum(a => a.input);
         x.output = xx.Where(a => a.recordType == g.terminationWithdraw || a.recordType == g.terminationRepayment).Sum(a => a.input);
         x.input = xx.Where(a => a.recordType == g.monthlyFee || a.recordType == g.userPayment).Sum(a => a.input);
-        x.account = GetAccountNo(g.monthlyFee);
+        x.account = GetAccount(g.monthlyFee);
+        x.note = x.account.title;
         if (x.output > 0 || x.input > 0) {
             xxx.Add(x);
         }
 
         x = new Recapitulation();
-        x.note = string.Format("Manipulativni troškovi {0}%", g.manipulativeCostsPerc());
+        //x.note = string.Format("Manipulativni troškovi {0}%", g.manipulativeCostsPerc());
         x.output = 0;
         x.input = xx.Where(a => a.recordType == g.manipulativeCosts).Sum(a => a.input);
-        x.account = GetAccountNo(g.manipulativeCosts);
+        x.account = GetAccount(g.manipulativeCosts);
+        x.note = x.account.title;
         if (x.output > 0 || x.input > 0) {
             xxx.Add(x);
         }
 
         x = new Recapitulation();
-        x.note = "Troškovi održavanja računa";
+        //x.note = "Troškovi održavanja računa";
         x.output = xx.Where(a => a.recordType == g.bankFee).Sum(a => a.input);
         x.input = 0;
-        x.account = GetAccountNo(g.monthlyFee);
+        x.account = GetAccount(g.monthlyFee);
+        x.note = x.account.title;
         if (x.output > 0 || x.input > 0) {
             xxx.Add(x);
         }
 
         x = new Recapitulation();
-        x.note = "Kamate po štednji";
+        //x.note = "Kamate po štednji";
         x.output = 0;
         x.input = xx.Where(a => a.recordType == g.interest).Sum(a => a.input);
-        x.account = GetAccountNo(g.interest);
+        x.account = GetAccount(g.interest);
+        x.note = x.account.title;
         if (x.output > 0 || x.input > 0) {
             xxx.Add(x);
         }
 
         x = new Recapitulation();
-        x.note = "Razni materijalni troškovi";
+        //x.note = "Razni materijalni troškovi";
         x.output = xx.Where(a => a.recordType == g.otherFee).Sum(a => a.input);
         x.input = 0;
-        x.account = GetAccountNo(g.otherFee);
+        x.account = GetAccount(g.otherFee);
+        x.note = x.account.title;
         if (x.output > 0 || x.input > 0) {
             xxx.Add(x);
         }
@@ -582,47 +613,51 @@ public class Account : System.Web.Services.WebService {
     private List<Recapitulation> PrepareEntryData_PS(int year) {
         List<Recapitulation> xx = new List<Recapitulation>();
         Recapitulation x = new Recapitulation();
-        x.note = "Žiro račun";
+        //x.note = "Žiro račun";
         double val = GetStartBalance(year, g.giroaccount);
         if (val > 0) {
             x.output = val;
         } else {
             x.output = Math.Abs(val);
         }
-        x.account = GetAccountNo(g.giroaccount);
+        x.account = GetAccount(g.giroaccount);
+        x.note = x.account.title;
         xx.Add(x);
 
         x = new Recapitulation();
-        x.note = "Pozajmice";
+        //x.note = "Pozajmice";
         val = GetLoanStartBalance(null, year);
         if (val > 0) {
             x.output = val;
         } else {
             x.output = Math.Abs(val);
         }
-        x.account = GetAccountNo(g.loan);
+        x.account = GetAccount(g.loan);
+        x.note = x.account.title;
         xx.Add(x);
 
         x = new Recapitulation();
-        x.note = "Ulozi";
+        //x.note = "Ulozi";
         val = GetStartBalance(year, g.monthlyFee);
         if (val > 0) {
             x.input = val;
         } else {
             x.output = Math.Abs(val);
         }
-        x.account = GetAccountNo(g.monthlyFee);
+        x.account = GetAccount(g.monthlyFee);
+        x.note = x.account.title;
         xx.Add(x);
 
         x = new Recapitulation();
-        x.note = "Prihodi";
+        //x.note = "Prihodi";
         val = GetStartBalance(year, g.income) - GetTotalSaldo(year);
         if (val > 0) {
             x.input = val;
         } else {
             x.output = Math.Abs(val);
         }
-        x.account = GetAccountNo(g.income);
+        x.account = GetAccount(g.income);
+        x.note = x.account.title;
         xx.Add(x);
 
         return xx;
@@ -643,12 +678,12 @@ public class Account : System.Web.Services.WebService {
             double output = 0;
             if (type == g.entry_I) {
                 input = LoadBalanceSql(year, g.otherFee);
-                string note = string.Format("Prijenos na {0}", GetAccountNo(g.incomeExpenseDiff));
+                string note = string.Format("Zatv. kart. Prijenos na {0}", GetAccount(g.incomeExpenseDiff).code);
                 if (input > 0 ) {
                     x = new Recapitulation();
                     x.note = note;
                     x.input = input;
-                    x.account = GetAccountNo(g.otherFee);
+                    x.account = GetAccount(g.otherFee);
                     et.data.Add(x);
                 }
 
@@ -657,7 +692,16 @@ public class Account : System.Web.Services.WebService {
                     x = new Recapitulation();
                     x.note = note;
                     x.input = input;
-                    x.account = GetAccountNo(g.bankFee);
+                    x.account = GetAccount(g.bankFee);
+                    et.data.Add(x);
+                }
+
+                input = LoadBalanceSql(year, g.amortization);
+                if (input > 0) {
+                    x = new Recapitulation();
+                    x.note = note;
+                    x.input = input;
+                    x.account = GetAccount(g.amortization);
                     et.data.Add(x);
                 }
 
@@ -666,7 +710,7 @@ public class Account : System.Web.Services.WebService {
                     x = new Recapitulation();
                     x.note = note;
                     x.output = output;
-                    x.account = GetAccountNo(g.interest);
+                    x.account = GetAccount(g.interest);
                     et.data.Add(x);
                 }
 
@@ -675,7 +719,7 @@ public class Account : System.Web.Services.WebService {
                     x = new Recapitulation();
                     x.note = note;
                     x.output = output;
-                    x.account = GetAccountNo(g.manipulativeCosts);
+                    x.account = GetAccount(g.manipulativeCosts);
                     et.data.Add(x);
                 }
 
@@ -685,7 +729,7 @@ public class Account : System.Web.Services.WebService {
                 x.note = "Donos sa 73/75/76...";
                 x.input = input;
                 x.output = output;
-                x.account = GetAccountNo(g.incomeExpenseDiff);
+                x.account = GetAccount(g.incomeExpenseDiff);
                 et.data.Add(x);
             } else if (type == g.entry_II) {
                 input = LoadBalanceSql(year, g.income);
@@ -697,11 +741,11 @@ public class Account : System.Web.Services.WebService {
                     x.note = "Prijenos rashoda";
                     x.input = diff;
                 } else {
-                    x.note = "Prijenos viška prihoda";
+                    x.note = "Obračun prihoda i rashoda";
                     x.output = input - output;
                 }
 
-                x.account = GetAccountNo(g.incomeExpenseDiff);
+                x.account = GetAccount(g.incomeExpenseDiff);
                 et.data.Add(x);
 
                 x = new Recapitulation();
@@ -709,10 +753,10 @@ public class Account : System.Web.Services.WebService {
                     x.note = "Donos rashoda";
                     x.output = diff;
                 } else {
-                    x.note = "Donos viška prihoda";
+                    x.note = "Donos na prihode";
                     x.input = input - output;
                 }
-                x.account = GetAccountNo(g.income);
+                x.account = GetAccount(g.income);
                 et.data.Add(x);
             } else if (type == g.entry_III) {  // Kad su rashodi veci od prihoda u tekucoj godini
                 input = LoadBalanceSql(year, g.income);
@@ -728,7 +772,7 @@ public class Account : System.Web.Services.WebService {
                     x.output = input - output;
                 }
 
-                x.account = GetAccountNo(g.incomeExpenseDiff);
+                x.account = GetAccount(g.incomeExpenseDiff);
                 et.data.Add(x);
 
                 x = new Recapitulation();
@@ -739,7 +783,7 @@ public class Account : System.Web.Services.WebService {
                     x.note = "Donos viška prihoda";  // TODO ???
                     x.input = input - output;
                 }
-                x.account = GetAccountNo(g.income);
+                x.account = GetAccount(g.income);
                 et.data.Add(x);
             }
 
@@ -766,17 +810,10 @@ public class Account : System.Web.Services.WebService {
                                     , g.withdraw
                                     , type
                                     , type == g.loan ? string.Format("OR a.recordType = '{0}' OR a.recordType = '{1}' OR a.recordType = '{2}'", g.repayment, g.userRepayment, g.terminationRepayment) : "");
-                //if (type == g.repayment || type == g.withdraw || type == g.loan) {
-                //    sql = string.Format(@"{0} AND (a.recordType = '{1}' OR a.recordType = '{2}' {3})"
-                //                        , _sql
-                //                        , g.withdraw
-                //                        , type
-                //                        , type == g.loan ? string.Format("OR a.recordType = '{0}' OR a.recordType = '{1}'", g.repayment, g.userRepayment) : "");
 
             } else if (type == g.giroaccount) {
                 sql = _sql;
             } else if (type == g.monthlyFee) {
-                //sql = string.Format(@"{0} AND (a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}')", _sql, g.monthlyFee, g.userPayment, g.terminationWithdraw);
                 sql = string.Format(@"{0} AND (a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}' OR a.recordType = '{4}')", _sql, g.monthlyFee, g.userPayment, g.terminationWithdraw, g.terminationRepayment);
             } else {
                 sql = string.Format(@"{0} AND a.recordType = '{1}'", _sql, type);
@@ -803,7 +840,7 @@ public class Account : System.Web.Services.WebService {
                 connection.Close();
                 xxx.year = year;
                 xxx.type = type;
-                xxx.account = GetAccountNo(type); // "TODO";  // TODO: Konto
+                xxx.account = GetAccount(type); // "TODO";  // TODO: Konto
                 xxx.data = GetRecapMonthleyTotal(xx, type, year);
                 xxx.total = new Recapitulation();
                 xxx.total.input = GetYearlyTotal(xxx.data, "input"); // xxx.data.Sum(a => a.total.input);
@@ -897,7 +934,7 @@ public class Account : System.Web.Services.WebService {
 
             xx.year = year;
             xx.type = type;
-            xx.account = GetAccountNo(type); 
+            xx.account = GetAccount(type); 
             xx.total = new Recapitulation();
             xx.total.input = GetYearlyTotal(xx.data, "input");
             xx.total.output = GetYearlyTotal(xx.data, "output");
@@ -912,12 +949,11 @@ public class Account : System.Web.Services.WebService {
         double val = 0;
         db.Account();
         string sql = null;
-        //string _sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE yr = '{0}' AND a.note <> 'PS'", year);
         string _sql = string.Format("SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE yr = '{0}'", year);
         if (type == g.income) {
             sql = string.Format(@"{0} AND (a.recordType = '{1}' OR a.recordType = '{2}')", _sql, g.interest, g.manipulativeCosts);
         } else if (type == g.expense) {
-            sql = string.Format(@"{0} AND (a.recordType = '{1}' OR a.recordType = '{2}')", _sql, g.bankFee, g.otherFee);
+            sql = string.Format(@"{0} AND (a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}')", _sql, g.bankFee, g.otherFee, g.amortization);
         } else {
             sql = string.Format(@"{0} AND a.recordType = '{1}'", _sql, type);
         }
@@ -1168,8 +1204,8 @@ public class Account : System.Web.Services.WebService {
         return x;
     }
 
-    private string GetAccountNo(string type) {
-        string x = null;
+    private CodeTitle GetAccount(string type) {
+        CodeTitle x = new CodeTitle();
         if (type == g.giroaccount) {
             x = s.Data().account.giroAccount;
         }
@@ -1200,8 +1236,49 @@ public class Account : System.Web.Services.WebService {
         if (type == g.incomeExpenseDiff) {
             x = s.Data().account.incomeExpenseDiff;
         }
+        if (type == g.amortization) {
+            x = s.Data().account.amortization;
+        }
         return x;
     }
+
+    //private string GetAccountNo(string type) {
+    //    string x = null;
+    //    if (type == g.giroaccount) {
+    //        x = s.Data().account.giroAccount;
+    //    }
+    //    if (type == g.loan) {
+    //        x = s.Data().account.loan;
+    //    }
+    //    if (type == g.monthlyFee) {
+    //        x = s.Data().account.monthlyFee;
+    //    }
+    //    if (type == g.manipulativeCosts) {
+    //        x = s.Data().account.manipulativeCosts;
+    //    }
+    //    if (type == g.bankFee) {
+    //        x = s.Data().account.bankFee;
+    //    }
+    //    if (type == g.interest) {
+    //        x = s.Data().account.interest;
+    //    }
+    //    if (type == g.otherFee) {
+    //        x = s.Data().account.otherFee;
+    //    }
+    //    if (type == g.income) {
+    //        x = s.Data().account.income;
+    //    }
+    //    if (type == g.expense) {
+    //        x = s.Data().account.expense;
+    //    }
+    //    if (type == g.incomeExpenseDiff) {
+    //        x = s.Data().account.incomeExpenseDiff;
+    //    }
+    //    if (type == g.amortization) {
+    //        x = s.Data().account.amortization;
+    //    }
+    //    return x;
+    //}
 
     private List<RecapMonthlyTotal> GetRecapMonthleyTotal(List<Recapitulation> data, string type, int year) {
         string inputType = null, outputType = null;

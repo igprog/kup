@@ -17,7 +17,7 @@
         </div>
     </div>
     <div ng-if="d.records.data.length>0&&!d.loading" >
-        Konto: {{d.records.account}}
+        Konto: {{d.records.account.code}}
     </div>
     <loading-directive loadingtitle="'Učitavanje...'" value="d.loading" size="5"></loading-directive>
     <div ng-if="d.records.data.length>0&&!d.loading" class="table-responsive">

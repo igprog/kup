@@ -37,56 +37,60 @@
                 <div class="card-body table-responsive">
                     <table class="table table-borderless">
                         <tr>
-                            <td>Novac na računu kod tuzemnih poslovnih banaka:</td>
-                            <td><input ng-model="d.account.giroAccount" class="form-control text-right" /></td>
+                            <th>Naziv</th>
+                            <th style="width:200px" class="text-center">Konto</th>
                         </tr>
                         <tr>
-                            <td>Potraživanja od članova za dane pozajmice:</td>
-                            <td><input ng-model="d.account.loan" class="form-control text-right" /></td>
+                            <td><input ng-model="d.account.giroAccount.title" class="form-control" /></td>
+                            <td><input ng-model="d.account.giroAccount.code" class="form-control text-right" /></td>
                         </tr>
                         <tr>
-                            <td>Obveze za članske uloge članova:</td>
-                            <td><input ng-model="d.account.monthlyFee" class="form-control text-right" /></td>
+                            <td><input ng-model="d.account.loan.title" class="form-control" /></td>
+                            <td><input ng-model="d.account.loan.code" class="form-control text-right" /></td>
                         </tr>
                         <tr>
-                            <td>Ostali prihodi od financijske imovine - manipulativni troškovi:</td>
-                            <td><input ng-model="d.account.manipulativeCosts" class="form-control text-right" /></td>
+                            <td><input ng-model="d.account.monthlyFee.title" class="form-control" /></td>
+                            <td><input ng-model="d.account.monthlyFee.code" class="form-control text-right" /></td>
                         </tr>
                         <tr>
-                            <td>Bankarske usluge i usluge platnog prometa:</td>
-                            <td><input ng-model="d.account.bankFee" class="form-control text-right" /></td>
+                            <td><input ng-model="d.account.manipulativeCosts.title" class="form-control" /></td>
+                            <td><input ng-model="d.account.manipulativeCosts.code" class="form-control text-right" /></td>
                         </tr>
                         <tr>
-                            <td>Kamata na oročena sredstva i depozite po viđenju:</td>
-                            <td><input ng-model="d.account.interest" class="form-control text-right" /></td>
+                            <td><input ng-model="d.account.bankFee.title" class="form-control" /></td>
+                            <td><input ng-model="d.account.bankFee.code" class="form-control text-right" /></td>
                         </tr>
                         <tr>
-                            <td>Intelektualne i osobne usluge:</td>
-                            <td><input ng-model="d.account.otherFee" class="form-control text-right" /></td>
+                            <td><input ng-model="d.account.interest.title" class="form-control" /></td>
+                            <td><input ng-model="d.account.interest.code" class="form-control text-right" /></td>
                         </tr>
                         <tr>
-                            <td>Višak prihoda:</td>
-                            <td><input ng-model="d.account.income" class="form-control text-right" /></td>
+                            <td><input ng-model="d.account.otherFee.title" class="form-control" /></td>
+                            <td><input ng-model="d.account.otherFee.code" class="form-control text-right" /></td>
                         </tr>
                         <tr>
-                            <td>Rashodi:</td>
-                            <td><input ng-model="d.account.expense" class="form-control text-right" /></td>
+                            <td><input ng-model="d.account.income.title" class="form-control" /></td>
+                            <td><input ng-model="d.account.income.code" class="form-control text-right" /></td>
                         </tr>
                         <tr>
-                            <td>Obračun prihoda i rashoda:</td>
-                            <td><input ng-model="d.account.incomeExpenseDiff" class="form-control text-right" /></td>
+                            <td><input ng-model="d.account.expense.title" class="form-control" /></td>
+                            <td><input ng-model="d.account.expense.code" class="form-control text-right" /></td>
                         </tr>
                         <tr>
-                            <td>Ulaganja u računalne programe:</td>
-                            <td><input ng-model="d.account.softwareInvestment" class="form-control text-right" /></td>
+                            <td><input ng-model="d.account.incomeExpenseDiff.title" class="form-control" /></td>
+                            <td><input ng-model="d.account.incomeExpenseDiff.code" class="form-control text-right" /></td>
                         </tr>
                         <tr>
-                            <td>Amortizacija:</td>
-                            <td><input ng-model="d.account.amortization" class="form-control text-right" /></td>
+                            <td><input ng-model="d.account.softwareInvestment.title" class="form-control" /></td>
+                            <td><input ng-model="d.account.softwareInvestment.code" class="form-control text-right" /></td>
                         </tr>
                         <tr>
-                            <td>Ispravak vrijednosti proizvoda dugotrajne imovine:</td>
-                            <td><input ng-model="d.account.correction" class="form-control text-right" /></td>
+                            <td><input ng-model="d.account.amortization.title" class="form-control" /></td>
+                            <td><input ng-model="d.account.amortization.code" class="form-control text-right" /></td>
+                        </tr>
+                        <tr>
+                            <td><input ng-model="d.account.correction.title" class="form-control" /></td>
+                            <td><input ng-model="d.account.correction.code" class="form-control text-right" /></td>
                         </tr>
                         <tr>
                             <td colspan="2" class="text-right">

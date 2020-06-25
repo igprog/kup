@@ -98,6 +98,12 @@
       "type": "softwareInvestment"
     },
     {
+      "tpl": "fee",
+      "title": "Amortizacija",
+      "ico": "balance-scale-left",
+      "type": "amortization"
+    },
+    {
       "tpl": null,
       "title": "MJESEČNA REKAPITULACIJA",
       "ico": null

@@ -1,1 +1,75 @@
-{"currency":"kn","monthlyFee":150,"manipulativeCostsCoeff":0.02,"defaultDedline":12,"account":{"giroAccount":"1111","loan":"1294","monthlyFee":"2493","manipulativeCosts":"3418","bankFee":"4431","interest":"3413","otherFee":"4257","income":"5221","expense":"7099","incomeExpenseDiff":"5211","softwareInvestment":"0261","amortization":"4311","correction":"0291"},"startBalance":{"giroAccountInput":884966.18,"giroAccountOutput":2346692.4,"date":"2019-09-30"},"startBalance1":{"income":278742.13,"expense":0,"date":"2019-01-01"},"printSettings":{"headerInfo":"KUP JANAF\nKasa uzajamne pomoći","orientation":"v"},"backupFolder":"C:/temp/"}
+{
+  "currency": "kn",
+  "monthlyFee": 150,
+  "manipulativeCostsCoeff": 0.02,
+  "defaultDedline": 12,
+  "account": {
+    "giroAccount": {
+      "code": "1111",
+      "title": "Novac na računu kod tuzemnih poslovnih banaka"
+    },
+    "loan": {
+      "code": "1294",
+      "title": "Potraživanja od članova za dane pozajmice"
+    },
+    "monthlyFee": {
+      "code": "2493",
+      "title": "Obveze za članske uloge članova"
+    },
+    "manipulativeCosts": {
+      "code": "3418",
+      "title": "Ostali prihodi od financijske imovine - manipulativni troškovi"
+    },
+    "bankFee": {
+      "code": "4431",
+      "title": "Bankarske usluge i usluge platnog prometa"
+    },
+    "interest": {
+      "code": "3413",
+      "title": "Kamata na oročena sredstva i depozite po viđenju"
+    },
+    "otherFee": {
+      "code": "4257",
+      "title": "Intelektualne i osobne usluge"
+    },
+    "income": {
+      "code": "5221",
+      "title": "Prihodi"
+    },
+    "expense": {
+      "code": "7099",
+      "title": "Rashodi"
+    },
+    "incomeExpenseDiff": {
+      "code": "5211",
+      "title": "Razlika rashoda i prihoda"
+    },
+    "softwareInvestment": {
+      "code": "0261",
+      "title": "Ulaganja u računalne programe"
+    },
+    "amortization": {
+      "code": "4311",
+      "title": "Amortizacija"
+    },
+    "correction": {
+      "code": "0291",
+      "title": "Ispravak vrijednosti proizvoda dugotrajne imovine"
+    }
+  },
+  "startBalance": {
+    "giroAccountInput": 884966.18,
+    "giroAccountOutput": 2346692.4,
+    "date": "2019-09-30"
+  },
+  "startBalance1": {
+    "income": 278742.13,
+    "expense": 0,
+    "date": "2019-01-01"
+  },
+  "printSettings": {
+    "headerInfo": "KUP JANAF\nKasa uzajamne pomoći",
+    "orientation": "v"
+  },
+  "backupFolder": "C:/temp/"
+}

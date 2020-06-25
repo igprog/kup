@@ -39,7 +39,7 @@
             <tbody>
                 <tr ng-repeat="x in d.records.data">
                     <td>{{x.note}}</td>
-                    <td class="text-right">{{x.account}}</td>
+                    <td class="text-right">{{x.account.code}}</td>
                     <td class="text-right"><span ng-if="x.output==0">-</span><span ng-if="x.output>0">{{x.output | number:2}}</span></td>
                     <td class="text-right"><span ng-if="x.input==0">-</span><span ng-if="x.input>0">{{x.input | number:2}}</span></td>
                 </tr>
