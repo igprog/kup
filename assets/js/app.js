@@ -1218,6 +1218,7 @@ angular.module('app', [])
         month: $scope.g.month,
         year: $scope.g.year,
         type: $scope.g.currTplType,
+        capitalAssets: [],
         pdf: null,
         loadingPdf: false,
         loading: false
@@ -1225,6 +1226,12 @@ angular.module('app', [])
     $scope.d = data;
 
     $scope.save = (x, d, idx) => {
+        if (d.type === 'amortization') {
+            if (x.amortization.amortized >= x.amortization.capitalAssetsAmount) {
+                alert('Osnovno sredstvo je amortizirano.');
+                return false;
+            }
+        }
         x.recordType = d.type;
         x.year = d.year;
         if (x.id === null) {
@@ -1283,6 +1290,23 @@ angular.module('app', [])
 
     $scope.removePdfLink = () => {
         $scope.d.pdf = null;
+    }
+
+    var loadCapitalAssets = () => {
+        f.post(service, 'LoadCapitalAssets', {}).then((d) => {
+            $scope.d.capitalAssets = d;
+        });
+    }
+    loadCapitalAssets();
+
+    $scope.getAmortization = (x) => {
+        f.post(service, 'GetAmortization', { id: x.loanId }).then((d) => {
+            x.amortization = d;
+        });
+    }
+
+    $scope.setAmortization = (x) => {
+        x.amount = x.amortization.amount;
     }
 
 }])

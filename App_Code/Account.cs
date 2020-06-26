@@ -50,6 +50,7 @@ public class Account : System.Web.Services.WebService {
         public double monthlyFeeStartBalance;
         public double loanStartBalance;
         public double activatedLoan;
+        public Amortization amortization;
     }
 
     public class Total {
@@ -169,6 +170,13 @@ public class Account : System.Web.Services.WebService {
         public string title;
     }
 
+    public class Amortization {
+        public double perc;
+        public double amount;
+        public double amortized;
+        public double capitalAssetsAmount;
+    }
+
     [WebMethod]
     public string Init(string type) {
         NewAccount x = new NewAccount();
@@ -189,6 +197,7 @@ public class Account : System.Web.Services.WebService {
         x.repaid = 0;
         x.restToRepayment = 0;
         x.totalObligation = 0;
+        x.amortization = new Amortization();
         return JsonConvert.SerializeObject(x, Formatting.None);
     }
 
@@ -252,6 +261,32 @@ public class Account : System.Web.Services.WebService {
         }
     }
 
+    [WebMethod]
+    public string LoadCapitalAssets() {
+        try {
+            db.Account();
+            //TODO: Osnovna sredstava, za sada samo ulaganju ra racunalne programe, treba dodati i druge vrste osnovnih sredstava ako se pojave
+            string sql = string.Format(@"SELECT * FROM Account WHERE recordType = '{0}'", g.softwareInvestment);
+            Accounts xx = new Accounts();
+            xx.data = new List<NewAccount>();
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            NewAccount x = ReadData(reader);
+                            xx.data.Add(x);
+                        }
+                    }
+                }
+                connection.Close();
+            }
+            return JsonConvert.SerializeObject(xx, Formatting.None);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
+        }
+    }
+
     public Accounts LoadData(int year, string type) {
         db.Account();
         string sql = string.Format(@"SELECT * FROM Account WHERE yr = '{0}' AND recordType = '{1}'", year, type);
@@ -274,9 +309,96 @@ public class Account : System.Web.Services.WebService {
         xx.total.bankFee = xx.data.Where(a => a.recordType == g.bankFee).Sum(a => a.amount);
         xx.total.interest = xx.data.Where(a => a.recordType == g.interest).Sum(a => a.amount);
         xx.total.amortization = xx.data.Where(a => a.recordType == g.amortization).Sum(a => a.amount);
+
+        xx.data = CheckAmortization(xx.data);
+
         return xx;
     }
 
+    private List<NewAccount> CheckAmortization(List<NewAccount> data) {
+        foreach (NewAccount x in data) {
+            if (x.recordType == g.amortization) {
+                x.amortization = new Amortization();
+                x.amortization.perc = s.Data().capitalAssets.Where(a => a.recordType == g.softwareInvestment).FirstOrDefault().amortization;
+                x.amortization.amount = GetAmortizationAmount(x.loanId, x.amortization.perc);
+                x.amortization.amortized = GetAmortizedAmount(x.loanId);
+                x.amortization.capitalAssetsAmount = GetCapitalAssetsAmount(x.loanId);
+                if (x.amortization.amortized >= x.amortization.capitalAssetsAmount) {
+                    x.amortization.amount = 0;
+                }
+            }
+        }
+        return data;
+    }
+
+    [WebMethod]
+    public string GetAmortization(string id) {
+        try {
+            Amortization x = new Amortization();
+            x.perc = s.Data().capitalAssets.Where(a => a.recordType == g.softwareInvestment).FirstOrDefault().amortization;
+            x.amount = GetAmortizationAmount(id, x.perc);
+            x.amortized = GetAmortizedAmount(id);
+            x.capitalAssetsAmount = GetCapitalAssetsAmount(id);
+            if (x.amortized >= x.capitalAssetsAmount) {
+                x.amount = 0;
+            }
+            return JsonConvert.SerializeObject(x, Formatting.None);
+        } catch (Exception e) {
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
+        }
+    }
+
+    private double GetAmortizationAmount(string capitalAssetId, double amortization) {
+        double x = 0, amount = 0;
+        string sql = string.Format(@"SELECT amount FROM Account WHERE id = '{0}'", capitalAssetId);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader())  {
+                    while (reader.Read()) {
+                        amount = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        x = Math.Round((amount * (amortization / 100) / 12), 2);
+        return x;
+    }
+
+    private double GetAmortizedAmount(string capitalAssetId) {
+        double x = 0;
+        string sql = string.Format(@"SELECT SUM(CAST(amount AS DECIMAL(10,2))) FROM Account WHERE loanId = '{0}'", capitalAssetId);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader())  {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
+    }
+
+    private double GetCapitalAssetsAmount(string capitalAssetId) {
+        double x = 0;
+        string sql = string.Format(@"SELECT SUM(CAST(amount AS DECIMAL(10,2))) FROM Account WHERE id = '{0}'", capitalAssetId);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
+    }
 
     [WebMethod]
     public string GetMonthlyFee(int month, int year, string buisinessUnitCode, string search) {

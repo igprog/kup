@@ -98,7 +98,7 @@
       "type": "softwareInvestment"
     },
     {
-      "tpl": "fee",
+      "tpl": "amortization",
       "title": "Amortizacija",
       "ico": "balance-scale-left",
       "type": "amortization"

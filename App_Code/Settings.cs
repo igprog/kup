@@ -29,6 +29,7 @@ public class Settings : System.Web.Services.WebService {
         public StartBalance startBalance;
         public StartBalance1 startBalance1;
         public PrintSettings printSettings;
+        public List<CapitalAssets> capitalAssets;
         //public string acrobatReaderDir;
         public string backupFolder;
     }
@@ -43,6 +44,13 @@ public class Settings : System.Web.Services.WebService {
         public double income;  // Potrazuje
         public double expense;  // Duguje
         public string date;
+    }
+
+    public class CapitalAssets {
+        public string code;
+        public string title;
+        public string recordType;
+        public double amortization;
     }
 
     public class PrintSettings {
