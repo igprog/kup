@@ -153,7 +153,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-12 p-3">
+        <div class="col-sm-6 p-3">
             <div class="card shadow">
                 <div class="card-header">Osnovna sredstva</div>
                 <div class="card-body table-responsive">
@@ -161,21 +161,19 @@
                         <tr>
                             <th style="width:150px">Kod:</th>
                             <th>Naziv</th>
-                            <th>recordType</th>
+                            <th ng-if="config.debug">recordType</th>
                             <th style="width:200px">Amortizacija (% / god.)</th>
                         </tr>
                         <tr ng-repeat="x in d.capitalAssets">
                             <td><input ng-model="x.code" class="form-control" /></td>
                             <td><input ng-model="x.title" class="form-control" /></td>
-                            <td><input ng-model="x.recordType" class="form-control" /></td>
+                            <td ng-if="config.debug"><input ng-model="x.recordType" class="form-control" /></td>
                             <td><input ng-model="x.amortization" class="form-control text-right" /></td>
                         </tr>
-                        <tr>
-                            <td colspan="4" class="text-right">
-                                <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fa fa-save"></i> Spremi</button>
-                            </td>
-                        </tr>
                     </table>
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-outline-primary" ng-click="save(d)"><i class="fa fa-save"></i> Spremi</button>
+                    </div>
                 </div>
             </div>
         </div>

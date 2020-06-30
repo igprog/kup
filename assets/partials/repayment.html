@@ -41,9 +41,9 @@
         </div>
         <loading-directive loadingtitle="'Učitavanje...'" value="d.loading" size="5"></loading-directive>
         <div ng-if="d.records.data.length>0&&!d.loading" class="table-responsive">
-            <table class="table">
+            <table class="table table-borderless">
                 <thead>
-                    <tr>
+                    <tr class="border-bottom">
                         <th>Mat. br.</th>
                         <th>Korisnik</th>
                         <th class="text-right">Ugovorena rata ({{config.currency}})</th>

@@ -907,6 +907,36 @@ public class Account : System.Web.Services.WebService {
                 }
                 x.account = GetAccount(g.income);
                 et.data.Add(x);
+            } else if (type == g.amortization) {  // Amortizacija - ulaganje u racunalne programe
+                input = LoadBalanceSql(year, g.amortization);
+                //output = LoadBalanceSql(year, g.amortization);
+                x = new Recapitulation();
+                x.note = s.Data().account.amortization.title;
+                x.output = input;
+                //double diff = output - input;
+                //if (diff > 0) {
+                //    x.note = "Prijenos rashoda, zatvaranje kartice";
+                //    x.input = diff;
+                //} else {
+                //    x.note = "Prijenos viška prihoda";  // TODO ???
+                //    x.output = input - output;
+                //}
+
+                x.account = GetAccount(g.amortization);
+                et.data.Add(x);
+
+                x = new Recapitulation();
+                x.note = s.Data().account.correction.title;  // Ispravak vrijednosti dugotrajne imovine
+                x.input = input;
+                //if (diff > 0) {
+                //    x.note = "Donos rashoda na ukupni prihod";
+                //    x.output = diff;
+                //} else {
+                //    x.note = "Donos viška prihoda";  // TODO ???
+                //    x.input = input - output;
+                //}
+                x.account = GetAccount(g.income);
+                et.data.Add(x);
             }
 
             et.total = new Recapitulation();
@@ -937,6 +967,8 @@ public class Account : System.Web.Services.WebService {
                 sql = _sql;
             } else if (type == g.monthlyFee) {
                 sql = string.Format(@"{0} AND (a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}' OR a.recordType = '{4}')", _sql, g.monthlyFee, g.userPayment, g.terminationWithdraw, g.terminationRepayment);
+            } else if (type == g.correction) {
+                sql = string.Format(@"{0} AND a.recordType = '{1}'", _sql, g.amortization);
             } else {
                 sql = string.Format(@"{0} AND a.recordType = '{1}'", _sql, type);
             }
@@ -981,7 +1013,8 @@ public class Account : System.Web.Services.WebService {
             RecapYearlyTotal xx = new RecapYearlyTotal();
             RecapMonthlyTotal x = new RecapMonthlyTotal();
             xx.data = new List<RecapMonthlyTotal>();
-            double balance = LoadBalanceSql(year, g.expense) - LoadBalanceSql(year, g.income);   // saldo
+            //double balance = LoadBalanceSql(year, g.expense) - LoadBalanceSql(year, g.income);   // saldo
+            double balance = LoadBalanceSql(year, g.income) - LoadBalanceSql(year, g.expense);   // saldo
             int nowYear = DateTime.Now.Year;
 
             if (type == g.income) {
@@ -1020,7 +1053,7 @@ public class Account : System.Web.Services.WebService {
                     x.month = "12";
                     x.total = new Recapitulation();
                     x.total.date = "31.12";
-                    x.total.note = string.Format("Zatvaranje kartice i prijenos na {0}", s.Data().account.income);  // (konto 9320)
+                    x.total.note = string.Format("Zatvaranje kartice i prijenos na {0}", s.Data().account.income.code);  // (konto 9320)
                     if (balance > 0) {
                         x.total.input = balance;
                     }
@@ -1420,6 +1453,9 @@ public class Account : System.Web.Services.WebService {
         } else if (type == g.monthlyFee) {
             inputType = type;
             outputType = g.terminationWithdraw;
+        } else if (type == g.correction) {
+            inputType = type;
+            outputType = g.amortization;
         } else {
             inputType = type;
             outputType = null;
@@ -1708,6 +1744,9 @@ public class Account : System.Web.Services.WebService {
         sql = string.Format("{0} {1}"
             , sql_
             , string.Format("AND (a.recordType = '{0}' OR a.recordType = '{1}')", g.interest, g.manipulativeCosts));
+        //sql = string.Format("{0} {1}"
+        //    , sql_
+        //    , string.Format("AND (a.recordType = '{0}' OR a.recordType = '{1}' OR a.recordType = '{2}')", g.interest, g.manipulativeCosts, g.amortization));
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
@@ -1720,9 +1759,12 @@ public class Account : System.Web.Services.WebService {
             connection.Close();
         }
 
+        //sql = string.Format("{0} {1}"
+        //    , sql_
+        //    , string.Format("AND (a.recordType = '{0}' OR a.recordType = '{1}')", g.bankFee, g.otherFee));
         sql = string.Format("{0} {1}"
             , sql_
-            , string.Format("AND (a.recordType = '{0}' OR a.recordType = '{1}')", g.bankFee, g.otherFee));
+            , string.Format("AND (a.recordType = '{0}' OR a.recordType = '{1}' OR a.recordType = '{2}')", g.bankFee, g.otherFee, g.amortization));
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {

@@ -17,16 +17,16 @@
         </div>
     </div>
     <div ng-if="!d.loading" class="table-responsive">
-        <table class="table">
+        <table class="table table-borderless">
             <thead>
-                <tr>
+                <tr class="border-bottom">
                     <th></th>
                     <th>Br.</th>
                     <th>Osnovno sredstvo</th>
                     <th style="width:190px">Datum</th>
                     <th style="width:200px">Mjesec</th>
                     <th>Opis</th>
-                    <th>Amortizacija</th>
+                    <th>Amortizacija ({{config.currency}})</th>
                     <th class="text-right" style="width:200px">Iznos ({{config.currency}})</th>
                     <!--<th>Amortizirano ({{config.currency}})</th>-->
                     <th></th>
@@ -42,7 +42,7 @@
                         <select ng-model="x.loanId" class="form-control mb-2 mr-sm-2" ng-change="getAmortization(x)">
                             <option ng-repeat="y in d.capitalAssets.data" value="{{y.id}}">{{y.note}}</option>
                         </select>
-                        <em>({{x.amortization.amortized}} / {{x.amortization.capitalAssetsAmount}})</em>
+                        <em>({{x.amortization.amortized}} {{config.currency}} / {{x.amortization.capitalAssetsAmount}} {{config.currency}})</em>
                     </td>
                     <td><input ng-model="x.recordDate" type="date" class="form-control" style="width:190px"></td>
                     <td>
