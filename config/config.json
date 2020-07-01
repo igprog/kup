@@ -1,6 +1,6 @@
 ﻿{
-  "version": "1.7.14",
-  "date":  "9.4.2020",
+  "version": "1.8.0",
+  "date":  "1.7.2020",
   "appname": "KUP - JANAF",
   "apptitle": "Kasa Uzajamne Pomoći",
   "debug": true,
@@ -8,7 +8,7 @@
   "currency": "kn",
   "manipulativeCostsPerc": 2,
   "fromYear": 2019,
-  "recordslimit":  20,
+  "recordslimit": 20,
   "menu": [
     {
       "tpl": "dashboard",
