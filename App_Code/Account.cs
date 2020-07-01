@@ -848,7 +848,7 @@ public class Account : System.Web.Services.WebService {
                 input = LoadBalanceSql(year, g.income);
                 output = LoadBalanceSql(year, g.expense);
                 x = new Recapitulation();
-                x.note = "Donos sa 73/75/76...";
+                x.note = "Donos sa kl.3 i kl.4";
                 x.input = input;
                 x.output = output;
                 x.account = GetAccount(g.incomeExpenseDiff);
@@ -1033,7 +1033,10 @@ public class Account : System.Web.Services.WebService {
                     x.total = new Recapitulation();
                     x.total.date = "31.12";
                     x.total.note = string.Format("Donos viška prihoda za {0} g.", year);
-                    x.total.output = balance;
+                    if (balance > 0) {
+                        x.total.input = balance;
+                    }
+                    //x.total.output = balance;
                     //x.total.input = LoadBalanceSql(year, type);
                     xx.data.Add(x);
                 }
@@ -1043,7 +1046,7 @@ public class Account : System.Web.Services.WebService {
                 x.total = new Recapitulation();
                 x.total.date = "31.12";
                 x.total.note = "Donos rashoda";
-                if (balance > 0) {
+                if (balance < 0) {
                     x.total.output = balance;
                 }
                 xx.data.Add(x);
@@ -1054,7 +1057,7 @@ public class Account : System.Web.Services.WebService {
                     x.total = new Recapitulation();
                     x.total.date = "31.12";
                     x.total.note = string.Format("Zatvaranje kartice i prijenos na {0}", s.Data().account.income.code);  // (konto 9320)
-                    if (balance > 0) {
+                    if (balance < 0) {
                         x.total.input = balance;
                     }
                     xx.data.Add(x);
@@ -1065,7 +1068,7 @@ public class Account : System.Web.Services.WebService {
                 x.month = "12";
                 x.total = new Recapitulation();
                 x.total.date = "31.12";
-                x.total.note = "Donos sa 73/75/76...";
+                x.total.note = "Donos sa kl.3 i kl.4";
                 x.total.input = input;
                 x.total.output = output;
                 xx.data.Add(x);
@@ -1444,7 +1447,7 @@ public class Account : System.Web.Services.WebService {
         } else if (type == g.repayment) {
             inputType = g.repayment;
             outputType = g.withdraw;
-        } else if (type == g.bankFee || type == g.otherFee) {
+        } else if (type == g.bankFee || type == g.otherFee || type == g.amortization) {
             inputType = null;
             outputType = type;
         } else if (type == g.giroaccount) {
@@ -1454,15 +1457,16 @@ public class Account : System.Web.Services.WebService {
             inputType = type;
             outputType = g.terminationWithdraw;
         } else if (type == g.correction) {
-            inputType = type;
-            outputType = g.amortization;
-        } else {
+            inputType = g.amortization;
+            outputType = null;
+        }
+        else {
             inputType = type;
             outputType = null;
         }
         List<RecapMonthlyTotal> xx = new List<RecapMonthlyTotal>();
 
-        if (type == g.loan || type == g.repayment || type == g.monthlyFee || type == g.giroaccount || type == g.loan) {
+        if (type == g.loan || type == g.repayment || type == g.monthlyFee || type == g.giroaccount || type == g.loan || type == g.correction) {
             RecapMonthlyTotal x = new RecapMonthlyTotal();
             x.month = "PS";
             x.total = new Recapitulation();
@@ -1473,7 +1477,7 @@ public class Account : System.Web.Services.WebService {
                 startBalance = GetLoanStartBalance(null, year);
                 x.total.output = startBalance;
             }
-            if (type == g.monthlyFee) {
+            if (type == g.monthlyFee || type == g.correction) {
                 x.total.input = startBalance;  // potražuje 
             }
             if (type == g.giroaccount && year >= Convert.ToDateTime(s.Data().startBalance.date).Year) {
@@ -1603,6 +1607,10 @@ public class Account : System.Web.Services.WebService {
                     //x.total.accountBalance = x.total.outputAccumulation - x.total.inputAccumulation;
                 } else if (type == g.otherFee) {
                     x.total.note = "Razni materijalni troškovi";
+                } else if (type == g.amortization) {
+                    x.total.note = s.Data().account.amortization.title;
+                } else if (type == g.correction) {
+                    x.total.note = s.Data().account.correction.title;
                 } else {
                     x.total.note = null; // data.Where(a => a.month.ToString() == i.ToString()).FirstOrDefault().note;
                 }
@@ -1671,6 +1679,8 @@ public class Account : System.Web.Services.WebService {
                                 (a.recordType = '{2}' OR a.recordType = '{3}' OR a.recordType = '{4}'
                                 OR  a.recordType = '{5}' OR a.recordType = '{6}')"
                                 , _sql, s.Data().startBalance.date, g.repayment, g.userRepayment, g.monthlyFee, g.userPayment, g.interest);
+        } else if (type == g.correction) {
+            sql = string.Format("{0} AND a.recordType = '{1}'", _sql, g.amortization);
         } else {
             sql = _sql;
         }
