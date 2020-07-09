@@ -643,7 +643,7 @@ public class Account : System.Web.Services.WebService {
     private List<Recapitulation> PrepareEntryData(List<Recapitulation> xx, int year, int month) {
         List<Recapitulation> xxx = new List<Recapitulation>();
         Recapitulation x = new Recapitulation();
-        x.note = "Žiro račun";
+        //x.note = "Žiro račun";
         x.output = xx.Where(a => a.recordType == g.monthlyFee).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.userPayment).Sum(a => a.input)
             + xx.Where(a => a.recordType == g.userRepayment).Sum(a => a.input)
@@ -703,7 +703,7 @@ public class Account : System.Web.Services.WebService {
         //x.note = "Troškovi održavanja računa";
         x.output = xx.Where(a => a.recordType == g.bankFee).Sum(a => a.input);
         x.input = 0;
-        x.account = GetAccount(g.monthlyFee);
+        x.account = GetAccount(g.bankFee);
         x.note = x.account.title;
         if (x.output > 0 || x.input > 0) {
             xxx.Add(x);
@@ -724,6 +724,24 @@ public class Account : System.Web.Services.WebService {
         x.output = xx.Where(a => a.recordType == g.otherFee).Sum(a => a.input);
         x.input = 0;
         x.account = GetAccount(g.otherFee);
+        x.note = x.account.title;
+        if (x.output > 0 || x.input > 0) {
+            xxx.Add(x);
+        }
+
+        x = new Recapitulation();
+        x.output = xx.Where(a => a.recordType == g.amortization).Sum(a => a.input);
+        x.input = 0;
+        x.account = GetAccount(g.amortization);
+        x.note = x.account.title;
+        if (x.output > 0 || x.input > 0) {
+            xxx.Add(x);
+        }
+
+        x = new Recapitulation();
+        x.output = 0;
+        x.input = xx.Where(a => a.recordType == g.amortization).Sum(a => a.input);
+        x.account = GetAccount(g.correction);
         x.note = x.account.title;
         if (x.output > 0 || x.input > 0) {
             xxx.Add(x);
@@ -1396,6 +1414,9 @@ public class Account : System.Web.Services.WebService {
         }
         if (type == g.amortization) {
             x = s.Data().account.amortization;
+        }
+        if (type == g.correction) {
+            x = s.Data().account.correction;
         }
         return x;
     }
