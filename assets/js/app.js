@@ -884,7 +884,8 @@ angular.module('app', [])
         limit: $scope.g.recordslimit,
         pdf: null,
         loadingPdf: false,
-        loading: false
+        loading: false,
+        disabled: false
     }
     $scope.d = data;
 
@@ -913,6 +914,7 @@ angular.module('app', [])
     }
 
     $scope.save = (x, d, idx) => {
+        $scope.d.disabled = true;
         if (x.monthlyFee === '') {
             x.monthlyFee = 0;
         }
@@ -920,6 +922,7 @@ angular.module('app', [])
         x.year = d.year;
         f.post('Account', 'SaveMonthlyFee', { x: x }).then((d) => {
             getMonthlyRecords($scope.d);
+            $scope.d.disabled = false;
         });
     }
 
@@ -989,7 +992,8 @@ angular.module('app', [])
         limit: $scope.g.recordslimit,
         pdf: null,
         loadingPdf: false,
-        loading: false
+        loading: false,
+        disabled: false
     }
     $scope.d = data;
 
@@ -1029,12 +1033,14 @@ angular.module('app', [])
     }
 
     var save = (x, d, idx) => {
+        $scope.d.disabled = true;
         f.post('Account', 'SaveRepayment', { x: x }).then((d) => {
             debugger;
             $scope.d.records.data[idx].id = d.id;
             $scope.d.records.data[idx].repaid = d.repaid;
             $scope.d.records.data[idx].currRepayment = d.currRepayment;
             $scope.d.records.data[idx].restToRepayment = d.restToRepayment;
+            $scope.d.disabled = false;
         });
     }
 
