@@ -27,7 +27,7 @@
                     <th style="width:200px">Mjesec</th>
                     <th>Opis</th>
                     <th>Amortizacija ({{config.currency}})</th>
-                    <th class="text-right" style="width:200px">Iznos ({{config.currency}})</th>
+                    <th class="text-right" style="width:150px">Iznos ({{config.currency}})</th>
                     <!--<th>Amortizirano ({{config.currency}})</th>-->
                     <th></th>
                 </tr>
@@ -35,7 +35,7 @@
             <tbody>
                 <tr ng-if="d.records.data.length>0" ng-repeat="x in d.records.data track by $index">
                     <td>
-                        <button class="btn btn-outline-danger" ng-click="remove(x)" title="Briši"><i class="fas fa-trash-alt"></i> Briši</button>
+                        <button class="btn btn-outline-danger" ng-click="remove(x)" title="Briši"><i class="fas fa-trash-alt"></i></button>
                     </td>
                     <td>{{$index + 1}}.</td>
                     <td>
@@ -55,7 +55,7 @@
                     <td><input ng-model="x.amount" class="form-control text-right" allow-only-numbers /></td>
                     <!--<td>{{x.amortization.amortized}}</td>-->
                     <td>
-                        <button class="btn btn-outline-primary" ng-click="save(x, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button>
+                        <button ng-disabled="d.disabled" class="btn btn-outline-primary" ng-click="save(x, d, $index)" title="Spremi"><i class="fas fa-save"></i></button>
                     </td>
                 </tr>
                 <tr>

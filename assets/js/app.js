@@ -212,7 +212,7 @@ angular.module('app', [])
     }
 
     $scope.toggleTpl = (tpl, title, currTplType) => {
-        if (tpl==null) {return false;}
+        if (tpl == null) { return false; }
         $scope.g.currTpl = f.currTpl(tpl);
         $scope.g.currTplTitle = title;
         if (f.defined(currTplType)) {   // ***** Only for recapitualtion and fee *****
@@ -1035,7 +1035,6 @@ angular.module('app', [])
     var save = (x, d, idx) => {
         $scope.d.disabled = true;
         f.post('Account', 'SaveRepayment', { x: x }).then((d) => {
-            debugger;
             $scope.d.records.data[idx].id = d.id;
             $scope.d.records.data[idx].repaid = d.repaid;
             $scope.d.records.data[idx].currRepayment = d.currRepayment;
@@ -1227,7 +1226,8 @@ angular.module('app', [])
         capitalAssets: [],
         pdf: null,
         loadingPdf: false,
-        loading: false
+        loading: false,
+        disabled: false
     }
     $scope.d = data;
 
@@ -1243,7 +1243,9 @@ angular.module('app', [])
         if (x.id === null) {
             x.recordDate = f.setDate(x.recordDate);
         }
+        $scope.d.disabled = true;
         f.post(service, 'SaveOtherFee', { x: x }).then((d) => {
+            $scope.d.disabled = false;
             $scope.d.records.data[idx] = d;
             load(x, x.recordType);
         });
