@@ -133,22 +133,6 @@ public class Account : System.Web.Services.WebService {
     }
 
     // ***** Konto *****
-    //public class AccountNo {
-    //    public string giroAccount;
-    //    public string loan;
-    //    public string monthlyFee;
-    //    public string manipulativeCosts;
-    //    public string bankFee;
-    //    public string interest;
-    //    public string otherFee;
-    //    public string income;
-    //    public string expense;
-    //    public string incomeExpenseDiff;
-    //    public string softwareInvestment;
-    //    public string amortization;
-    //    public string correction;
-    //}
-
     public class AccountNo {
         public CodeTitle giroAccount;
         public CodeTitle loan;
@@ -265,7 +249,7 @@ public class Account : System.Web.Services.WebService {
     public string LoadCapitalAssets() {
         try {
             db.Account();
-            //TODO: Osnovna sredstava, za sada samo ulaganju ra racunalne programe, treba dodati i druge vrste osnovnih sredstava ako se pojave
+            //TODO: Osnovna sredstava, za sada samo ulaganje u racunalne programe, treba dodati i druge vrste osnovnih sredstava ako se pojave
             string sql = string.Format(@"SELECT * FROM Account WHERE recordType = '{0}'", g.softwareInvestment);
             Accounts xx = new Accounts();
             xx.data = new List<NewAccount>();
@@ -289,7 +273,7 @@ public class Account : System.Web.Services.WebService {
 
     public Accounts LoadData(int year, string type) {
         db.Account();
-        string sql = string.Format(@"SELECT * FROM Account WHERE yr = '{0}' AND recordType = '{1}'", year, type);
+        string sql = string.Format(@"SELECT * FROM Account WHERE yr = '{0}' AND recordType = '{1}' ORDER BY mo", year, type);
         Accounts xx = new Accounts();
         xx.data = new List<NewAccount>();
             using (SqlConnection connection = new SqlConnection(g.connectionString)) {
