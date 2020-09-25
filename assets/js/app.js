@@ -351,7 +351,7 @@ angular.module('app', [])
             $scope.d.limit = $scope.g.recordslimit;
             f.post(service, 'Load', { buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
                 $scope.d.users = d;
-                $scope.d.year = f.year();
+                $scope.d.year = null; // f.year();
                 $scope.d.loading = false;
                 $scope.zipFileName = null;
             });

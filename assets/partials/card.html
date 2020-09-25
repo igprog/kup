@@ -7,8 +7,9 @@
                         <option value="" selected disabled>Poslovna jedinica</option>
                         <option ng-repeat="x in g.buisinessUnits" value="{{x.code}}">{{x.title}}</option>
                     </select>
-                    <label for="year" class="mb-2 mr-sm-2">Godina:</label>
+                    <!--<label for="year" class="mb-2 mr-sm-2">Godina:</label>-->
                     <select ng-model="d.year" class="form-control mb-2 mr-sm-2">
+                        <option value="" selected disabled>Godina</option>
                         <option ng-repeat="x in g.years" value="{{x}}">{{x}}</option>
                     </select>
                 </div>
