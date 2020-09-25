@@ -421,7 +421,8 @@ public class User : System.Web.Services.WebService {
             connection.Close();
         }
         //x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment) - GetAmount(id, g.userRepayment);
-        x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment) - GetAmount(id, g.userRepayment) - GetAmount(id, g.terminationRepayment);
+        //x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment) - GetAmount(id, g.userRepayment) - GetAmount(id, g.terminationRepayment);
+        x.restToRepayment = GetLoanAmount(id) - GetAmount(id, g.repayment) - GetAmount(id, g.userRepayment) - GetAmount(id, g.terminationRepayment) - GetAmount(id, g.loan);
         x.totalMebershipFees = GetAmount(id, g.monthlyFee);
         x.totalUserPayment = GetAmount(id, g.userPayment);
         x.totalWithdrawn = GetAmount(id, g.terminationWithdraw);

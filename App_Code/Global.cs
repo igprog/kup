@@ -35,8 +35,8 @@ namespace Igprog {
         public string softwareInvestment = "softwareInvestment";  //***** ulaganja u racunalne programe *****
         public string amortization = "amortization";  //***** amortizacija *****
         public string correction = "correction";  //***** Ispravak vrijednosti proizvoda dugotrajne imovine *****
-
         #endregion RecordType
+
         public string giroaccount = "giroaccount";
         public string loan = "loan";  //***** otplata novom pozajmicom ? *****
         public string income = "income";
