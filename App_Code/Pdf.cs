@@ -577,6 +577,10 @@ _____________
                     typeTitle = "Amortizacija";
                     totValue = g.Format(records.total.amortization);
                     break;
+                case "softwareInvestment":
+                    typeTitle = "Ulaganja u računalne programe";
+                    totValue = g.Format(records.total.softwareInvestment);
+                    break;
             }
             p.Alignment = Element.ALIGN_CENTER;
             p.Add(new Paragraph(string.Format("{0} - {1}", typeTitle, year), GetFont(12, Font.BOLD)));

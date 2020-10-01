@@ -78,6 +78,7 @@ public class Account : System.Web.Services.WebService {
         public double manipulativeCosts;
         public double currRepayment; // uplacena pozajmica
         public double amortization;
+        public double softwareInvestment;
 
         public List<RecapMonthlyTotal> monthlyTotalList;  // TODO
     }
@@ -293,6 +294,7 @@ public class Account : System.Web.Services.WebService {
         xx.total.bankFee = xx.data.Where(a => a.recordType == g.bankFee).Sum(a => a.amount);
         xx.total.interest = xx.data.Where(a => a.recordType == g.interest).Sum(a => a.amount);
         xx.total.amortization = xx.data.Where(a => a.recordType == g.amortization).Sum(a => a.amount);
+        xx.total.softwareInvestment = xx.data.Where(a => a.recordType == g.softwareInvestment).Sum(a => a.amount);
 
         xx.data = CheckAmortization(xx.data);
 
@@ -470,7 +472,8 @@ public class Account : System.Web.Services.WebService {
                 xx.data.Add(x);
             }
             xx.total = new Total();
-            //  xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
+            //xx.total.monthlyFee = xx.data.Sum(a => a.monthlyFee);
+
             // xx.total.repayment = xx.data.Sum(a => a.amount);
             xx.total.currRepayment = xx.data.Sum(a => a.currRepayment);
             xx.total.restToRepayment = xx.data.Sum(a => a.restToRepayment);
@@ -1471,7 +1474,7 @@ public class Account : System.Web.Services.WebService {
         }
         List<RecapMonthlyTotal> xx = new List<RecapMonthlyTotal>();
 
-        if (type == g.loan || type == g.repayment || type == g.monthlyFee || type == g.giroaccount || type == g.loan || type == g.correction) {
+        if (type == g.loan || type == g.repayment || type == g.monthlyFee || type == g.giroaccount || type == g.loan || type == g.correction || type == g.softwareInvestment) {
             RecapMonthlyTotal x = new RecapMonthlyTotal();
             x.month = "PS";
             x.total = new Recapitulation();
@@ -1490,6 +1493,9 @@ public class Account : System.Web.Services.WebService {
                 x.total.input = 0;
                // x.total.output = s.Data().startBalance.giroAccountOutput;  // TODO: + ukupno ziro racun do te godine, metoda: getGiroAccountOutputTotal(year)
                // x.total.input = s.Data().startBalance.giroAccountInput; // TODO: + ukupno ziro racun do te godine, metoda: getGiroAccountInputTotal(year)
+            }
+            if (type == g.softwareInvestment) {
+                x.total.output = startBalance;
             }
             xx.Add(x);
         }
@@ -1686,6 +1692,8 @@ public class Account : System.Web.Services.WebService {
                                 , _sql, s.Data().startBalance.date, g.repayment, g.userRepayment, g.monthlyFee, g.userPayment, g.interest);
         } else if (type == g.correction) {
             sql = string.Format("{0} AND a.recordType = '{1}'", _sql, g.amortization);
+        } else if (type == g.softwareInvestment) {
+            sql = string.Format("{0} AND a.recordType = '{1}'", _sql, g.softwareInvestment);
         } else {
             sql = _sql;
         }
