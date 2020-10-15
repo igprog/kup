@@ -50,6 +50,8 @@
                         <div ng-if="d.loan.user.restToRepayment>0" class="form-group">
                             <input ng-model="d.loan.repaidOldDebt" type="checkbox" id="repaidOldDebt" ng-change="calculate(d.loan)" />
                             <label for="repaidOldDebt">Otplati stari dug ({{d.loan.user.restToRepayment | number:2}} kn):</label>
+                            <input ng-disabled="!d.loan.repaidOldDebt" ng-model="d.loan.restToRepayment" type="text" class="form-control" ng-change="calculate(d.loan)" allow-only-numbers>
+
                         </div>
                         <div class="form-group">
                             <label for="withdraw">Za isplatu:</label>

@@ -569,16 +569,22 @@ public class Account : System.Web.Services.WebService {
     [WebMethod]
     public string Delete(string id) {
         try {
-            string sql = string.Format("DELETE FROM Account WHERE id = '{0}'", id);
-            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(sql, connection)) {
-                    command.ExecuteReader();
+            string msg = null;
+            if (!string.IsNullOrEmpty(id)) {
+                string sql = string.Format("DELETE FROM Account WHERE id = '{0}'", id);
+                using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection)) {
+                        command.ExecuteReader();
+                    }
+                    connection.Close();
                 }
-                connection.Close();
+                msg = "Obrisano";
+            } else {
+                msg = "Greška";
             }
-            return JsonConvert.SerializeObject("Obrisano", Formatting.None);
-        }catch (Exception e) {
+            return JsonConvert.SerializeObject(msg, Formatting.None);
+        } catch (Exception e) {
             return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }

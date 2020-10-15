@@ -295,18 +295,24 @@ public class User : System.Web.Services.WebService {
     [WebMethod]
     public string Delete(string id) {
         try {
-            db.Users();
-            string sql = string.Format(@"DELETE FROM Users WHERE id = '{0}';
+            string msg = null;
+            if (!string.IsNullOrEmpty(id)) {
+                db.Users();
+                string sql = string.Format(@"DELETE FROM Users WHERE id = '{0}';
                         DELETE FROM Account WHERE userId = '{0}';
                         DELETE FROM Loan WHERE userId = '{0}';", id);
-            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(sql, connection)) {
-                    command.ExecuteNonQuery();
+                using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection)) {
+                        command.ExecuteNonQuery();
+                    }
+                    connection.Close();
                 }
-                connection.Close();
+                msg = "Korisnik izbrisan";
+            } else {
+                msg = "Korisnik ne može biti obrisan jer nije spremljen";
             }
-            return JsonConvert.SerializeObject("Korisnik izbrisan", Formatting.None);
+            return JsonConvert.SerializeObject(msg, Formatting.None);
         } catch (Exception e) {
             return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.None);
         }

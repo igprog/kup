@@ -33,7 +33,7 @@ public class BuisinessUnit : System.Web.Services.WebService {
         x.id = Guid.NewGuid().ToString();
         x.code = null;
         x.title = null;
-        return JsonConvert.SerializeObject(x, Formatting.Indented);
+        return JsonConvert.SerializeObject(x, Formatting.None);
     }
 
     [WebMethod]
@@ -58,9 +58,9 @@ public class BuisinessUnit : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
-            return JsonConvert.SerializeObject("Spremljeno", Formatting.Indented);
+            return JsonConvert.SerializeObject("Spremljeno", Formatting.None);
         } catch (Exception e) {
-            return JsonConvert.SerializeObject("Error: " + e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
 
@@ -87,26 +87,33 @@ public class BuisinessUnit : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
-            return JsonConvert.SerializeObject(xx, Formatting.Indented);
+            return JsonConvert.SerializeObject(xx, Formatting.None);
         }catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
 
     [WebMethod]
     public string Delete(string id) {
         try {
-            string sql = string.Format("DELETE FROM BuisinessUnit WHERE id = '{0}'", id);
-            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(sql, connection)) {
-                    command.ExecuteReader();
+            string msg = null;
+            if (!string.IsNullOrEmpty(id)) {
+                string sql = string.Format("DELETE FROM BuisinessUnit WHERE id = '{0}'", id);
+                using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection)) {
+                        command.ExecuteReader();
+                    }
+                    connection.Close();
                 }
-                connection.Close();
+                msg = "Obrisano";
+            } else {
+                msg = "Greška";
             }
-            return JsonConvert.SerializeObject("Obrisano", Formatting.Indented);
+
+            return JsonConvert.SerializeObject(msg, Formatting.None);
         }catch (Exception e) {
-            return JsonConvert.SerializeObject(e.Message, Formatting.Indented);
+            return JsonConvert.SerializeObject(e.Message, Formatting.None);
         }
     }
 

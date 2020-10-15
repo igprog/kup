@@ -180,7 +180,8 @@ angular.module('app', [])
 	        buisinessUnits: [],
 	        recordTypes: f.recordTypes(),
 	        total: null,
-	        recordslimit: $scope.config.recordslimit
+	        recordslimit: $scope.config.recordslimit,
+            showData: false  // for change fee tpl
 	    }
 	    f.post('BuisinessUnit', 'Load', {}).then((d) => {
 	        data.buisinessUnits = d;
@@ -231,6 +232,7 @@ angular.module('app', [])
         $scope.g.currTplTitle = title;
         if (f.defined(currTplType)) {   // ***** Only for recapitualtion and fee *****
             $scope.g.currTplType = currTplType;
+            $scope.g.showData = false;
         }
     }
 
@@ -666,7 +668,15 @@ angular.module('app', [])
                 $scope.d.loan.manipulativeCosts = 0;
             }
             if (x.repaidOldDebt) {
-                $scope.d.loan.withdraw = $scope.d.loan.loan - $scope.d.loan.user.restToRepayment - $scope.d.loan.manipulativeCosts;
+
+                //TODO:
+                debugger;
+                //$scope.d.loan.restToRepayment = angular.copy($scope.d.loan.user.restToRepayment);
+
+
+                //$scope.d.loan.withdraw = $scope.d.loan.loan - $scope.d.loan.user.restToRepayment - $scope.d.loan.manipulativeCosts;
+                $scope.d.loan.withdraw = $scope.d.loan.loan - $scope.d.loan.restToRepayment - $scope.d.loan.manipulativeCosts;
+
             } else {
                 $scope.d.loan.withdraw = $scope.d.loan.loan - $scope.d.loan.manipulativeCosts;
             }
@@ -685,12 +695,15 @@ angular.module('app', [])
             alert('Odaberite korisnika!');
             return false;
         }
-         if (parseInt(x.loan) <= 0 || parseInt(x.repayment) <= 0 || parseInt(x.withdraw) <= 0 || parseInt(x.dedline) <= 0) {
+        if (parseInt(x.loan) <= 0 || parseInt(x.repayment) <= 0 || parseInt(x.withdraw) <= 0 || parseInt(x.dedline) <= 0) {
 			alert('Neisprava unos!');
             return false;
         }
         if (!f.isValidDate(x.loanDate)) {
             alert('Neispravan datum!');
+            return false;
+        } if (x.restToRepayment > x.user.restToRepayment) {
+            alert('Otplata starog duga ne može biti veća od ' + x.user.restToRepayment + ' kn');
             return false;
         } else {
             return true;
@@ -703,7 +716,8 @@ angular.module('app', [])
             $scope.d.loan.loanDate = new Date($scope.d.loan.loanDate);
             return false;
         }
-        x.loan.restToRepayment = x.loan.user.restToRepayment;
+        debugger;
+        //x.loan.restToRepayment = x.loan.user.restToRepayment;
         f.post(service, 'Save', { x: x.loan }).then((d) => {
             $scope.d.loan = d;
             $scope.d.loan.loanDate = new Date($scope.d.loan.loanDate);
@@ -729,6 +743,8 @@ angular.module('app', [])
                 $scope.d.loan.loanDate = new Date();
                 f.post('User', 'Get', { id: id, year: null }).then((d) => {
                     $scope.d.loan.user = d;
+                    debugger;
+                    $scope.d.loan.restToRepayment = angular.copy($scope.d.loan.user.restToRepayment);
                 });
             });
         }
@@ -1275,6 +1291,7 @@ angular.module('app', [])
                 $scope.d.records.data[key].month = parseInt(value.month);
             });
             $scope.d.loading = false;
+            $scope.g.showData = true;
         });
     }
 
@@ -1361,6 +1378,7 @@ angular.module('app', [])
         f.post(service, method, { year: x.year, type: x.type }).then((d) => {
             $scope.d.records = d;
             $scope.d.loading = false;
+            $scope.g.showData = true;
         });
     }
 
