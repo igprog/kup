@@ -1414,44 +1414,6 @@ public class Account : System.Web.Services.WebService {
         return x;
     }
 
-    //private string GetAccountNo(string type) {
-    //    string x = null;
-    //    if (type == g.giroaccount) {
-    //        x = s.Data().account.giroAccount;
-    //    }
-    //    if (type == g.loan) {
-    //        x = s.Data().account.loan;
-    //    }
-    //    if (type == g.monthlyFee) {
-    //        x = s.Data().account.monthlyFee;
-    //    }
-    //    if (type == g.manipulativeCosts) {
-    //        x = s.Data().account.manipulativeCosts;
-    //    }
-    //    if (type == g.bankFee) {
-    //        x = s.Data().account.bankFee;
-    //    }
-    //    if (type == g.interest) {
-    //        x = s.Data().account.interest;
-    //    }
-    //    if (type == g.otherFee) {
-    //        x = s.Data().account.otherFee;
-    //    }
-    //    if (type == g.income) {
-    //        x = s.Data().account.income;
-    //    }
-    //    if (type == g.expense) {
-    //        x = s.Data().account.expense;
-    //    }
-    //    if (type == g.incomeExpenseDiff) {
-    //        x = s.Data().account.incomeExpenseDiff;
-    //    }
-    //    if (type == g.amortization) {
-    //        x = s.Data().account.amortization;
-    //    }
-    //    return x;
-    //}
-
     private List<RecapMonthlyTotal> GetRecapMonthleyTotal(List<Recapitulation> data, string type, int year) {
         string inputType = null, outputType = null;
         double startBalance = 0;

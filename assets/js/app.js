@@ -668,15 +668,7 @@ angular.module('app', [])
                 $scope.d.loan.manipulativeCosts = 0;
             }
             if (x.repaidOldDebt) {
-
-                //TODO:
-                debugger;
-                //$scope.d.loan.restToRepayment = angular.copy($scope.d.loan.user.restToRepayment);
-
-
-                //$scope.d.loan.withdraw = $scope.d.loan.loan - $scope.d.loan.user.restToRepayment - $scope.d.loan.manipulativeCosts;
                 $scope.d.loan.withdraw = $scope.d.loan.loan - $scope.d.loan.restToRepayment - $scope.d.loan.manipulativeCosts;
-
             } else {
                 $scope.d.loan.withdraw = $scope.d.loan.loan - $scope.d.loan.manipulativeCosts;
             }
@@ -716,8 +708,6 @@ angular.module('app', [])
             $scope.d.loan.loanDate = new Date($scope.d.loan.loanDate);
             return false;
         }
-        debugger;
-        //x.loan.restToRepayment = x.loan.user.restToRepayment;
         f.post(service, 'Save', { x: x.loan }).then((d) => {
             $scope.d.loan = d;
             $scope.d.loan.loanDate = new Date($scope.d.loan.loanDate);
@@ -743,7 +733,6 @@ angular.module('app', [])
                 $scope.d.loan.loanDate = new Date();
                 f.post('User', 'Get', { id: id, year: null }).then((d) => {
                     $scope.d.loan.user = d;
-                    debugger;
                     $scope.d.loan.restToRepayment = angular.copy($scope.d.loan.user.restToRepayment);
                 });
             });

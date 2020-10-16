@@ -242,7 +242,6 @@ public class Loan : System.Web.Services.WebService {
         x.id = reader.GetValue(0) == DBNull.Value ? null : reader.GetString(0);
         x.user = new User.NewUser();
         x.user.id = reader.GetValue(1) == DBNull.Value ? null : reader.GetString(1);
-
         x.user = U.GetUserData(x.user.id, null);
         x.loan = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
         x.loanDate = reader.GetValue(3) == DBNull.Value ? null : reader.GetString(3);
