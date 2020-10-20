@@ -1060,6 +1060,7 @@ angular.module('app', [])
             $scope.d.records.data[idx].restToRepayment = d.restToRepayment;
             $scope.d.disabled = false;
         });
+        getMonthlyRecords(d);
     }
 
     $scope.add = (x, idx) => {
@@ -1083,15 +1084,17 @@ angular.module('app', [])
         y.year = d.year;
         y.recordDate = f.setDate(y.recordDate);
         f.post('Account', 'SaveUserPayment', { userId: x.user.id, y: y }).then((d) => {
-            getMonthlyRecords($scope.d);
+            //getMonthlyRecords(d);
         });
+        getMonthlyRecords(d);
     }
 
-    $scope.removeUserPayment = (y) => {
+    $scope.removeUserPayment = (y, d) => {
         if (confirm('Briši uplatu ' + y.amount + ' ' + $scope.config.currency + '?')) {
             f.post('Account', 'Delete', { id: y.id }).then((d) => {
-                getMonthlyRecords($scope.d);
+                //getMonthlyRecords($scope.d);
             });
+            getMonthlyRecords(d);
         }
     }
 

@@ -1838,7 +1838,9 @@ public class Account : System.Web.Services.WebService {
                 loan = GetLoanAmount(x.loanId);
             }
 
-            x.restToRepayment = loan - Repaid(x);
+            //x.restToRepayment = loan - Repaid(x);
+            User U = new User();
+            x.restToRepayment = U.GetLoanAmount(x.user.id) - U.GetAmount(x.user.id, g.repayment) - U.GetAmount(x.user.id, g.userRepayment) - U.GetAmount(x.user.id, g.terminationRepayment) - U.GetAmount(x.user.id, g.loan);
             SetLoanIsRepaid(x);
 
             return x;
@@ -1978,6 +1980,7 @@ public class Account : System.Web.Services.WebService {
     }
 
     public NewAccount CheckLoan(NewAccount x, string userId) {
+        User U = new User();
         string sql = string.Format(@"
                     SELECT l.id, l.loan, l.repayment FROM Loan l
                     WHERE l.userId = '{0}' AND (CAST(l.loanDate AS datetime) <= CAST('{1}-{2}-{3}' AS datetime)) {4} AND l.isRepaid = 0"
@@ -1995,7 +1998,8 @@ public class Account : System.Web.Services.WebService {
                         x.loan = reader.GetValue(1) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(1));
                         x.repayment = reader.GetValue(2) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetString(2));
                         x.repaid = Repaid(x);
-                        x.restToRepayment = x.loan - x.repaid;
+                        //x.restToRepayment = x.loan - x.repaid;
+                        x.restToRepayment = U.GetLoanAmount(userId) - U.GetAmount(userId, g.repayment) - U.GetAmount(userId, g.userRepayment) - U.GetAmount(userId, g.terminationRepayment) - U.GetAmount(userId, g.loan);
                         if (x.restToRepayment > 0 && x.restToRepayment < x.repayment && x.repayment > 0) {
                             x.repayment = x.restToRepayment;
                         }

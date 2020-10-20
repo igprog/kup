@@ -83,7 +83,7 @@
                                     <label>Napomena:</label>
                                     <input ng-model="y.note" class="form-control mb-2" maxlength="50" />
                                     <div class="pt-2 text-right">
-                                        <button ng-if="y.id!==null" class="btn btn-outline-danger" ng-click="removeUserPayment(y)" title="Briši"><i class="fas fa-trash-alt"></i> Briši</button>
+                                        <button ng-if="y.id!==null" class="btn btn-outline-danger" ng-click="removeUserPayment(y, d)" title="Briši"><i class="fas fa-trash-alt"></i> Briši</button>
                                         <button class="btn btn-outline-secondary" ng-click="saveUserPayment(x, y, d, $index)" title="Spremi"><i class="fas fa-save"></i> Spremi</button>
                                     </div>
                                 </div>
