@@ -746,8 +746,35 @@ public class Account : System.Web.Services.WebService {
     private List<Recapitulation> PrepareEntryData_PS(int year) {
         List<Recapitulation> xx = new List<Recapitulation>();
         Recapitulation x = new Recapitulation();
+
+        //x.note = "Ispravak vrijednosti";
+        double val = GetStartBalance(year, g.correction);
+        if (val > 0) {
+            x.input = val;
+        } else {
+            x.output = Math.Abs(val);
+        }
+        x.account = GetAccount(g.correction);
+        x.note = x.account.title;
+        xx.Add(x);
+
+        if (val > 0) {
+            x = new Recapitulation();
+            //x.note = "Ulaganje u rac programe";
+            val = GetStartBalance(year, g.softwareInvestment);
+            if (val > 0) {
+                x.output = val;
+            } else {
+                x.output = Math.Abs(val);
+            }
+            x.account = GetAccount(g.softwareInvestment);
+            x.note = x.account.title;
+            xx.Add(x);
+        }
+
+        x = new Recapitulation();
         //x.note = "Žiro račun";
-        double val = GetStartBalance(year, g.giroaccount);
+        val = GetStartBalance(year, g.giroaccount);
         if (val > 0) {
             x.output = val;
         } else {
@@ -1043,9 +1070,13 @@ public class Account : System.Web.Services.WebService {
                     x.month = "12";
                     x.total = new Recapitulation();
                     x.total.date = "31.12";
-                    x.total.note = string.Format("Donos viška prihoda za {0} g.", year);
                     if (balance > 0) {
+                        x.total.note = string.Format("Donos viška prihoda za {0} g.", year);
                         x.total.input = balance;
+                    }
+                    if (balance < 0) {
+                        x.total.note = string.Format("Donos razlike prihoda i rashoda za {0} g.", year);
+                        x.total.output = Math.Abs(balance);
                     }
                     //x.total.output = balance;
                     //x.total.input = LoadBalanceSql(year, type);
@@ -1058,7 +1089,7 @@ public class Account : System.Web.Services.WebService {
                 x.total.date = "31.12";
                 x.total.note = "Donos rashoda";
                 if (balance < 0) {
-                    x.total.output = balance;
+                    x.total.output = Math.Abs(balance);
                 }
                 xx.data.Add(x);
 
@@ -1069,7 +1100,7 @@ public class Account : System.Web.Services.WebService {
                     x.total.date = "31.12";
                     x.total.note = string.Format("Zatvaranje kartice i prijenos na {0}", s.Data().account.income.code);  // (konto 9320)
                     if (balance < 0) {
-                        x.total.input = balance;
+                        x.total.input = Math.Abs(balance);
                     }
                     xx.data.Add(x);
                 }
@@ -1411,6 +1442,9 @@ public class Account : System.Web.Services.WebService {
         if (type == g.correction) {
             x = s.Data().account.correction;
         }
+        if (type == g.softwareInvestment) {
+            x = s.Data().account.softwareInvestment;
+        }
         return x;
     }
 
@@ -1648,7 +1682,7 @@ public class Account : System.Web.Services.WebService {
         string sql = null;
         string _sql = string.Format(@"SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a WHERE a.yr < {0}", year);
         if (type == g.monthlyFee) {
-            sql = string.Format("{0} AND a.recordType = '{1}' OR a.recordType = '{2}'", _sql, type, g.userPayment);
+            sql = string.Format("{0} AND (a.recordType = '{1}' OR a.recordType = '{2}')", _sql, type, g.userPayment);
         } else if (type == g.income) {
             sql = string.Format("{0} AND (a.recordType = '{1}' OR a.recordType = '{2}')", _sql, g.interest, g.manipulativeCosts);
         } else if (type == g.expense) {
@@ -1694,10 +1728,27 @@ public class Account : System.Web.Services.WebService {
                 }
                 connection.Close();
             }
+
+            double terminationRepayment = 0;
+            using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+                connection.Open();
+                sql = string.Format("{0} AND a.recordType = '{1}'", _sql, g.terminationRepayment);
+                using (SqlCommand command = new SqlCommand(sql, connection)) {
+                    using (SqlDataReader reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            terminationRepayment = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                        }
+                    }
+                }
+                connection.Close();
+            }
+
+
             if (year.ToString() == g.GetYear(s.Data().startBalance.date)) {
                 x = 0;  // samo pocetna godina (2019)
             } else {
-                x = x - terminationWithdraw;
+                //x = x - terminationWithdraw;
+                x = x - terminationWithdraw - terminationRepayment;
             }
             //x = x - terminationWithdraw;
         } else if (type == g.giroaccount) {
@@ -2206,12 +2257,21 @@ public class Account : System.Web.Services.WebService {
         double startLoan = 0; // ukupno pozajmica na dan 30.09.2019 
         string sql = string.Format(@"
                     SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
-                    {0} (a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}') AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{4}-01-01' AS datetime))"
+                    {0} (a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}' OR a.recordType = '{4}') AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{5}-01-01' AS datetime))"
                        , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE a.userId = '{0}' AND", userId)
                        , g.repayment
                        , g.userRepayment
                        , g.loan
+                       , g.terminationRepayment
                        , year);
+        //string sql = string.Format(@"
+        //            SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
+        //            {0} (a.recordType = '{1}' OR a.recordType = '{2}' OR a.recordType = '{3}') AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{4}-01-01' AS datetime))"
+        //               , string.IsNullOrEmpty(userId) ? "WHERE" : string.Format("WHERE a.userId = '{0}' AND", userId)
+        //               , g.repayment
+        //               , g.userRepayment
+        //               , g.loan
+        //               , year);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
