@@ -49,7 +49,7 @@
                         <th class="text-right">Ukupno ({{config.currency}})</th>
                     </tr>
                 </thead>
-                <tbody ng-hide="d.buisinessUnitCode==null || d.buisinessUnitCode==''">
+                <tbody>
                     <tr ng-repeat="x in d.records.data track by $index" class="{{x.changed ? 'font-weight-bold' : ''}}">
                         <td><span ng-show="x.changed">* </span>{{x.user.id}}</td>
                         <td>{{x.user.lastName}} {{x.user.firstName}}</td>

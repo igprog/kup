@@ -881,27 +881,25 @@ _____________
             table = new PdfPTable(5);
             table.WidthPercentage = 100f;
             table.SetWidths(new float[] { 1f, 2f, 1f, 1f, 1f });
-            if (!string.IsNullOrEmpty(buisinessUnitCode)) {
-                foreach (Account.NewAccount x in records.data) {
-                    PdfPCell cell1 = new PdfPCell(new Phrase(string.Format("{0} {1}", x.totalObligation != x.lastMonthObligation ? "*" : "", x.user.id), GetFont(x.totalObligation != x.lastMonthObligation ? true : false)));
-                    cell1.Border = 0;
-                    table.AddCell(cell1);
-                    PdfPCell cell2 = new PdfPCell(new Phrase(string.Format("{0} {1}", x.user.lastName, x.user.firstName), GetFont(x.totalObligation != x.lastMonthObligation ? true : false)));
-                    cell2.Border = 0;
-                    table.AddCell(cell2);
-                    PdfPCell cell3 = new PdfPCell(new Phrase(string.Format("{0:N}", x.monthlyFee), GetFont(x.totalObligation != x.lastMonthObligation ? true : false))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
-                    cell3.Border = 0;
-                    table.AddCell(cell3);
-                    PdfPCell cell4 = new PdfPCell(new Phrase(string.Format("{0:N}", x.currRepayment), GetFont(x.totalObligation != x.lastMonthObligation ? true : false))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
-                    cell4.Border = 0;
-                    table.AddCell(cell4);
-                    PdfPCell cell5 = new PdfPCell(new Phrase(string.Format("{0:N}", x.totalObligation), GetFont(x.totalObligation != x.lastMonthObligation ? true : false))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
-                    cell5.Border = 0;
-                    table.AddCell(cell5);
-                }
-                doc.Add(table);
+            foreach (Account.NewAccount x in records.data) {
+                PdfPCell cell1 = new PdfPCell(new Phrase(string.Format("{0} {1}", x.totalObligation != x.lastMonthObligation ? "*" : "", x.user.id), GetFont(x.totalObligation != x.lastMonthObligation ? true : false)));
+                cell1.Border = 0;
+                table.AddCell(cell1);
+                PdfPCell cell2 = new PdfPCell(new Phrase(string.Format("{0} {1}", x.user.lastName, x.user.firstName), GetFont(x.totalObligation != x.lastMonthObligation ? true : false)));
+                cell2.Border = 0;
+                table.AddCell(cell2);
+                PdfPCell cell3 = new PdfPCell(new Phrase(string.Format("{0:N}", x.monthlyFee), GetFont(x.totalObligation != x.lastMonthObligation ? true : false))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell3.Border = 0;
+                table.AddCell(cell3);
+                PdfPCell cell4 = new PdfPCell(new Phrase(string.Format("{0:N}", x.currRepayment), GetFont(x.totalObligation != x.lastMonthObligation ? true : false))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell4.Border = 0;
+                table.AddCell(cell4);
+                PdfPCell cell5 = new PdfPCell(new Phrase(string.Format("{0:N}", x.totalObligation), GetFont(x.totalObligation != x.lastMonthObligation ? true : false))) { Padding = 2, HorizontalAlignment = PdfPCell.ALIGN_RIGHT };
+                cell5.Border = 0;
+                table.AddCell(cell5);
             }
-            
+            doc.Add(table);
+
             table = new PdfPTable(5);
             table.WidthPercentage = 100f;
             table.SetWidths(new float[] { 1f, 2f, 1f, 1f, 1f });
