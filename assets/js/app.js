@@ -214,6 +214,7 @@ angular.module('app', [])
                 $scope.g.currTplTitle = $scope.config.apptitle;
             } else {
                 $scope.g.currTpl = f.currTpl('login');
+                alert('Pogrešno korisničko ime i lozinka');
             }
             $scope.d.isLogin = d;
             sessionStorage.setItem('islogin', d);
@@ -912,7 +913,6 @@ angular.module('app', [])
         if (x.month == null) { x.month = $scope.g.month; }
         if (x.year == null) { x.year = $scope.g.year; }
         $scope.d.loading = true;
-        $scope.d.limit = $scope.g.recordslimit;
         f.post(service, 'GetMonthlyFee', { month: x.month, year: x.year, buisinessUnitCode: x.buisinessUnitCode, search: x.search }).then((d) => {
             $scope.d.records = d;
             angular.forEach(d.data, function (value1, key1) {
@@ -939,8 +939,9 @@ angular.module('app', [])
         }
         x.month = d.month;
         x.year = d.year;
+        $scope.d.limit = d.limit;
         f.post('Account', 'SaveMonthlyFee', { x: x }).then((d) => {
-            getMonthlyRecords($scope.d);
+            //getMonthlyRecords($scope.d);
             $scope.d.disabled = false;
         });
     }
