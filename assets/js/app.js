@@ -214,7 +214,7 @@ angular.module('app', [])
                 $scope.g.currTplTitle = $scope.config.apptitle;
             } else {
                 $scope.g.currTpl = f.currTpl('login');
-                alert('Pogrešno korisničko ime i lozinka');
+                alert('Pogrešno korisničko ime i lozinka. Kontaktirajte administratora.');
             }
             $scope.d.isLogin = d;
             sessionStorage.setItem('islogin', d);
@@ -1332,7 +1332,7 @@ angular.module('app', [])
     loadCapitalAssets();
 
     $scope.getAmortization = (x) => {
-        f.post(service, 'GetAmortization', { id: x.loanId }).then((d) => {
+        f.post(service, 'GetAmortization', { data: x }).then((d) => {
             x.amortization = d;
         });
     }

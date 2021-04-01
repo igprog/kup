@@ -307,7 +307,7 @@ public class Account : System.Web.Services.WebService {
                 x.amortization = new Amortization();
                 x.amortization.perc = s.Data().capitalAssets.Where(a => a.recordType == g.softwareInvestment).FirstOrDefault().amortization;
                 x.amortization.amount = GetAmortizationAmount(x.loanId, x.amortization.perc);
-                x.amortization.amortized = GetAmortizedAmount(x.loanId);
+                x.amortization.amortized = GetAmortizedAmount(x);
                 x.amortization.capitalAssetsAmount = GetCapitalAssetsAmount(x.loanId);
                 if (x.amortization.amortized >= x.amortization.capitalAssetsAmount) {
                     x.amortization.amount = 0;
@@ -318,13 +318,13 @@ public class Account : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    public string GetAmortization(string id) {
+    public string GetAmortization(NewAccount data) {
         try {
             Amortization x = new Amortization();
             x.perc = s.Data().capitalAssets.Where(a => a.recordType == g.softwareInvestment).FirstOrDefault().amortization;
-            x.amount = GetAmortizationAmount(id, x.perc);
-            x.amortized = GetAmortizedAmount(id);
-            x.capitalAssetsAmount = GetCapitalAssetsAmount(id);
+            x.amount = GetAmortizationAmount(data.loanId, x.perc);
+            x.amortized = GetAmortizedAmount(data);
+            x.capitalAssetsAmount = GetCapitalAssetsAmount(data.loanId);
             if (x.amortized >= x.capitalAssetsAmount) {
                 x.amount = 0;
             }
@@ -352,21 +352,25 @@ public class Account : System.Web.Services.WebService {
         return x;
     }
 
-    private double GetAmortizedAmount(string capitalAssetId) {
-        double x = 0;
-        string sql = string.Format(@"SELECT SUM(CAST(amount AS DECIMAL(10,2))) FROM Account WHERE loanId = '{0}'", capitalAssetId);
+    private double GetAmortizedAmount(NewAccount x) {
+        double result = 0;
+        string sql = string.Format(@"SELECT SUM(CAST(amount AS DECIMAL(10,2))) FROM Account WHERE loanId = '{0}' {1}"
+                    , x.loanId
+                    , !string.IsNullOrWhiteSpace(x.id) 
+                                ? string.Format("AND (CAST(CONCAT(yr, '-', mo, '-', '01') AS datetime) < CAST('{0}' AS datetime))", g.SetDate(g.GetLastDayInMonth(x.year, Convert.ToInt32(x.month)), Convert.ToInt32(x.month), x.year))
+                                : null);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
-                using (SqlDataReader reader = command.ExecuteReader())  {
+                using (SqlDataReader reader = command.ExecuteReader()) {
                     while (reader.Read()) {
-                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                        result = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
                     }
                 }
             }
             connection.Close();
         }
-        return x;
+        return result;
     }
 
     private double GetCapitalAssetsAmount(string capitalAssetId) {
