@@ -377,7 +377,7 @@ public class User : System.Web.Services.WebService {
         db.Users();
         string sql = string.Format(@"{0}
                         LEFT OUTER JOIN Loan l on u.id = l.userId
-                        {1} {2} {3}"
+                        {1} {2} {3} ORDER BY u.lastName ASC"
                 , sqlString
                 , !string.IsNullOrEmpty(buisinessUnitCode) || !string.IsNullOrEmpty(search) ? "WHERE" : ""
                 , !string.IsNullOrEmpty(buisinessUnitCode) ? string.Format("u.buisinessUnitCode = '{0}'", buisinessUnitCode) : ""
