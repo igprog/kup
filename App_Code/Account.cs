@@ -2231,7 +2231,8 @@ public class Account : System.Web.Services.WebService {
             }
             connection.Close();
         }
-        x = x - GetTerminationWithdraw(userId, year);
+        x = x - GetTerminationWithdraw(userId, year) - GetTerminationRepayment(userId, year);
+        // x = x - GetTerminationWithdraw(userId, year);
         return x;
     }
 
@@ -2240,6 +2241,25 @@ public class Account : System.Web.Services.WebService {
         string sql = string.Format(@"SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
                                     WHERE a.userId = '{0}' AND a.recordType = '{1}' AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{2}-01-01' AS datetime))"
                                    , userId, g.terminationWithdraw, year);
+        using (SqlConnection connection = new SqlConnection(g.connectionString)) {
+            connection.Open();
+            using (SqlCommand command = new SqlCommand(sql, connection)) {
+                using (SqlDataReader reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        x = reader.GetValue(0) == DBNull.Value ? 0 : Convert.ToDouble(reader.GetDecimal(0));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        return x;
+    }
+
+    private double GetTerminationRepayment(string userId, int? year) {
+        double x = 0;
+        string sql = string.Format(@"SELECT SUM(CAST(a.amount AS DECIMAL(10,2))) FROM Account a
+                                    WHERE a.userId = '{0}' AND a.recordType = '{1}' AND (CAST(CONCAT(a.yr, '-', a.mo, '-', '01') AS datetime) < CAST('{2}-01-01' AS datetime))"
+                                   , userId, g.terminationRepayment, year);
         using (SqlConnection connection = new SqlConnection(g.connectionString)) {
             connection.Open();
             using (SqlCommand command = new SqlCommand(sql, connection)) {
